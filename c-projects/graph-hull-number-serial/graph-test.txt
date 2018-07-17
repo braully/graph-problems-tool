@@ -1,0 +1,6 @@
+#Graph in format CSR
+#first line not comment is the R array, and second line is C array.
+#elements separated for blank space
+#see example de csr graph in https://devblogs.nvidia.com/parallelforall/accelerating-graph-betweenness-centrality-cuda/
+0 3 5 8 12 16 20 24 27 28
+1 2 3 0 2 0 1 3 0 2 4 5 3 5 7 6 3 4 6 7 4 5 8 7 4 5 6 6

@@ -1,0 +1,6 @@
+Main
+Processing: 40 graphs 48v/g 
+Time for the kernel(one graph by thread): 600215 ms
+Time for the kernel(one graph by block): 7038 ms
+Time for Vt/Thread kernel(one graph by kernel): 3158 ms
+Time for the serial: 6667 ms
