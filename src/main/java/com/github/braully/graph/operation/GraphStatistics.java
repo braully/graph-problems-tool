@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 public class GraphStatistics implements IGraphOperation {
     
-    static final String type = "Graph Class";
+    static final String type = "General";
     static final String description = "Statistics";
     
     private static final Logger log = Logger.getLogger(GraphWS.class);

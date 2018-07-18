@@ -5,6 +5,7 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 
 import static com.github.braully.graph.generator.GraphGeneratorCompleteBipartite.P_VERTICES;
 import static com.github.braully.graph.generator.GraphGeneratorKP.K_VERTICES;
+import java.math.BigInteger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,9 +21,8 @@ public class GraphNKIndexedGenerator extends AbstractGraphGenerator {
 
     static final String N_VERTICES = "N,M,Index";
     static final String[] parameters = {K_VERTICES};
-    static final String description = "N,M-Indexed";
+    static final String description = "NM-Indexed";
     static final Integer DEFAULT_NVERTICES = 5;
-
 
     @Override
     public String[] getParameters() {
@@ -42,9 +42,9 @@ public class GraphNKIndexedGenerator extends AbstractGraphGenerator {
         try {
             String[] split = nmindexcode.split(",");
 
-            Integer nvertices = Integer.parseInt(split[0]);
-            Integer pvertices = Integer.parseInt(split[1]);
-            Long nkindex = Long.parseLong(split[2]);
+            Integer nvertices = Integer.parseInt(split[0].replaceAll("\\D", ""));
+            Integer pvertices = Integer.parseInt(split[1].replaceAll("\\D", ""));
+            BigInteger nkindex = new BigInteger(split[2].replaceAll("\\D", ""));
 
             graph = new UndirectedSparseGraphTO<>();
             String name = "N" + nvertices + ",M" + pvertices + "-Indexed" + nkindex;

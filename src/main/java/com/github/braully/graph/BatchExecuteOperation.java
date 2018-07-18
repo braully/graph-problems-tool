@@ -5,12 +5,8 @@
  */
 package com.github.braully.graph;
 
-import com.github.braully.graph.operation.GraphCalcCaratheodoryNumberBinaryStrategy;
-import com.github.braully.graph.operation.GraphCaratheodoryBFSErika;
-import com.github.braully.graph.operation.GraphCaratheodoryHeuristic;
+import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
 import com.github.braully.graph.operation.GraphCaratheodoryHeuristicHybrid;
-import com.github.braully.graph.operation.GraphCaratheodoryHeuristicV2;
-import com.github.braully.graph.operation.GraphCaratheodoryHeuristicV3;
 import com.github.braully.graph.operation.GraphHullNumber;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -49,19 +45,15 @@ public class BatchExecuteOperation implements IBatchExecute {
     static boolean verbose = true;
 
     static final IGraphOperation[] operations = new IGraphOperation[]{
-        new GraphCalcCaratheodoryNumberBinaryStrategy(),
-        new GraphCaratheodoryHeuristic(),
-        new GraphCaratheodoryHeuristicV2(),
-        new GraphCaratheodoryHeuristicV3(),
+        new GraphCaratheodoryNumberBinary(),
         new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumber(),
-        new GraphHullNumberHeuristicV1(),
-        new GraphCaratheodoryBFSErika()
+        new GraphHullNumberHeuristicV1()
     };
 
     @Override
     public String getDefaultInput() {
-        return "/home/strike/Documentos/grafos-processamento/Critical_H-free/critical";
+        return "/tmp/graphs/mtfs";
     }
 
     public static void main(String... args) {
@@ -75,10 +67,7 @@ public class BatchExecuteOperation implements IBatchExecute {
     }
 
     void processMain(String... args) {
-        GraphCaratheodoryHeuristic.verbose = false;
-
         Options options = new Options();
-
         OptionGroup exec = new OptionGroup();
         exec.setRequired(false);
         IGraphOperation[] opers = getOperations();
@@ -108,8 +97,6 @@ public class BatchExecuteOperation implements IBatchExecute {
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
 
-        //        input.setRequired(true);
-        //        exec.setRequired(true);
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
@@ -148,9 +135,6 @@ public class BatchExecuteOperation implements IBatchExecute {
 
         if (operationsToExecute.isEmpty()) {
             operationsToExecute.add(opers[0]);
-//            formatter.printHelp("BatchExecuteOperation", options);
-//            System.exit(1);
-//            return;
         }
         File dir = new File(inputFilePath);
         if (dir.isDirectory()) {
@@ -475,7 +459,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         }
         return ret;
     }
-    
+
     static List<File> sortFileArrayBySize(File[] files) {
         List<File> fileList = new ArrayList<>(Arrays.asList(files));
         Collections.sort(fileList, new Comparator<File>() {

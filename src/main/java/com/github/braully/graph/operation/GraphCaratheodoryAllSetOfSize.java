@@ -12,11 +12,11 @@ import org.apache.log4j.Logger;
  *
  * @author Braully Rocha da Silva
  */
-public class GraphAllCaratheodoryExistsSetOfSize extends GraphCalcCaratheodoryNumberBinaryStrategy {
+public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary {
 
-    static final Logger log = Logger.getLogger(GraphAllCaratheodoryExistsSetOfSize.class);
+    static final Logger log = Logger.getLogger(GraphCaratheodoryAllSetOfSize.class);
     static final String type = "P3-Convexity";
-    static final String description = "All Caratheodory Set of Size  (Java)";
+    static final String description = "Caratheodory All Sets of Size";
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Map<String, Object> result = new HashMap<>();

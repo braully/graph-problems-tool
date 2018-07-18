@@ -7,10 +7,9 @@ package com.github.braully.graph.hn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import com.github.braully.graph.operation.GraphCaratheodoryHeuristic;
+import com.github.braully.graph.operation.GraphCaratheodoryHeuristicHybrid;
 import java.util.HashSet;
 import java.util.Set;
-import static junit.framework.Assert.assertNotNull;
 import junit.framework.TestCase;
 
 /**
@@ -34,7 +33,7 @@ public class GraphOperationsTest extends TestCase {
     }
 
     public void testConverterFronJson() {
-        GraphCaratheodoryHeuristic heuristic = new GraphCaratheodoryHeuristic();
+        GraphCaratheodoryHeuristicHybrid heuristic = new GraphCaratheodoryHeuristicHybrid();
 
         Set<Integer> s = new HashSet<>();
         Set<Integer> hs = new HashSet<>();
@@ -89,10 +88,6 @@ public class GraphOperationsTest extends TestCase {
         }
         System.out.println("}");
 
-//        System.out.println("Adding vertice " + nv0 + " to S");
-//        heuristic.addVertToS(nv0, s, hs, partial, graph, aux);
-//        System.out.println("Adding vertice " + nv1 + " to S");
-//        heuristic.addVertToS(nv1, s, hs, partial, graph, aux);
         System.out.println("Add " + vp);
         heuristic.addVertToS(vp, s, graph, aux);
         System.out.print("Aux = {");
@@ -100,7 +95,5 @@ public class GraphOperationsTest extends TestCase {
             System.out.printf("%2d | ", aux[i]);
         }
         System.out.println("}");
-
-//        heuristic.printSituation(graph.getVertexCount(), partial, hs, s, aux);
     }
 }

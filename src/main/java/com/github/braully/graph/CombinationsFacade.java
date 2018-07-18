@@ -24,6 +24,20 @@ public class CombinationsFacade {
         return comb;
     }
 
+    public static synchronized int[] getCombinationNKByLexicographIndex(int n, int k, BigInteger index) {
+        int[] comb = null;
+        if (n <= 0 || k <= 0 || index.compareTo(BigInteger.ZERO) < 0) {
+            return comb;
+        }
+        BigInteger maxCombinations = CombinationsFacade.maxCombinationsBig(n, k);
+        if (index.compareTo(maxCombinations) == 1) { // index > combination
+            return comb;
+        }
+        comb = new int[k];
+        CombinationsFacade.initialCombination(n, k, comb, index);
+        return comb;
+    }
+
     public static synchronized long lexicographicIndex(int n, int k, int[] combination) {
         long index = 0;
         int j = 0;
@@ -78,6 +92,23 @@ public class CombinationsFacade {
         return ans;
     }
 
+    public static synchronized BigInteger lexicographicIndexBig(int n, int k, int[] combination) {
+        BigInteger index = BigInteger.ZERO;
+        int j = 0;
+        for (int i = 0; i < k; ++i) {
+            for (++j; j != combination[i] + 1; ++j) {
+                int nj = n - j;
+                int kj = k - i - 1;
+                BigInteger maxComb = maxCombinationsBig(nj, kj);
+                index = index.add(maxComb);
+                if (maxComb.equals(BigInteger.ZERO)) {
+                    index = index.add(BigInteger.ONE);
+                }
+            }
+        }
+        return index;
+    }
+
     public static synchronized BigInteger maxCombinationsBig(int n, int k) {
         if (n == 0 || k == 0) {
             return BigInteger.ZERO;
@@ -108,6 +139,25 @@ public class CombinationsFacade {
             ansbig = ansbig.divide(bigi);
         }
         return ansbig;
+    }
+
+    public static synchronized void initialCombination(int n, int k, int[] combinationArray, BigInteger idx) {
+        int a = n;
+        int b = k;
+        BigInteger x = (maxCombinationsBig(n, k).subtract(BigInteger.ONE)).subtract(idx);
+        for (int i = 0; i < k; ++i) {
+            combinationArray[i] = a - 1;
+            while (maxCombinationsBig(combinationArray[i], b).compareTo(x) == 1) {
+                --combinationArray[i];
+            }
+            x = x.subtract(maxCombinationsBig(combinationArray[i], b));
+            a = combinationArray[i];
+            b = b - 1;
+        }
+
+        for (int i = 0; i < k; ++i) {
+            combinationArray[i] = (n - 1) - combinationArray[i];
+        }
     }
 
     public static synchronized void initialCombination(int n, int k, int[] combinationArray, long idx) {

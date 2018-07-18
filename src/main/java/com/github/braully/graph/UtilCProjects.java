@@ -1,6 +1,7 @@
 package com.github.braully.graph;
 
 import com.github.braully.graph.operation.IGraphOperation;
+import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -17,6 +18,7 @@ public class UtilCProjects {
     public static final String DEFAULT_C_SUPPROJECTS = "c-projects";
     public static final String DEFAULT_FILE_NAME_DESCRIPTOR = "Descriptor";
     public static final String DEFAULT_FILE_NAME_LAST_COMPILATION = "last-compilation.log";
+    private static final String OBS = "*";
 
     public static void main(String... args) {
         String comand = "";
@@ -125,7 +127,8 @@ public class UtilCProjects {
                         while (format != null && format.startsWith("#")) {
                             format = frConReader.readLine();
                         }
-                        if (binaryExec != null) {
+                        if (binaryExec != null && !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(operation) && !Strings.isNullOrEmpty(format)) {
+                            operation = OBS + operation;
                             operations.add(new CBInaryOperation(binaryExec.getAbsolutePath(), type, operation, format));
                         }
                     }

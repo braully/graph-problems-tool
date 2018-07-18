@@ -1,7 +1,7 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphAllCaratheodoryExistsSetOfSize.log;
+import static com.github.braully.graph.operation.GraphCaratheodoryAllSetOfSize.log;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 public class GraphCaratheodoryExpandSet implements IGraphOperation {
 
     static final String type = "P3-Convexity";
-    static final String description = "Expand Caratheodory Set";
+    static final String description = "Caratheodory Expand Set";
 
     public static final int NEIGHBOOR_COUNT_INCLUDED = 1;
     public static final int INCLUDED = 2;
@@ -32,9 +32,6 @@ public class GraphCaratheodoryExpandSet implements IGraphOperation {
             int countNCarat = 0;
             for (int size = set.size() + 1; size <= maxSizeSet; size++) {
                 Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graphRead.getVertexCount(), size);
-                if (GraphCaratheodoryHeuristic.verbose) {
-                    log.info("Verifying sets of size " + size);
-                }
                 // precisa de melhorias
                 while (combinationsIterator.hasNext()) {
                     int[] currentSet = combinationsIterator.next();
@@ -51,24 +48,13 @@ public class GraphCaratheodoryExpandSet implements IGraphOperation {
                         OperationConvexityGraphResult hsp3g = hsp3(graphRead, currentSet);
                         if (hsp3g != null) {
                             String key = "Caratheodory Superset-" + (countNCarat++);
-                            if (GraphCaratheodoryHeuristic.verbose) {
-                                log.info("Find " + key + ": " + hsp3g.caratheodorySet);
-                            }
                             result.put(key, hsp3g.caratheodorySet);
-                            if (GraphCaratheodoryHeuristic.verbose) {
-                                log.info("Try next size");
-                            }
                             result.put("Max Caratheodory Superset", hsp3g.caratheodorySet);
                             break;
                         }
                     }
                 }
             }
-            if (GraphCaratheodoryHeuristic.verbose) {
-                log.info("End");
-            }
-        } else if (GraphCaratheodoryHeuristic.verbose) {
-            log.info("Set size < 2 Or Null");
         }
         totalTimeMillis = System.currentTimeMillis() - totalTimeMillis;
         return result;

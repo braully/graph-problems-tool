@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 public class GraphSubgraph implements IGraphOperation {
 
-    static final String type = "Graph Class";
+    static final String type = "General";
     static final String description = "Subgraph";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);

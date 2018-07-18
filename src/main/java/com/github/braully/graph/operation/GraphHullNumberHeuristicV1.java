@@ -15,7 +15,7 @@ public class GraphHullNumberHeuristicV1
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV1.class);
 
-    static final String description = "Hull Number (Heuristic v1)";
+    static final String description = "Hull Number Heuristic";
 
     @Override
     public String getName() {
@@ -51,16 +51,10 @@ public class GraphHullNumberHeuristicV1
         Set<Integer> hullSet = null;
         Collection<Integer> vertices = graphRead.getVertices();
         for (Integer v : vertices) {
-            if (GraphCaratheodoryHeuristic.verbose) {
-                log.info("Trying Start Vertice: " + v);
-            }
             Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v);
             if (hullSet == null || tmp.size() < hullSet.size()) {
                 hullSet = tmp;
             }
-        }
-        if (GraphCaratheodoryHeuristic.verbose) {
-            log.info("Best S=" + hullSet);
         }
         return hullSet;
     }
@@ -79,9 +73,7 @@ public class GraphHullNumberHeuristicV1
             bv = -1;
             int maiorGrau = 0;
             int maiorDeltaHs = 0;
-            if (GraphCaratheodoryHeuristic.verbose) {
-                log.info("\tAnalizing vertice: ");
-            }
+
             for (int i = 0; i < vertexCount; i++) {
                 if (aux[i] >= INCLUDED) {
                     continue;
@@ -96,17 +88,11 @@ public class GraphHullNumberHeuristicV1
                     }
                 }
 
-                if (GraphCaratheodoryHeuristic.verbose) {
-                    log.info("\t" + s + " = Charatheodory |H(S)|=" + sizeHs + " d=" + neighborCount);
-                }
                 if (bv == -1 || (deltaHsi >= maiorDeltaHs && neighborCount > maiorGrau)) {
                     maiorDeltaHs = deltaHsi;
                     maiorGrau = neighborCount;
                     bv = i;
                 }
-            }
-            if (GraphCaratheodoryHeuristic.verbose) {
-                log.info("\tBest vert choice: " + bv);
             }
             sizeHs = sizeHs + addVertToS(bv, s, graph, aux);
         } while (sizeHs < vertexCount);
