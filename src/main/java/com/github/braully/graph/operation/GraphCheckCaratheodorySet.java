@@ -4,11 +4,9 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import static com.github.braully.graph.operation.GraphCaratheodoryHeuristic.INCLUDED;
 import static com.github.braully.graph.operation.GraphCaratheodoryHeuristic.NEIGHBOOR_COUNT_INCLUDED;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -16,7 +14,7 @@ import java.util.Set;
 public class GraphCheckCaratheodorySet implements IGraphOperation {
 
     static final String type = "P3-Convexity";
-    static final String description = "Check Set(S)";
+    static final String description = "Check Carathéodory Set(S)";
 
     public static final int NEIGHBOOR_COUNT_INCLUDED = 1;
     public static final int INCLUDED = 2;
