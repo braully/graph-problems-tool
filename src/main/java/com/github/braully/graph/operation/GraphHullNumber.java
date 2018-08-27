@@ -2,8 +2,7 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphCaratheodoryHeuristic.INCLUDED;
-import static com.github.braully.graph.operation.GraphCheckCaratheodorySet.PROCESSED;
+import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.PROCESSED;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;

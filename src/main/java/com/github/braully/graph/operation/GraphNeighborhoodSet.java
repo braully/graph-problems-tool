@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 public class GraphNeighborhoodSet implements IGraphOperation {
 
-    static final String type = "Graph Class";
+    static final String type = "General";
     static final String description = "N(S)";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);

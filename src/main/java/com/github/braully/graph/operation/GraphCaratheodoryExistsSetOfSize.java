@@ -7,10 +7,10 @@ import java.util.Map;
  *
  * @author Braully Rocha da Silva
  */
-public class GraphCaratheodoryExistsSetOfSize extends GraphCalcCaratheodoryNumberBinaryStrategy {
+public class GraphCaratheodoryExistsSetOfSize extends GraphCaratheodoryNumberBinary {
 
     static final String type = "P3-Convexity";
-    static final String description = "Caratheodory Set of Size  (Java)";
+    static final String description = "Caratheodory Exists Set of Size";
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         OperationConvexityGraphResult processedCaratheodroySet = null;

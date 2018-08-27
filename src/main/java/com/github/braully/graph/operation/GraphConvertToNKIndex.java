@@ -3,6 +3,7 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.CombinationsFacade;
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import java.math.BigInteger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +12,8 @@ import org.apache.log4j.Logger;
 
 public class GraphConvertToNKIndex implements IGraphOperation {
 
-    static final String type = "Graph Class";
-    static final String description = "Convert to NKIndex";
+    static final String type = "General";
+    static final String description = "Convert to N,M,Index";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
 
@@ -29,7 +30,6 @@ public class GraphConvertToNKIndex implements IGraphOperation {
         String code = null;
         long n = 0;
         long k = 0;
-        long index = 0;
         try {
             n = graph.getVertexCount();
             k = graph.getEdgeCount();
@@ -57,8 +57,8 @@ public class GraphConvertToNKIndex implements IGraphOperation {
                 }
             }
             System.out.println("}");
-            index = CombinationsFacade.lexicographicIndex((int) maxEdges, (int) combi, comb);
-            code = n + "," + k + "," + index;
+            BigInteger index = CombinationsFacade.lexicographicIndexBig((int) maxEdges, (int) combi, comb);
+            code = n + "," + k + "," + index.toString();
         } catch (Exception ex) {
             log.error(null, ex);
         }

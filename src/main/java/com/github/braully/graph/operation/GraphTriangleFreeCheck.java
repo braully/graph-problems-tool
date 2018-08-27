@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 public class GraphTriangleFreeCheck implements IGraphOperation {
 
-    static final String type = "Graph Class";
+    static final String type = "General";
     static final String description = "Triangle-Free Check (Java)";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);

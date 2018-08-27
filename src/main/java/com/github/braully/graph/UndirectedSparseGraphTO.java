@@ -71,7 +71,7 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
     @JsonIgnore
     @Override
     public EdgeType getDefaultEdgeType() {
-        return super.getDefaultEdgeType(); //To change body of generated methods, choose Tools | Templates.
+        return super.getDefaultEdgeType();
     }
 
     @Override
