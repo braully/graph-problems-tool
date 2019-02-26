@@ -7,6 +7,7 @@ package com.github.braully.graph;
 
 import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
 import com.github.braully.graph.operation.GraphCaratheodoryHeuristicHybrid;
+import com.github.braully.graph.operation.GraphCountEdges;
 import com.github.braully.graph.operation.GraphHullNumber;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -48,7 +49,8 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphCaratheodoryNumberBinary(),
         new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumber(),
-        new GraphHullNumberHeuristicV1()
+        new GraphHullNumberHeuristicV1(),
+        new GraphCountEdges()
     };
 
     @Override
