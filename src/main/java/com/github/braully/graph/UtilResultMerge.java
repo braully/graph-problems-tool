@@ -72,17 +72,17 @@ public class UtilResultMerge {
         String[] inputs = cmd.getOptionValues("input");
         if (inputs == null) {
             inputs = new String[]{
-                "/home/strike/Dropbox/workspace/graph-caratheodory-np3/grafos-processamento/Almost_hypohamiltonian"
+                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/workspace/graph-caratheodory-np3/grafos-processamento/Almost_hypohamiltonian"
 //                "/media/dados/documentos/grafos-processamento/Almost_hypohamiltonian",
-//                "/home/strike/Documentos/grafos-processamento/Cubic",
-//                "/home/strike/Documentos/grafos-processamento/Critical_H-free",
-//                "/home/strike/Documentos/grafos-processamento/Highly_irregular",
-//                "/home/strike/Documentos/grafos-processamento/Hypohamiltonian_graphs",
-//                "/home/strike/Documentos/grafos-processamento/Maximal_triangle-free",
-//                "/home/strike/Documentos/grafos-processamento/Minimal_Ramsey",
-//                "/home/strike/Documentos/grafos-processamento/Strongly_regular",
-//                "/home/strike/Documentos/grafos-processamento/Vertex-transitive",
-//                "/home/strike/Documentos/grafos-processamento/Trees"
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Cubic",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Critical_H-free",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Highly_irregular",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Hypohamiltonian_graphs",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Maximal_triangle-free",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Minimal_Ramsey",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Strongly_regular",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Vertex-transitive",
+//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Trees"
             };
             excludes = new String[]{"carathe"};
             verbose = true;

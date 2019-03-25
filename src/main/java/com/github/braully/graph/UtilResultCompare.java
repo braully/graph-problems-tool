@@ -54,15 +54,15 @@ public class UtilResultCompare {
 
         String inputFilePath = cmd.getOptionValue("input");
         if (inputFilePath == null) {
-            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-quartic-ht.txt";
+            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-quartic-ht.txt";
 
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-mft-parcial-ht.txt";
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-highlyirregular-ht.txt";
-//            inputFilePath = "/home/strike/Documentos/grafos-processados/mtf/resultado-ht.txt";
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-hypo-parcial-ht.txt";
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-eul-ht.txt";
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-almhypo-ht.txt";
-//            inputFilePath = "/home/strike/Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-Almost_hypohamiltonian_graphs_cubic-parcial-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-mft-parcial-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-highlyirregular-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processados/mtf/resultado-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-hypo-parcial-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-eul-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-almhypo-ht.txt";
+//            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/documentos/mestrado/resultado-processamento-grafos/resultado-Almost_hypohamiltonian_graphs_cubic-parcial-ht.txt";
         }
         if (inputFilePath != null) {
             if (inputFilePath.toLowerCase().endsWith(".txt")) {

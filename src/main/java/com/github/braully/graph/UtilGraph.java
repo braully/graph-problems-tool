@@ -32,8 +32,8 @@ public class UtilGraph {
     private static final Logger logWebconsole = Logger.getLogger("WEBCONSOLE");
     private static final Logger log = Logger.getLogger(UtilGraph.class);
 
-    private static String inputFilePath = "/home/strike/tmp/grafos/converter";
-    private static String outputFilePath = "/home/strike/tmp/grafos/convertidos";
+    private static String inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/converter";
+    private static String outputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/convertidos";
 
     public static void main(String... args) throws Exception {
         processDirectory(null, null);
@@ -491,6 +491,32 @@ public class UtilGraph {
                 }
             }
 
+        }
+        return ret;
+    }
+
+    public static UndirectedSparseGraphTO loadGraph(File file) {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        try {
+            String fileName = file.getName();
+            InputStream uploadedInputStream = new FileInputStream(file);
+            if (fileName != null && !fileName.trim().isEmpty()) {
+                String tmpFileName = fileName.trim().toLowerCase();
+                if (tmpFileName.endsWith("csr")) {
+                    ret = UtilGraph.loadGraphCsr(uploadedInputStream);
+                } else if (tmpFileName.endsWith("mat")) {
+                    ret = UtilGraph.loadGraphAdjMatrix(uploadedInputStream);
+                } else if (tmpFileName.endsWith("g6")) {
+                    ret = UtilGraph.loadGraphG6(uploadedInputStream);
+                } else if (tmpFileName.endsWith("es")) {
+                    ret = UtilGraph.loadGraphES(uploadedInputStream);
+                }
+                if (ret != null) {
+                    ret.setName(fileName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("fail on load graph", e);
         }
         return ret;
     }

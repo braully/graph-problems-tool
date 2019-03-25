@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class DatabaseFacade {
 
-    public static final String DATABASE_DIRECTORY = System.getProperty("user.home") + File.separator + "." + "graph-problem";
+    public static final String DATABASE_DIRECTORY = System.getProperty("user.home") + File.separator + "." + "graph-problem" + File.separator;
     public static final String BATCH_DIRECTORY = DATABASE_DIRECTORY + File.separator + "batch";
     public static final String DATABASE_URL = DATABASE_DIRECTORY + File.separator + "graph-problem-results.json";
     public static final String DATABASE_DIRECTORY_GRAPH = DATABASE_DIRECTORY + File.separator + "graph";

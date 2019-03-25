@@ -2,11 +2,8 @@ package com.github.braully.graph.generator;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import org.apache.log4j.Logger;
 
 public class GraphGeneratorBlock extends AbstractGraphGenerator {
 

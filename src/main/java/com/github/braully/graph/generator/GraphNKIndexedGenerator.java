@@ -3,7 +3,6 @@ package com.github.braully.graph.generator;
 import com.github.braully.graph.CombinationsFacade;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 
-import static com.github.braully.graph.generator.GraphGeneratorCompleteBipartite.P_VERTICES;
 import static com.github.braully.graph.generator.GraphGeneratorKP.K_VERTICES;
 import java.math.BigInteger;
 

@@ -1,6 +1,5 @@
 package com.github.braully.graph.generator;
 
-import com.github.braully.graph.CombinationsFacade;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.GraphConvertToNKIndex;

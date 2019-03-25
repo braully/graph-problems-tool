@@ -60,7 +60,7 @@ public class UtilResult {
 
         String inputFilePath = cmd.getOptionValue("input");
         if (inputFilePath == null) {
-            inputFilePath = "/home/strike/grafos-para-processar/mft2/resultado.txt";
+            inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "grafos-para-processar/mft2/resultado.txt";
         }
         if (inputFilePath != null) {
             if (inputFilePath.toLowerCase().endsWith(".txt")) {
