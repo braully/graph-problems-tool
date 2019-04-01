@@ -152,6 +152,12 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
+                <directory>${basedir}</directory>
+                <includes>
+                    <include>*.es</include>
+                </includes>
+            </resource>
+            <resource>
                 <directory>graph</directory>
             </resource>
         </resources>

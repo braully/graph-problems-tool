@@ -1,6 +1,11 @@
 package util;
 
 import com.github.braully.graph.operation.GraphStatistics;
+import static com.google.common.base.CharMatcher.is;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +17,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -176,7 +182,18 @@ public class PipeGraph {
         if (inputFilePath == null) {
             System.out.println("No input graph, loading default: ");
             inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "/ultimo-grafo-de-moore.es";
-
+            try {
+                File file = new File(inputFilePath);
+                if (!file.exists()) {
+                    System.out.println("File not exists... copying previous version");
+                    InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("esqueleto-ultimo-grafo-moore.es");
+                    OutputStream outputStream = new FileOutputStream(file);
+                    IOUtils.copy(in, outputStream);
+                    System.out.println("Success");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (inputFilePath == null || inputFilePath.isEmpty()) {
