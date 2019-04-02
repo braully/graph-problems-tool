@@ -27,11 +27,9 @@ import java.util.TreeMap;
  * @author strike
  */
 public class UtilProccess {
-    
-    
-    
 
     public static final String fileDump = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + ".comb-moore-java-tmp.txt";
+    public static final String lastComb = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + ".comb-moore-java-tmp.last-caminho";
     public static final int max_length_file = 3000;
     public static final long ALERT_HOUR = 1000 * 60 * 60 * 1;
     public static final long ALERT_HOUR_2 = 1000 * 60 * 60 * 2;
@@ -288,7 +286,7 @@ public class UtilProccess {
 
     static void saveToCache(Object o, String caminho) {
         try {
-            FileOutputStream fos = new FileOutputStream(new File(caminho));
+            FileOutputStream fos = new FileOutputStream(new File(com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + caminho));
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(o);
         } catch (Exception e) {
@@ -311,7 +309,7 @@ public class UtilProccess {
             ObjectInputStream iis = new ObjectInputStream(is);
             ret = iis.readObject();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return ret;
     }
@@ -326,11 +324,16 @@ public class UtilProccess {
         dumpVertAddArray(lastgraph, numArestasIniciais, caminhoPercorrido, "", true);
     }
 
+    public static String getLastComb() {
+        return lastComb;
+    }
+
     static void dumpVertAddArray(UndirectedSparseGraphTO lastgraph,
             int numArestasIniciais, TreeMap<Integer, Collection<Integer>> caminhoPercorrido, String offset, boolean trunk) {
         System.out.print("Dump-edge: ");
         try {
             FileWriter fileWriter = new FileWriter(fileDump + offset, true);
+            FileWriter lastfileWriter = new FileWriter(lastComb + offset);
             fileWriter.append(hostname);
             fileWriter.append(": ");
 
@@ -347,12 +350,15 @@ public class UtilProccess {
                             lastgraph.getEndpoints(i).getSecond());
                     System.out.printf(str);
                     fileWriter.append(str);
+                    lastfileWriter.append(str);
                     charcount = charcount - str.length();
                     if (trunk && charcount <= 0) {
                         charcount = max_length_file;
                         fileWriter.append("\n");
+                        lastfileWriter.append("\n");
                     }
                     fileWriter.append("[");
+                    lastfileWriter.append("[");
                     System.out.print("[");
 
                     for (Integer j : opcoesTestadas) {
@@ -361,19 +367,25 @@ public class UtilProccess {
                         System.out.print(",");
                         fileWriter.append(jstr);
                         fileWriter.append(",");
+                        lastfileWriter.append(jstr);
+                        lastfileWriter.append(",");
                         charcount = charcount - jstr.length() - 1;
                         if (trunk && charcount <= 0) {
                             charcount = max_length_file;
                             fileWriter.append("\n");
+                            lastfileWriter.append("\n");
                         }
                     }
                     fileWriter.append("] ");
+                    lastfileWriter.append("] ");
                     System.out.print("] ");
                 }
             }
             System.out.println();
             fileWriter.append("\n");
+            lastfileWriter.append("\n");
             fileWriter.close();
+            lastfileWriter.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

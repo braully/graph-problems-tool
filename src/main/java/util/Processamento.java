@@ -5,6 +5,7 @@ import com.github.braully.graph.UtilGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,23 +34,23 @@ public class Processamento {
     boolean vebosePossibilidadesIniciais = false;
     boolean veboseFimEtapa = false;
     boolean verboseRankingOption = false;
-
+    
     boolean rankearOpcoes = true;
     int rankearOpcoesProfundidade = 3;
     boolean rankearSegundaOpcoes = false;
-
+    
     boolean anteciparVazio = true;
     boolean descartarOpcoesNaoOptimais = true;
-
+    
     boolean falhaInRollBack = false;
     int falhaRollbackCount = 0;
-
+    
     boolean falhaInCommitCount = false;
     int falhaCommitCount = 0;
     boolean failInviable = true;
-
+    
     boolean compressPossiblidades = true;
-
+    
     final boolean ordenarTrabalhoPorFazerPorPrimeiraOpcao = true;
     final boolean dumpResultadoPeriodicamente = true;
 
@@ -70,7 +71,7 @@ public class Processamento {
 //    LinkedList<Integer> edegesAdded = new LinkedList<>();
     Map<Integer, TreeMap<Integer, Collection<Integer>>> pendencia = new HashMap<>();
     Map<Integer, BFSUtil> rankingTmp = new HashMap<>();
-
+    
     int numArestasIniciais;
     int numVertices;
     int numAretasFinais;
@@ -78,7 +79,7 @@ public class Processamento {
     int k;
     Integer trabalhoAtual;
     int marcoInicial;
-
+    
     BFSUtil bfsalg;
     BFSUtil bfsRanking;
     BFSUtil bfsRankingSegundaOpcao;
@@ -92,12 +93,12 @@ public class Processamento {
                 + rankearOpcoesProfundidade + "-" + (ordenarTrabalhoPorFazerPorPrimeiraOpcao ? "opft" : "otpff")
                 + "-" + (descartarOpcoesNaoOptimais ? "dnot" : "dnof") + "-" + (anteciparVazio ? "avt" : "avf");
     }
-
+    
     void loadGraph(String inputFilePath) {
         UndirectedSparseGraphTO graph = UtilGraph.loadGraph(new File(inputFilePath));
         loadGraph(graph);
     }
-
+    
     private void loadGraph(UndirectedSparseGraphTO graph) {
         this.insumo = graph;
         this.vertices = (Collection<Integer>) graph.getVertices();
@@ -106,7 +107,7 @@ public class Processamento {
         this.caminhosPossiveisOriginal = new HashMap<>();
         this.caminhoPercorrido = new TreeMap<>();
         this.historicoRanking = new TreeMap<>();
-
+        
         k = 0;
         for (Integer v : vertices) {
             int dg = graph.degree(v);
@@ -117,12 +118,16 @@ public class Processamento {
         this.numVertices = vertices.size();
         this.numAretasFinais = ((k * k + 1) * k) / 2;
         this.numArestasIniciais = this.insumo.getEdgeCount();
-
+        
         bfsalg = new BFSUtil(numVertices);
         bfsRanking = new BFSUtil(numVertices);
         bfsRankingSegundaOpcao = new BFSUtil(numVertices);
     }
-
+    
+    void loadLastCaminho() {
+        loadCaminho(UtilProccess.getLastComb());
+    }
+    
     void loadCaminho(String loadProcess) {
         try {
             BufferedReader bf = new BufferedReader(new FileReader(loadProcess));
@@ -176,25 +181,27 @@ public class Processamento {
             Logger.getLogger(PipeGraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     void prepareStart() {
-
-        if (caminhosPossiveis.isEmpty()) {
+        
+        if (caminhosPossiveis == null || caminhosPossiveis.isEmpty()) {
             initialLoad();
+        } else {
+            System.out.println("Pre-started");
         }
-
+        
         if (ordenarTrabalhoPorFazerPorPrimeiraOpcao) {
             Collections.sort(trabalhoPorFazer);
         }
-
-        System.out.printf("Trabalho por fazer[%d]: \n", trabalhoPorFazer.size());
+        
+        System.out.printf("Trabalho por fazer... nº de vertices incompletos %d: \n", trabalhoPorFazer.size());
         for (Integer e : trabalhoPorFazer) {
             if (verbose) {
                 System.out.printf("%d (%d), ", e, insumo.degree(e));
             }
         }
         printGraphCount();
-
+        
         if (vebosePossibilidadesIniciais) {
             System.out.print("Caminhos possiveis: \n");
             List<Integer> ant = caminhosPossiveis.get(trabalhoPorFazer.get(0));
@@ -213,13 +220,13 @@ public class Processamento {
         }
         System.out.println();
     }
-
+    
     public void initialLoad() {
         System.out.println("Calculando trabalho a fazer");
         trabalhoPorFazer.clear();
         caminhosPossiveis.clear();
         caminhosPossiveisOriginal.clear();
-
+        
         for (Integer v : vertices) {
             int remain = k - insumo.degree(v);
             if (remain > 0) {
@@ -227,8 +234,13 @@ public class Processamento {
                 caminhosPossiveis.put(v, new ArrayList<>());
             }
         }
+        
+        if (compressPossiblidades) {
+            System.out.print("Compressed...");
+        }
+        
         System.out.print("Calculando possibilidades de caminho...");
-
+        
         for (int i = 0; i < trabalhoPorFazer.size(); i++) {
             Integer v = trabalhoPorFazer.get(i);
             bfsalg.labelDistances(insumo, v);
@@ -255,23 +267,38 @@ public class Processamento {
                 }
             }
         }
-
+        
         ordenarTrabalhoPorCaminhosPossiveis();
-//        this.caminhosPossiveisOriginal = UtilTmp.cloneMap(caminhosPossiveis);
         this.trabalhoPorFazerOrigianl = new LinkedList<>(trabalhoPorFazer);
         System.out.println("Grafo viavel");
     }
-
+    
     void loadStartFromCache() {
-        trabalhoPorFazer = (LinkedList<Integer>) UtilProccess.loadFromCache("trabalho-por-fazer-partial.dat");
-        caminhosPossiveis = (Map<Integer, List<Integer>>) UtilProccess.loadFromCache("caminhos-possiveis.dat");
-
+        try {
+            trabalhoPorFazer = (LinkedList<Integer>) UtilProccess.loadFromCache("trabalho-por-fazer-partial.dat");
+        } catch (Exception e) {
+            if (e.getCause() instanceof FileNotFoundException) {
+                System.out.println("Cache not found, generating");
+                this.prepareStart();
+                UtilProccess.saveToCache(trabalhoPorFazer, "trabalho-por-fazer-partial.dat");
+            }
+        }
+        
+        try {
+            caminhosPossiveis = (Map<Integer, List<Integer>>) UtilProccess.loadFromCache("caminhos-possiveis.dat");
+        } catch (Exception e) {
+            if (e.getCause() instanceof FileNotFoundException) {
+                System.out.println("Cache not found, generating");
+                this.prepareStart();
+                UtilProccess.saveToCache(caminhosPossiveis, "caminhos-possiveis.dat");
+            }
+        }
     }
-
+    
     void recheckPossibilities() {
         recheckPossibilities(insumo);
     }
-
+    
     void recheckPossibilities(UndirectedSparseGraphTO insumo) {
         System.out.println("Checking graph");
         boolean inviavel = false;
@@ -298,7 +325,7 @@ public class Processamento {
         }
         System.out.println("Graph... Ok");
     }
-
+    
     public void sanitizeGraphPossibility() {
         System.out.println("Sanitizando grafo");
         TreeSet<Integer> verticeSanitizar = new TreeSet<>();
@@ -327,7 +354,7 @@ public class Processamento {
         resincTrabalhosPorFazer();
         this.printGraphCount();
     }
-
+    
     void stripIncompleteVertices() {
         System.out.println("strip grafo");
         TreeSet<Integer> verticeSanitizar = new TreeSet<>();
@@ -345,7 +372,7 @@ public class Processamento {
         resincTrabalhosPorFazer();
         this.printGraphCount();
     }
-
+    
     public UndirectedSparseGraphTO sanitizarVertices(TreeSet<Integer> verticeSanitizar) throws IllegalStateException {
         UndirectedSparseGraphTO insumoTmp = insumo.clone();
         for (Integer v : verticeSanitizar) {
@@ -372,15 +399,15 @@ public class Processamento {
         }
         return insumoTmp;
     }
-
+    
     void printGraphCount() {
         System.out.println("Vertices : " + (numVertices - trabalhoPorFazer.size()) + "/" + numVertices + " Edges: " + insumo.getEdgeCount() + "/" + numAretasFinais);
     }
-
+    
     boolean verticeComplete(Integer i) {
         return insumo.degree(i) == k;
     }
-
+    
     void resincTrabalhosPorFazer() {
         trabalhoPorFazer.clear();
         for (Integer e : trabalhoPorFazerOrigianl) {
@@ -389,7 +416,7 @@ public class Processamento {
             }
         }
     }
-
+    
     synchronized Processamento fork() {
         Processamento sub = new Processamento();
 //        this.insumo = graph;
@@ -400,7 +427,7 @@ public class Processamento {
         sub.numVertices = numVertices;
         sub.numAretasFinais = numAretasFinais;
         sub.numArestasIniciais = numArestasIniciais;
-
+        
         sub.insumo = insumo.clone();
         sub.trabalhoPorFazer = new LinkedList<>(trabalhoPorFazer);
         sub.caminhoPercorrido = UtilProccess.cloneMap(caminhoPercorrido);
@@ -421,11 +448,11 @@ public class Processamento {
         sub.rankearOpcoesProfundidade = this.rankearOpcoesProfundidade;
         return sub;
     }
-
+    
     void dumpResultadoSeInteressante() {
         dumpResultadoSeInteressante(this);
     }
-
+    
     void dumpResultadoSeInteressante(Processamento processamento) {
         if (processamento.dumpResultadoPeriodicamente && System.currentTimeMillis() - processamento.lastime > UtilProccess.ALERT_HOUR) {
             System.out.println("Alert hour ");
@@ -440,7 +467,7 @@ public class Processamento {
             String lastAdd = String.format(" last+[%5d](%4d,%4d) \n", insumo.getEdgeCount(), processamento.trabalhoAtual, melhorOpcaoLocal);
             UtilProccess.dumpString(lastAdd);
             UtilProccess.printCurrentItme();
-
+            
             if (processamento.longestresult < processamento.insumo.getEdgeCount() || System.currentTimeMillis() - processamento.lastime2 > UtilProccess.ALERT_HOUR_12) {
                 processamento.lastime2 = System.currentTimeMillis();
                 if (processamento.longestresult < processamento.insumo.getEdgeCount()) {
@@ -457,7 +484,7 @@ public class Processamento {
             }
         }
     }
-
+    
     void printGraphCaminhoPercorrido() {
         try {
             System.out.print("vert-adds: ");
@@ -469,13 +496,13 @@ public class Processamento {
                             insumo.getEndpoints(i).getSecond());
                     System.out.printf(str);
                     System.out.print("[");
-
+                    
                     for (Integer j : opcoesTestadas) {
                         String jstr = j.toString();
                         System.out.print(jstr);
                         System.out.print(",");
                     }
-
+                    
                     System.out.print("] ");
                 }
             }
@@ -484,37 +511,37 @@ public class Processamento {
             ex.printStackTrace();
         }
     }
-
+    
     void ordenarTrabalhoPorFazerNatual() {
         Collections.sort(trabalhoPorFazer);
     }
-
+    
     void ordenarTrabalhoPorCaminhosPossiveis() {
         Collections.sort(trabalhoPorFazer, new ComparatorTrabalhoPorFazer(this.caminhosPossiveis));
     }
-
+    
     List<Integer> getOpcoesPossiveisAtuais() {
         return caminhosPossiveis.get(trabalhoAtual);
     }
-
+    
     private Integer getPosicaoAtualAbsoluta(Integer e1) {
         return getPosicaoAtualRelativa(e1) + numAretasFinais;
-
+        
     }
-
+    
     public Integer getPosicaoAtualAbsoluta() {
 //        return insumo.getEdgeCount();
         return getPosicaoAtualRelativa() + numAretasFinais;
     }
-
+    
     public Integer getPosicaoAtualRelativa() {
         return getPosicaoAtualRelativa(trabalhoAtual);
     }
-
+    
     public Integer getPosicaoAtualRelativa(Integer v) {
         return v * k + insumo.degree(v);
     }
-
+    
     void mergeProcessamentos(List<Processamento> processamentos) {
         System.out.println("Merge current processamento");
         printGraphCount();
@@ -539,7 +566,7 @@ public class Processamento {
         printGraphCount();
         printGraphCaminhoPercorrido();
     }
-
+    
     private boolean addEdgeIfConsistent(Integer first, Integer second, Collection<Integer> value) {
         int posicaoAtual = getPosicaoAtualAbsoluta(first);
         boolean ret = addEdgeIfConsistent(first, second);
@@ -548,7 +575,7 @@ public class Processamento {
         }
         return ret;
     }
-
+    
     boolean addEdgeIfConsistent(Integer first, Integer second) {
         boolean ret = false;
         bfsRankingSegundaOpcao.bfs(insumo, first);
@@ -558,7 +585,7 @@ public class Processamento {
         }
         return ret;
     }
-
+    
     private void removerTrabalhoPorFazerVerticesCompletos() {
         Set<Integer> removeList = new HashSet<>();
         for (Integer v : trabalhoPorFazer) {
@@ -568,22 +595,22 @@ public class Processamento {
         }
         trabalhoPorFazer.removeAll(removeList);
     }
-
+    
     public void marcoInicial() {
         this.marcoInicial = insumo.getEdgeCount();
     }
-
+    
     public boolean deuPassoFrente() {
         return insumo.getEdgeCount() >= this.marcoInicial || !caminhoPercorrido.isEmpty();
     }
-
+    
     public Collection<Integer> getCaminhoPercorridoPosicaoAtual() {
         Integer posicaoAtual = getPosicaoAtualAbsoluta();
         Collection<Integer> caminho = caminhoPercorrido.getOrDefault(posicaoAtual, new ArrayList<>());
         caminhoPercorrido.putIfAbsent(posicaoAtual, caminho);
         return caminho;
     }
-
+    
     Integer addEge() {
 //        Integer edge = getPosicaoAtualAbsoluta();
 //        if (insumo.addEdge(edge, trabalhoAtual, melhorOpcaoLocal)) {
@@ -591,7 +618,7 @@ public class Processamento {
 //        }
         return addEdge(trabalhoAtual, melhorOpcaoLocal);
     }
-
+    
     private Integer addEdge(Integer e1, Integer e2) {
         Integer edge = getPosicaoAtualAbsoluta(e1);
         if (insumo.addEdge(edge, e1, e2)) {
@@ -599,11 +626,11 @@ public class Processamento {
         }
         return null;
     }
-
+    
     int getDvTrabalhoAtual() {
         return (k - insumo.degree(trabalhoAtual));
     }
-
+    
     Pair<Integer> desfazerUltimoTrabalho() {
         if (falhaInRollBack) {
             if (falhaRollbackCount-- <= 0) {
@@ -614,7 +641,7 @@ public class Processamento {
         caminhoPercorrido.get(posicaoAtual).clear();
         Integer ultimoPasso = posicaoAtual - 1;
         Pair<Integer> desfazer = insumo.getEndpoints(ultimoPasso);
-
+        
         if (desfazer == null) {
             throw new IllegalStateException("Vertice falhou na primeira posição " + trabalhoAtual + " " + melhorOpcaoLocal + " " + posicaoAtual);
         }
@@ -634,7 +661,7 @@ public class Processamento {
         }
         return desfazer;
     }
-
+    
     void bfsRankingTotal(Integer val) {
         bfsRanking.clearRanking();
         bfsRanking.labelDistances(insumo, trabalhoAtual);
@@ -658,31 +685,31 @@ public class Processamento {
             insumo.removeEdge(edge);
         }
     }
-
+    
     void bfsRanking(Integer val) {
         bfsRanking.bfsRanking(insumo, trabalhoAtual, val);
     }
-
+    
     boolean atingiuObjetivo() {
         return insumo.getEdgeCount() == numAretasFinais;
     }
-
+    
     int countEdges() {
         return insumo.getEdgeCount();
     }
-
+    
     private void addPendencia(Integer v, Pair endpoints, Collection<Integer> percorrido) {
         TreeMap<Integer, Collection<Integer>> pend = this.pendencia.getOrDefault(v, new TreeMap<>());
         this.pendencia.putIfAbsent(v, pend);
         pend.put((Integer) endpoints.getSecond(), percorrido);
     }
-
+    
     void dumpCaminho() {
         UtilProccess.dumpVertAddArray(insumo,
                 numArestasIniciais,
                 caminhoPercorrido);
     }
-
+    
     void mergeContinues(String... strmerge) {
         if (strmerge == null || strmerge.length == 0) {
             return;
@@ -696,12 +723,12 @@ public class Processamento {
         }
         this.mergeProcessamentos(processamentos);
     }
-
+    
     Pair<Integer> getEdgePosicao(int i) {
         Pair<Integer> endpoints = insumo.getEndpoints(i);
         return endpoints;
     }
-
+    
     Integer getLastAdd() {
         Integer lastAdd = null;
         Pair<Integer> edgePosicao = getEdgePosicao(getPosicaoAtualAbsoluta() - 1);
@@ -710,7 +737,7 @@ public class Processamento {
         }
         return lastAdd;
     }
-
+    
     Integer getRankingHistorico(int posicao, Integer melhorOpcao) {
         Integer ranking = null;
         List<Integer> get = historicoRanking.get(posicao).get(melhorOpcao);
@@ -719,5 +746,5 @@ public class Processamento {
         }
         return ranking;
     }
-
+    
 }

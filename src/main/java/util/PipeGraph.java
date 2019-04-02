@@ -224,10 +224,15 @@ public class PipeGraph {
 
         processamento.prepareStart();
 
-        String loadProcess = cmd.getOptionValue("continue");
-        if (loadProcess != null) {
-            processamento.loadCaminho(loadProcess);
-            System.out.println("...Ok");
+        if (cmd.hasOption("continue")) {
+            System.out.println("Continue combination");
+            String loadProcess = cmd.getOptionValue("continue");
+            if (loadProcess != null && loadProcess.trim().isEmpty()) {
+                processamento.loadCaminho(loadProcess);
+                System.out.println("...Ok");
+            } else {
+                processamento.loadLastCaminho();
+            }
         }
         String mergec = cmd.getOptionValue("merge-continue");
         if (mergec != null) {
