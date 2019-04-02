@@ -41,6 +41,10 @@ public class Auto {
     
      */
     public static void main(String... args) {
-        PipeGraph.main(new String[]{"--load-start", "--continue", "", "-7"});
+        String[] param = args;
+        if (param == null || param.length == 0) {
+            param = new String[]{"--load-start", "--continue", "", "-7"};
+        }
+        PipeGraph.main(param);
     }
 }
