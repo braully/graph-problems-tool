@@ -1,5 +1,6 @@
 package util;
 
+import edu.uci.ics.jung.graph.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +26,12 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
         while (trabalhoNaoAcabou(processamento) && processamento.deuPassoFrente()) {
             processamento.getCaminhoPercorridoPosicaoAtual();
             processamento.melhorOpcaoLocal = avaliarMelhorOpcao(processamento);
-            adicionarMellhorOpcao(processamento);
+            try {
+                adicionarMellhorOpcao(processamento);
+            } catch (UnsupportedOperationException e) {
+                System.out.print(e.getMessage());
+                return;
+            }
         }
         if (trabalhoAcabou(processamento, processamento.trabalhoAtual) && temFuturo(processamento.trabalhoAtual)) {
             processamento.trabalhoPorFazer.remove(processamento.trabalhoAtual);
@@ -60,7 +66,10 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
             }
             observadorDeEtapa(aresta, processamento.melhorOpcaoLocal, processamento);
         } else {
-            desfazerUltimoTrabalho(processamento);
+            Pair<Integer> ultimoTrabalho = desfazerUltimoTrabalho(processamento);
+            if (ultimoTrabalho == null || !ultimoTrabalho.getFirst().equals(processamento.trabalhoAtual)) {
+                throw new UnsupportedOperationException("Não é possivel desfazer um trabalho já comitado por outra etapa");
+            }
         }
     }
 
@@ -121,7 +130,8 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
                     listRankingVal.add(0);
                     continue;
                 }
-                if (bfs[val] == 4) {
+                int bfval = bfs[val];
+                if (bfval == 4) {
                     List<Integer> listRankingVal = rankingAtual.get(val);
                     if (listRankingVal == null) {
                         listRankingVal = new ArrayList<>(4);
@@ -129,10 +139,18 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
                     }
                     rankearOpcao(processamento, posicaoAtual, val);
                 } else {
-                    break;
+//                    if (processamento.verboseRankingOption) {
+                    //Erro, valor ira provocar cintura menor que 5.
+//                        System.out.printf("#(%4d,%4d): ", processamento.trabalhoAtual, val);
+//                        UtilProccess.printArray(processamento.bfsRanking.depthcount);
+
+//                    }
+                    zeraRankOpcao(processamento, posicaoAtual, val);
+                    //                        Devo breakar?
+//                    break;
                 }
                 if (processamento.verboseRankingOption) {
-                    System.out.printf("Ranking (%4d,%4d): ", val, processamento.trabalhoAtual);
+                    System.out.printf("Ranking (%4d,%4d): ", processamento.trabalhoAtual, val);
                     UtilProccess.printArray(processamento.bfsRanking.depthcount);
 
                 }
@@ -148,6 +166,18 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
                 throw e;
             }
         }
+    }
+
+    public void zeraRankOpcao(Processamento processamento, Integer posicaoAtual, Integer val) {
+        processamento.bfsRanking(val);
+//        processamento.bfsRanking(val);
+        List<Integer> listRankingVal = processamento.historicoRanking.get(posicaoAtual).getOrDefault(val, new ArrayList<>(4));
+        listRankingVal.clear();
+
+        listRankingVal.add(0);
+        listRankingVal.add(0);
+        listRankingVal.add(0);
+        listRankingVal.add(0);
     }
 
     @Override

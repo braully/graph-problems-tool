@@ -48,9 +48,18 @@ public class ComparatorMap implements Comparator<Integer> {
         }
         if (mapListRanking != null) {
             int cont = 0;
-            while (ret == 0 && cont < rankearOpcoesProfundidade && cont < mapListRanking.get(o1).size()) {
-                ret = Integer.compare(mapListRanking.get(o2).get(cont), mapListRanking.get(o1).get(cont));
-                cont++;
+
+            if (mapListRanking.get(o1) == mapListRanking.get(o2)) {
+                ret = 0;
+            } else if (mapListRanking.get(o1) == null && mapListRanking.get(o2) != null) {
+                ret = 1;
+            } else if (mapListRanking.get(o1) != null && mapListRanking.get(o2) == null) {
+                ret = -1;
+            } else {
+                while (ret == 0 && cont < rankearOpcoesProfundidade && cont < mapListRanking.get(o1).size()) {
+                    ret = Integer.compare(mapListRanking.get(o2).get(cont), mapListRanking.get(o1).get(cont));
+                    cont++;
+                }
             }
         }
         if (ret == 0) {
