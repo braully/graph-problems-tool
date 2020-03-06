@@ -177,6 +177,9 @@ public class Processamento {
             }
             System.out.print("Loaded " + (insumo.getEdgeCount() - count) + " edges added. ");
             printGraphCount();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Não existe processamento anterior: " + loadProcess);
+            System.out.println("Começando do zero");
         } catch (IOException ex) {
             Logger.getLogger(PipeGraph.class.getName()).log(Level.SEVERE, null, ex);
         }

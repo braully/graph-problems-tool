@@ -1,7 +1,6 @@
 package util;
 
 import com.github.braully.graph.operation.GraphStatistics;
-import static com.google.common.base.CharMatcher.is;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;

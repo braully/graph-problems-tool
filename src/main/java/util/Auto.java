@@ -8,7 +8,7 @@ public class Auto {
 
     /*
     
-     -0                             Estagnação de Vertice
+ -0                             Estagnação de Vertice
  -1                             Evitar colisão
  -2                             Estangar em Bloco
  -3                             Gerar em Bloco Sequencial
@@ -44,6 +44,7 @@ public class Auto {
         String[] param = args;
         if (param == null || param.length == 0) {
             param = new String[]{"--load-start", "--continue", "", "-7"};
+            System.out.println("Using default options: --load-start --continue -7");
         }
         PipeGraph.main(param);
     }
