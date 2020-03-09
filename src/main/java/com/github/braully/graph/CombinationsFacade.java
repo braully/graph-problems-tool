@@ -1,8 +1,6 @@
 package com.github.braully.graph;
 
 import java.math.BigInteger;
-import java.util.Iterator;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 
 /**
  *
