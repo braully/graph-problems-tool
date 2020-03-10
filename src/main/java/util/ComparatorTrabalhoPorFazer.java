@@ -29,12 +29,15 @@ public class ComparatorTrabalhoPorFazer implements Comparator<Integer> {
     @Override
     public int compare(Integer t, Integer t1) {
         int ret = 0;
-        ret = Integer.compare(caminhosPossiveis.get(t1).size(), caminhosPossiveis.get(t).size());
+        int sizeT1 = caminhosPossiveis.get(t1).size();
+        int sizeT = caminhosPossiveis.get(t).size();
+        ret = Integer.compare(sizeT1, sizeT);
         int cont = 0;
-        while (aprofundar && ret == 0 && cont < caminhosPossiveis.get(t).size()) {
+        
+        /*while (aprofundar && ret == 0 && cont < sizeT) {
             ret = Integer.compare(caminhosPossiveis.get(t).get(cont), caminhosPossiveis.get(t1).get(cont));
             cont++;
-        }
+        }*/
 
         if (ret == 0) {
             ret = Integer.compare(t, t1);

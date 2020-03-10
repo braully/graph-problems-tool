@@ -64,6 +64,10 @@ public class PipeGraph {
         stat.setRequired(false);
         options.addOption(stat);
 
+        Option orderInit = new Option("oi", "order-init", false, "Ordenação pre processamento");
+        //orderInit.setRequired(false);
+        options.addOption(orderInit);
+
         Option verb = new Option("v", "verbose", false, "verbose processing");
         options.addOption(verb);
 
@@ -281,8 +285,13 @@ public class PipeGraph {
             }
         }
 
-        if (cmd.hasOption("nparallel") || cmd.hasOption("vparallel") || cmd.hasOption("iparallel")) {
+        if (cmd.hasOption("nparallel")
+                || cmd.hasOption("vparallel")
+                || cmd.hasOption("iparallel")
+                || cmd.hasOption("order-init")) {
             processamento.ordenarTrabalhoPorCaminhosPossiveis();
+            System.out.println("Reordenando trabalho por fazer: ");
+            System.out.println(processamento.trabalhoPorFazer);
         }
 
         List<TrabalhoProcessamento> processos = new ArrayList<>();
