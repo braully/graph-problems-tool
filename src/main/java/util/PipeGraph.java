@@ -289,7 +289,7 @@ public class PipeGraph {
                 || cmd.hasOption("vparallel")
                 || cmd.hasOption("iparallel")
                 || cmd.hasOption("order-init")) {
-            processamento.ordenarTrabalhoPorCaminhosPossiveis();
+            processamento.ordenarTrabalhoInicialPorCaminhosPossiveis();
             System.out.println("Reordenando trabalho por fazer: ");
             System.out.println(processamento.trabalhoPorFazer);
         }

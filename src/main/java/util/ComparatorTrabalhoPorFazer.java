@@ -33,11 +33,11 @@ public class ComparatorTrabalhoPorFazer implements Comparator<Integer> {
         int sizeT = caminhosPossiveis.get(t).size();
         ret = Integer.compare(sizeT1, sizeT);
         int cont = 0;
-        
-        /*while (aprofundar && ret == 0 && cont < sizeT) {
+
+        while (aprofundar && ret == 0 && cont < sizeT) {
             ret = Integer.compare(caminhosPossiveis.get(t).get(cont), caminhosPossiveis.get(t1).get(cont));
             cont++;
-        }*/
+        }
 
         if (ret == 0) {
             ret = Integer.compare(t, t1);

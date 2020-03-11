@@ -29,6 +29,13 @@ import java.util.regex.Pattern;
  */
 public class Processamento {
 
+    static long OFFSET_ANOS = 360 * 24 * 60 * 60 * 1000;
+    static long OFFSET_MESES = 30 * 24 * 60 * 60 * 1000;
+    static long OFFSET_HORAS = 24 * 60 * 60 * 1000;
+    static long OFFSET_DIAS = 60 * 60 * 1000;
+    static long OFFSET_MINUTOS = 60 * 1000;
+
+
     /* Parametos */
     boolean verbose = false;
     boolean vebosePossibilidadesIniciais = false;
@@ -56,6 +63,7 @@ public class Processamento {
 
     /* Acompamnehto */
     long lastime = System.currentTimeMillis();
+    int lastresult = 0;
     long lastime2 = System.currentTimeMillis();
     long[] rbcount = new long[4];
 
@@ -404,7 +412,37 @@ public class Processamento {
     }
 
     void printGraphCount() {
-        System.out.println("Vertices : " + (numVertices - trabalhoPorFazer.size()) + "/" + numVertices + " Edges: " + insumo.getEdgeCount() + "/" + numAretasFinais);
+        System.out.println(toStringGraphCount());
+    }
+
+    String toStringGraphCount() {
+        int edgeCount = insumo.getEdgeCount();
+        String grafoCount = "Verts : " + (numVertices - trabalhoPorFazer.size())
+                + "/" + numVertices + " Edges: "
+                + edgeCount + "/" + numAretasFinais + " (" + ((edgeCount / numAretasFinais) * 100) + "%)";
+        return grafoCount;
+    }
+
+    String toStringEstimatedTime(int trabalhoCount, long time) {
+        int deltaUltimoTrabalho = trabalhoCount - lastresult;
+        String tempoEstimado = "infinito";
+        if (deltaUltimoTrabalho > 0) {
+            long deltaTempoUltimoTrabalho = time - lastime;
+            int trabalhoRestante = numAretasFinais - trabalhoCount;
+            long temposEstimado = (trabalhoRestante * deltaTempoUltimoTrabalho) / deltaUltimoTrabalho;
+            //
+            long anos = temposEstimado / OFFSET_ANOS;
+            temposEstimado = temposEstimado - OFFSET_ANOS * anos;
+            long meses = temposEstimado / OFFSET_MESES;
+            temposEstimado = temposEstimado - OFFSET_MESES * meses;
+            long dias = temposEstimado / OFFSET_DIAS;
+            temposEstimado = temposEstimado - OFFSET_DIAS * dias;
+            long horas = temposEstimado / OFFSET_HORAS;
+            temposEstimado = temposEstimado - OFFSET_HORAS * horas;
+            long minutos = temposEstimado / OFFSET_MINUTOS;
+            tempoEstimado = String.format("%da:%dm:%dd:%dh:%dm", anos, meses, dias, horas, minutos);
+        }
+        return tempoEstimado;
     }
 
     boolean verticeComplete(Integer i) {
@@ -457,22 +495,31 @@ public class Processamento {
     }
 
     void dumpResultadoSeInteressante(Processamento processamento) {
-        if (processamento.dumpResultadoPeriodicamente && System.currentTimeMillis() - processamento.lastime > UtilProccess.ALERT_HOUR) {
-            System.out.println("Alert hour ");
+        long currentTimeMillis = System.currentTimeMillis();
+        if (processamento.dumpResultadoPeriodicamente
+                && currentTimeMillis - processamento.lastime > UtilProccess.ALERT_HOUR) {
+
+            System.out.println("Alert hour");
             UtilProccess.dumpStringIdentified(processamento.getEstrategiaString());
-            UtilProccess.dumpString(String.format(" rbcount[%d,%d,%d,%d]=%d", processamento.rbcount[0], processamento.rbcount[1],
+            UtilProccess.dumpString(String.format(" rbcount[%d,%d,%d,%d]=%d",
+                    processamento.rbcount[0], processamento.rbcount[1],
                     processamento.rbcount[2], processamento.rbcount[3],
                     (processamento.rbcount[0] + processamento.rbcount[1] + processamento.rbcount[2] + processamento.rbcount[3])));
-            processamento.rbcount[0] = processamento.rbcount[1] = processamento.rbcount[2] = processamento.rbcount[3] = 0;
-            processamento.lastime = System.currentTimeMillis();
-            //                        printVertAddArray(insumo, numArestasIniciais);
 
+            String printGraphCount = processamento.toStringGraphCount();
+            String estimatedTime = processamento.toStringEstimatedTime(processamento.insumo.getEdgeCount(), currentTimeMillis);
+
+            processamento.rbcount[0] = processamento.rbcount[1] = processamento.rbcount[2] = processamento.rbcount[3] = 0;
+            processamento.lastime = currentTimeMillis;
+            processamento.lastresult = processamento.insumo.getEdgeCount();
             String lastAdd = String.format(" last+[%5d](%4d,%4d) \n", insumo.getEdgeCount(), processamento.trabalhoAtual, melhorOpcaoLocal);
-            UtilProccess.dumpString(lastAdd);
+
+            UtilProccess.dumpString(lastAdd + "\n" + printGraphCount + "\n estimado: " + estimatedTime);
             UtilProccess.printCurrentItme();
 
-            if (processamento.longestresult < processamento.insumo.getEdgeCount() || System.currentTimeMillis() - processamento.lastime2 > UtilProccess.ALERT_HOUR_12) {
-                processamento.lastime2 = System.currentTimeMillis();
+            if (processamento.longestresult < processamento.insumo.getEdgeCount()
+                    || currentTimeMillis - processamento.lastime2 > UtilProccess.ALERT_HOUR_12) {
+                processamento.lastime2 = currentTimeMillis;
                 if (processamento.longestresult < processamento.insumo.getEdgeCount()) {
                     System.out.print("new longest  result: ");
                     processamento.longestresult = processamento.insumo.getEdgeCount();
@@ -517,6 +564,10 @@ public class Processamento {
 
     void ordenarTrabalhoPorFazerNatual() {
         Collections.sort(trabalhoPorFazer);
+    }
+
+    void ordenarTrabalhoInicialPorCaminhosPossiveis() {
+        Collections.sort(trabalhoPorFazer, new ComparatorTrabalhoPorFazer(this.caminhosPossiveis, false));
     }
 
     void ordenarTrabalhoPorCaminhosPossiveis() {
