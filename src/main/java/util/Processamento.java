@@ -417,8 +417,8 @@ public class Processamento {
 
     String toStringGraphCount() {
         int edgeCount = insumo.getEdgeCount();
-        String grafoCount = "Verts : " + (numVertices - trabalhoPorFazer.size())
-                + "/" + numVertices + " Edges: "
+        String grafoCount = "verts : " + (numVertices - trabalhoPorFazer.size())
+                + "/" + numVertices + " edges: "
                 + edgeCount + "/" + numAretasFinais + " (" + ((edgeCount / numAretasFinais) * 100) + "%)";
         return grafoCount;
     }
@@ -501,7 +501,7 @@ public class Processamento {
 
             System.out.println("Alert hour");
             UtilProccess.dumpStringIdentified(processamento.getEstrategiaString());
-            UtilProccess.dumpString(String.format(" rbcount[%d,%d,%d,%d]=%d",
+            UtilProccess.dumpString(String.format("rbcount[%d,%d,%d,%d]=%d ",
                     processamento.rbcount[0], processamento.rbcount[1],
                     processamento.rbcount[2], processamento.rbcount[3],
                     (processamento.rbcount[0] + processamento.rbcount[1] + processamento.rbcount[2] + processamento.rbcount[3])));
@@ -512,9 +512,9 @@ public class Processamento {
             processamento.rbcount[0] = processamento.rbcount[1] = processamento.rbcount[2] = processamento.rbcount[3] = 0;
             processamento.lastime = currentTimeMillis;
             processamento.lastresult = processamento.insumo.getEdgeCount();
-            String lastAdd = String.format(" last+[%5d](%4d,%4d) \n", insumo.getEdgeCount(), processamento.trabalhoAtual, melhorOpcaoLocal);
+            String lastAdd = String.format("last+[%5d](%4d,%4d) \n", insumo.getEdgeCount(), processamento.trabalhoAtual, melhorOpcaoLocal);
 
-            UtilProccess.dumpString(lastAdd + "\n" + printGraphCount + "\n estimado: " + estimatedTime);
+            UtilProccess.dumpString(lastAdd + "\n" + printGraphCount + "\nestimado: " + estimatedTime);
             UtilProccess.printCurrentItme();
 
             if (processamento.longestresult < processamento.insumo.getEdgeCount()
