@@ -361,19 +361,21 @@ public class UtilProccess {
                     lastfileWriter.append("[");
                     System.out.print("[");
 
-                    for (Integer j : opcoesTestadas) {
-                        String jstr = j.toString();
-                        System.out.print(jstr);
-                        System.out.print(",");
-                        fileWriter.append(jstr);
-                        fileWriter.append(",");
-                        lastfileWriter.append(jstr);
-                        lastfileWriter.append(",");
-                        charcount = charcount - jstr.length() - 1;
-                        if (trunk && charcount <= 0) {
-                            charcount = max_length_file;
-                            fileWriter.append("\n");
-                            lastfileWriter.append("\n");
+                    if (opcoesTestadas != null) {
+                        for (Integer j : opcoesTestadas) {
+                            String jstr = j.toString();
+                            System.out.print(jstr);
+                            System.out.print(",");
+                            fileWriter.append(jstr);
+                            fileWriter.append(",");
+                            lastfileWriter.append(jstr);
+                            lastfileWriter.append(",");
+                            charcount = charcount - jstr.length() - 1;
+                            if (trunk && charcount <= 0) {
+                                charcount = max_length_file;
+                                fileWriter.append("\n");
+                                lastfileWriter.append("\n");
+                            }
                         }
                     }
                     fileWriter.append("] ");
