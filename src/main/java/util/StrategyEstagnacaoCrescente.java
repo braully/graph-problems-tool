@@ -23,6 +23,7 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
     @Override
     public void estagnarVertice(Processamento processamento) throws IllegalStateException {
         verboseInicioEtapa(processamento);
+        System.out.println("Trabalho por fazer: " + processamento.trabalhoPorFazer);
         System.out.println("Estagnando vertice: " + processamento.trabalhoAtual);
         System.out.println("Possibilidades: " + processamento.getOpcoesPossiveisAtuais());
         Collection<Integer> caminhoPercorridoPosicaoAtual = processamento.getCaminhoPercorridoPosicaoAtual();
