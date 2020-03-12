@@ -4,6 +4,7 @@ import edu.uci.ics.jung.graph.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,13 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
         } else {
             Collections.sort(processamento.trabalhoPorFazer);
         }
+    }
+
+    public Comparator<Integer> getComparatorTrabalhoPorFazer(Processamento processamento) {
+        if (comparatorTrabalhoPorFazer == null) {
+            comparatorTrabalhoPorFazer = new ComparatorTrabalhoPorFazer(processamento.caminhosPossiveis);
+        }
+        return comparatorTrabalhoPorFazer;
     }
 
     @Override

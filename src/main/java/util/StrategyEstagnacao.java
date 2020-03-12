@@ -17,8 +17,8 @@ import java.util.TreeMap;
  */
 public class StrategyEstagnacao implements IGenStrategy {
 
-    private Comparator<Integer> comparatorTrabalhoPorFazer;
-    private ComparatorMap comparatorProfundidade;
+    Comparator<Integer> comparatorTrabalhoPorFazer;
+    ComparatorMap comparatorProfundidade;
 
     public ComparatorMap getComparatorProfundidade(Processamento processamento) {
         if (comparatorProfundidade == null) {

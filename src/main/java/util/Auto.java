@@ -43,7 +43,7 @@ public class Auto {
     public static void main(String... args) {
         String[] param = args;
         if (param == null || param.length == 0) {
-            param = new String[]{"--load-start", "--continue", "", "-7"};
+            param = new String[]{"--load-start", "--continue", "", "-7", "-oi"};
             System.out.println("Using default options: --load-start --continue -7");
         }
         PipeGraph.main(param);
