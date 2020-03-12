@@ -25,8 +25,10 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
         verboseInicioEtapa(processamento);
         System.out.println("Estagnando vertice: " + processamento.trabalhoAtual);
         System.out.println("Possibilidades: " + processamento.getOpcoesPossiveisAtuais());
+        Collection<Integer> caminhoPercorridoPosicaoAtual = processamento.getCaminhoPercorridoPosicaoAtual();
+        System.out.println("Possibilidades já percorridas: " + caminhoPercorridoPosicaoAtual);
         while (trabalhoNaoAcabou(processamento) && processamento.deuPassoFrente()) {
-            Collection<Integer> caminhoPercorridoPosicaoAtual = processamento.getCaminhoPercorridoPosicaoAtual();
+            processamento.getCaminhoPercorridoPosicaoAtual();
             processamento.melhorOpcaoLocal = avaliarMelhorOpcao(processamento);
             try {
                 adicionarMellhorOpcao(processamento);
