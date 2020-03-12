@@ -50,7 +50,7 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
 
     public Comparator<Integer> getComparatorTrabalhoPorFazer(Processamento processamento) {
         if (comparatorTrabalhoPorFazer == null) {
-            comparatorTrabalhoPorFazer = new ComparatorTrabalhoPorFazer(processamento.caminhosPossiveis);
+            comparatorTrabalhoPorFazer = new ComparatorTrabalhoPorFazer(processamento.caminhosPossiveis, false);
         }
         return comparatorTrabalhoPorFazer;
     }
