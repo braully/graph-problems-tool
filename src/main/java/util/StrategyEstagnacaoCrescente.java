@@ -24,8 +24,9 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
     public void estagnarVertice(Processamento processamento) throws IllegalStateException {
         verboseInicioEtapa(processamento);
         System.out.println("Estagnando vertice: " + processamento.trabalhoAtual);
+        System.out.println("Possibilidades: " + processamento.getOpcoesPossiveisAtuais());
         while (trabalhoNaoAcabou(processamento) && processamento.deuPassoFrente()) {
-            processamento.getCaminhoPercorridoPosicaoAtual();
+            Collection<Integer> caminhoPercorridoPosicaoAtual = processamento.getCaminhoPercorridoPosicaoAtual();
             processamento.melhorOpcaoLocal = avaliarMelhorOpcao(processamento);
             try {
                 adicionarMellhorOpcao(processamento);
