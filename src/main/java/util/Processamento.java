@@ -160,9 +160,9 @@ public class Processamento {
                             Integer e2 = Integer.parseInt(matcher.group(3));
                             List<Integer> caminho = UtilProccess.strToList(matcher.group(4));
                             Integer aresta = addEdge(e1, e2);
-//                            if (!numEdge.equals(aresta)) {
-//                                throw new IllegalStateException(String.format("Incorrect load info edge %d expected %d for: %s ", aresta, numEdge, str));
-//                            }
+                            if (!numEdge.equals(aresta)) {
+                                throw new IllegalStateException(String.format("Incorrect load info edge %d expected %d for: %s ", aresta, numEdge, str));
+                            }
                             if (aresta != null) {
                                 caminhoPercorrido.put(aresta, caminho);
                                 if (verbose) {
