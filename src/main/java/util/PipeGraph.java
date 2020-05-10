@@ -230,7 +230,7 @@ public class PipeGraph {
         if (cmd.hasOption("continue")) {
             System.out.println("Continue combination");
             String loadProcess = cmd.getOptionValue("continue");
-            if (loadProcess != null && loadProcess.trim().isEmpty()) {
+            if (loadProcess != null && !loadProcess.trim().isEmpty()) {
                 processamento.loadCaminho(loadProcess);
                 System.out.println("...Ok");
             } else {
