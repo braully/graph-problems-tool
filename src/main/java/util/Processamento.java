@@ -438,7 +438,7 @@ public class Processamento {
         int edgeCount = insumo.getEdgeCount();
         String grafoCount = "verts : " + (numVertices - trabalhoPorFazer.size())
                 + "/" + numVertices + " edges: "
-                + edgeCount + "/" + numAretasFinais + " (" + ((edgeCount / numAretasFinais) * 100) + "%)";
+                + edgeCount + "/" + numAretasFinais + " (" + (((double) edgeCount / (double) numAretasFinais) * 100) + "%)";
         return grafoCount;
     }
 
