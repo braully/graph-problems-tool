@@ -449,7 +449,10 @@ public class UtilProccess {
             String[] split = group.split(",");
             if (split != null && split.length > 0) {
                 for (String str : split) {
-                    list.add(Integer.parseInt(str.trim().replaceAll("\\D+", "")));
+                    String strTrimed = str.trim().replaceAll("\\D+", "");
+                    if (!strTrimed.isEmpty()) {
+                        list.add(Integer.parseInt(strTrimed));
+                    }
                 }
             }
         }
