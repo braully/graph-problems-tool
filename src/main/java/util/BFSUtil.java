@@ -48,13 +48,13 @@ public class BFSUtil {
         }
     }
 
-    void visitVertexRanking(Integer v, Integer[] bfs, UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
-//        queue.clear();
-//        queue.add(v);
+    void visitVertexRanking(Integer v, Integer[] bfs,
+            UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
         while (!queue.isEmpty()) {
             Integer poll = queue.poll();
             int depth = bfs[poll] + 1;
-            Collection<Integer> ns = (Collection<Integer>) subgraph1.getNeighborsUnprotected(poll);
+            Collection<Integer> ns = (Collection<Integer>) subgraph1.
+                    getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
                 if (bfs[nv] == null) {
                     bfs[nv] = depth;
@@ -67,28 +67,10 @@ public class BFSUtil {
 
     void bfs(UndirectedSparseGraphTO<Integer, Integer> subgraph, Integer v) {
         bfsRanking(subgraph, v);
-//        for (int i = 0; i < bfs.length; i++) {
-//            bfs[i] = null;
-//        }
-//        bfs[v] = 0;
-//        visitVertex(v, bfs, subgraph);
-
     }
 
     void visitVertex(Integer v, Integer[] bfs, UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
-//        queue.clear();
-//        queue.add(v);
-//        while (!queue.isEmpty()) {
-//            Integer poll = queue.poll();
-//            int depth = bfs[poll] + 1;
-//            Collection<Integer> ns = (Collection<Integer>) subgraph1.getNeighborsUnprotected(poll);
-//            for (Integer nv : ns) {
-//                if (bfs[nv] == null) {
-//                    bfs[nv] = depth;
-//                    queue.add(nv);
-//                }
-//            }
-//        }
+
     }
 
     void incDepthcount(int[] depthcount) {
