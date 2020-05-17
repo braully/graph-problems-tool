@@ -341,8 +341,12 @@ public class UtilProccess {
 
             System.out.print("vert-add: ");
             fileWriter.append("dump-caminho-percorrido: ");
-
-            for (Integer i : (Collection<Integer>) lastgraph.getEdges()) {
+            Collection<Integer> edges = (Collection<Integer>) lastgraph.getEdges();
+            List<Integer> listEdges = new ArrayList<>();
+            if (edges != null) {
+                listEdges.addAll(edges);
+            }
+            for (Integer i : listEdges) {
                 if (i > numArestasIniciais) {
                     Collection<Integer> opcoesTestadas = caminhoPercorrido.get(i);
                     String str = String.format("{%d}(%d,%d)",
