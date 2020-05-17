@@ -356,14 +356,15 @@ public class UtilProccess {
                     fileWriter.append(str);
                     lastfileWriter.append(str);
                     charcount = charcount - str.length();
+                    fileWriter.append("[");
+                    lastfileWriter.append("[");
+                    System.out.print("[");
+
                     if (trunk && charcount <= 0) {
                         charcount = max_length_file;
                         fileWriter.append("\n");
                         lastfileWriter.append("\n");
                     }
-                    fileWriter.append("[");
-                    lastfileWriter.append("[");
-                    System.out.print("[");
 
                     if (opcoesTestadas != null) {
                         for (Integer j : opcoesTestadas) {
