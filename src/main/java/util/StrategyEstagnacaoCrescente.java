@@ -27,7 +27,9 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
         System.out.println("Estagnando vertice: " + processamento.trabalhoAtual);
         System.out.println("Possibilidades: " + processamento.getOpcoesPossiveisAtuais());
         Collection<Integer> caminhoPercorridoPosicaoAtual = processamento.getCaminhoPercorridoPosicaoAtual();
-        System.out.println("Possibilidades já percorridas: " + caminhoPercorridoPosicaoAtual);
+        if (caminhoPercorridoPosicaoAtual != null && !caminhoPercorridoPosicaoAtual.isEmpty()) {
+            System.out.println("Possibilidades já percorridas: " + caminhoPercorridoPosicaoAtual);
+        }
         while (trabalhoNaoAcabou(processamento) && processamento.deuPassoFrente()) {
             processamento.getCaminhoPercorridoPosicaoAtual();
             processamento.melhorOpcaoLocal = avaliarMelhorOpcao(processamento);
@@ -57,6 +59,64 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
             comparatorTrabalhoPorFazer = new ComparatorTrabalhoPorFazer(processamento.caminhosPossiveis, false);
         }
         return comparatorTrabalhoPorFazer;
+    }
+
+    boolean opcaoValida(Processamento processamento) {
+        Integer melhorOpcao = processamento.melhorOpcaoLocal;
+
+        if (!processamento.bfsalg.getDistance(processamento.insumo, processamento.trabalhoAtual).equals(0)) {
+            throw new IllegalStateException("Estado do bfs incorreto para" + processamento.trabalhoAtual + " " + processamento.getPosicaoAtualAbsoluta());
+        }
+
+        if (melhorOpcao == null) {
+            processamento.rbcount[0]++;
+            if (processamento.verbose) {
+                System.out.println("melhor opçao é nula");
+            }
+            return false;
+        }
+
+        int posicao = processamento.getPosicaoAtualAbsoluta();
+        int distanciaMelhorOpcao = processamento.bfsalg.getDistance(processamento.insumo, melhorOpcao);
+        if (distanciaMelhorOpcao < 4) {
+            //Opção do caminho original já não é mais valida
+            processamento.rbcount[1]++;
+            if (processamento.verbose) {
+                System.out.printf("g[%d](%d,%d) ", posicao, processamento.trabalhoAtual, melhorOpcao);
+            }
+            return false;
+        }
+
+        if (processamento.anteciparVazio && processamento.bfsalg.getDistance(processamento.insumo, processamento.trabalhoAtual) == 0) {
+            boolean condicao1 = true;
+            int dv = processamento.getDvTrabalhoAtual();
+            condicao1 = dv <= processamento.bfsalg.depthcount[4];
+            if (!condicao1 && processamento.verbose) {
+                System.out.printf("*[%d](%d,%d -> rdv=%d 4c=%d) ", posicao,
+                        processamento.trabalhoAtual, melhorOpcao, dv,
+                        processamento.bfsalg.depthcount[4]);
+            }
+            if (!condicao1) {
+                processamento.rbcount[2]++;
+                return false;
+            }
+        }
+        if (processamento.descartarOpcoesNaoOptimais && !processamento.caminhoPercorrido.get(posicao).isEmpty()) {
+            Integer escolhaAnterior = ((List<Integer>) processamento.caminhoPercorrido.get(posicao)).get(0);
+            List<Integer> rankingAnterior = processamento.historicoRanking.get(posicao).get(escolhaAnterior);
+            if (rankingAnterior != null) {
+                Integer rankingEscolhaAnterior = rankingAnterior.get(0);
+                Integer rankingOpcaoAtual = processamento.getRankingHistorico(posicao, melhorOpcao);
+                if (rankingEscolhaAnterior != null && rankingOpcaoAtual != null && rankingOpcaoAtual < rankingEscolhaAnterior) {
+                    processamento.rbcount[3]++;
+                    if (processamento.verbose) {
+                        System.out.printf("o[%d](%d,%d) ", posicao, processamento.trabalhoAtual, melhorOpcao);
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
@@ -131,35 +191,29 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
             int i = 0;
             for (i = 0; i < processamento.getOpcoesPossiveisAtuais().size(); i++) {
                 Integer val = processamento.getOpcoesPossiveisAtuais().get(i);
+                //Vertice já foi testado em ranking anterior, não precisa recalcular
                 if (val < lastAdd) {
                     List<Integer> listRankingVal = rankingAtual.get(val);
                     if (listRankingVal == null) {
                         listRankingVal = new ArrayList<>(4);
+                        listRankingVal.add(0);
+                        listRankingVal.add(0);
+                        listRankingVal.add(0);
                         rankingAtual.put(val, listRankingVal);
                     }
-                    listRankingVal.add(0);
-                    listRankingVal.add(0);
-                    listRankingVal.add(0);
                     continue;
                 }
                 int bfval = bfs[val];
-                if (bfval == 4) {
+                if (bfval == 4) {//Rankear opção potencial                    
                     List<Integer> listRankingVal = rankingAtual.get(val);
                     if (listRankingVal == null) {
                         listRankingVal = new ArrayList<>(4);
+                        //Rankear opção
                         rankingAtual.put(val, listRankingVal);
                     }
                     rankearOpcao(processamento, posicaoAtual, val);
                 } else {
-//                    if (processamento.verboseRankingOption) {
-                    //Erro, valor ira provocar cintura menor que 5.
-//                        System.out.printf("#(%4d,%4d): ", processamento.trabalhoAtual, val);
-//                        UtilProccess.printArray(processamento.bfsRanking.depthcount);
-
-//                    }
-                    zeraRankOpcao(processamento, posicaoAtual, val);
-                    //                        Devo breakar?
-//                    break;
+                    //zeraRankOpcao(processamento, posicaoAtual, val);
                 }
                 if (processamento.verboseRankingOption) {
                     System.out.printf("Ranking (%4d,%4d): ", processamento.trabalhoAtual, val);

@@ -353,7 +353,7 @@ public class Processamento {
         if (inviavel) {
             throw new IllegalStateException("Grafo inviavel vetrice ");
         }
-        System.out.println("Graph... Ok");
+        System.out.println("Graph viability... Ok");
     }
 
     public void sanitizeGraphPossibility() {
@@ -711,7 +711,9 @@ public class Processamento {
             }
         }
         Integer arestaAtual = getPosicaoAtualAbsoluta();
-        caminhoPercorrido.get(arestaAtual).clear();//limparranking
+        caminhoPercorrido.get(arestaAtual).clear();//limpar caminho
+        //limparranking
+        historicoRanking.get(arestaAtual).clear();
         Integer arestaAnterior = arestaAtual - 1;
         Pair<Integer> desfazer = null;
         while ((desfazer = insumo.getEndpoints(arestaAnterior)) == null) {

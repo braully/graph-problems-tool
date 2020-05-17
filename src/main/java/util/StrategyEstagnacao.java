@@ -120,45 +120,6 @@ public class StrategyEstagnacao implements IGenStrategy {
         }
     }
 
-    private boolean posicaoTemMaisOpcoes(Processamento processamento) {
-//        return false;
-        Integer melhorOpcao = processamento.melhorOpcaoLocal;
-        Integer posicao = processamento.getPosicaoAtualAbsoluta();
-//
-//        if (melhorOpcao == null) {
-//            processamento.rbcount[0]++;
-//            if (processamento.verbose) {
-//                System.out.println("melhor opçao é nula");
-//            }
-//            return false;
-//        }
-//
-        if (processamento.anteciparVazio && processamento.bfsalg.getDistance(processamento.insumo, processamento.trabalhoAtual) == 0) {
-            boolean condicao1 = true;
-            int dv = processamento.getDvTrabalhoAtual();
-            condicao1 = dv <= processamento.bfsalg.depthcount[4];
-            if (!condicao1 && processamento.verbose) {
-                System.out.printf("*[%d](%d,%d -> rdv=%d 4c=%d) ", posicao, processamento.trabalhoAtual, melhorOpcao, dv, processamento.bfsalg.depthcount[4]);
-            }
-            if (!condicao1) {
-                processamento.rbcount[2]++;
-                return false;
-            }
-        }
-        if (processamento.descartarOpcoesNaoOptimais && !processamento.caminhoPercorrido.get(posicao).isEmpty()) {
-            Integer escolhaAnterior = ((List<Integer>) processamento.caminhoPercorrido.get(posicao)).get(0);
-            List<Integer> rankingAnterior = processamento.historicoRanking.get(posicao).get(escolhaAnterior);
-            if (rankingAnterior != null) {
-                Integer rankingEscolhaAnterior = rankingAnterior.get(0);
-                if (processamento.historicoRanking.get(posicao).get(melhorOpcao).get(0) < rankingEscolhaAnterior) {
-                    processamento.rbcount[3]++;
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     /* */
     void verboseInicioEtapa(Processamento processamento) {
 //        System.out.print("Start trabalho: ");
