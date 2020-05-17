@@ -376,16 +376,16 @@ public class UtilProccess {
                             lastfileWriter.append(jstr);
                             lastfileWriter.append(",");
                             charcount = charcount - jstr.length() - 1;
-                            if (trunk && charcount <= 0) {
-                                charcount = max_length_file;
-                                fileWriter.append("\n");
-                                lastfileWriter.append("\n");
-                            }
                         }
                     }
                     fileWriter.append("] ");
                     lastfileWriter.append("] ");
                     System.out.print("] ");
+                    if (trunk && charcount <= 0) {
+                        charcount = max_length_file;
+                        fileWriter.append("\n");
+                        lastfileWriter.append("\n");
+                    }
                 }
             }
             System.out.println();
