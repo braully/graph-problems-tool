@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -345,6 +346,7 @@ public class UtilProccess {
             List<Integer> listEdges = new ArrayList<>();
             if (edges != null) {
                 listEdges.addAll(edges);
+                Collections.sort(listEdges);
             }
             for (Integer i : listEdges) {
                 if (i > numArestasIniciais) {

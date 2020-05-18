@@ -212,9 +212,10 @@ public class StrategyEstagnacaoCrescente extends StrategyEstagnacao implements I
                         rankingAtual.put(val, listRankingVal);
                     }
                     rankearOpcao(processamento, posicaoAtual, val);
-                } else {
+                } 
+                //else {
                     //zeraRankOpcao(processamento, posicaoAtual, val);
-                }
+                //}
                 if (processamento.verboseRankingOption) {
                     System.out.printf("Ranking (%4d,%4d): ", processamento.trabalhoAtual, val);
                     UtilProccess.printArray(processamento.bfsRanking.depthcount);
