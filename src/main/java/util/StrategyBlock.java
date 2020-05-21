@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class StrategyBlock
-        extends StrategyEstagnacao
+        extends StrategyEstagnacaoCrescente
         implements IGenStrategy {
 
     public String getName() {
@@ -50,7 +50,8 @@ public class StrategyBlock
         while (!blocos.isEmpty()) {
             Map.Entry<Integer, LinkedList<Integer>> firstEntry = blocos.firstEntry();
             LinkedList<Integer> bloco = firstEntry.getValue();
-            System.out.printf("Processando bloco %d vertices %s\n", firstEntry.getKey(), firstEntry.getValue().toString());
+            System.out.printf("Processando bloco %d vertices %s\n",
+                    firstEntry.getKey(), firstEntry.getValue().toString());
             processamento.marcoInicial();
             estagnarBloco(processamento, bloco);
 
@@ -78,20 +79,6 @@ public class StrategyBlock
         }
     }
 
-//    @Override
-//    void adicionarMellhorOpcao(Processamento processamento) {
-//        super.adicionarMellhorOpcao(processamento);
-//    }
-//    @Override
-//    Pair<Integer> desfazerUltimoTrabalho(Processamento processamento) {
-////        Pair<Integer> desfazer = super.desfazerUltimoTrabalho(processamento);
-////        blocoidx--;
-////        Integer idx = bloco.indexOf(desfazer.getFirst());
-////        blocoidx = idx;
-////        return desfazer;
-//        return super.desfazerUltimoTrabalho(processamento);
-//    }
-//
     boolean temTrabalhoNoBloco(Processamento processamento, LinkedList<Integer> bloco) {
         boolean ret = true;
         for (Integer i : bloco) {

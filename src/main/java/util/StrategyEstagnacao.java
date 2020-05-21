@@ -68,13 +68,12 @@ public class StrategyEstagnacao implements IGenStrategy {
         }
     }
 
-    //Na estagnação crescente não há reordenação de fim de etapa...?
     public void ordenacaoFimEtapa(Processamento processamento) {
-        /*if (processamento.ordenarTrabalhoPorFazerPorPrimeiraOpcao) {
+        if (processamento.ordenarTrabalhoPorFazerPorPrimeiraOpcao) {
             Collections.sort(processamento.trabalhoPorFazer, getComparatorTrabalhoPorFazer(processamento));
         } else {
             Collections.sort(processamento.trabalhoPorFazer);
-        }*/
+        }
     }
 
     void verboseInicioGeracao(Processamento processamento) {

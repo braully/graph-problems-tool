@@ -7,7 +7,7 @@ public class StrategyBlockSeq
         implements IGenStrategy {
 
     public String getName() {
-        return "Gerar em Bloco Sequencial";
+        return "Estagnar em Bloco Sequencial";
     }
 
     @Override
