@@ -413,15 +413,21 @@ public class Processamento {
                 Integer indiceAresta = posicaoAtualAbsoluta - degree + i;
                 Pair endpoints = insumoTmp.getEndpoints(indiceAresta);
                 if (endpoints != null) {
-                    Collection<Integer> percorrido = caminhoPercorrido.get(indiceAresta);
-                    if (!endpoints.getFirst().equals(v)) {
-                        throw new IllegalStateException("Vertices em sequencias incorrestas: " + v + " " + endpoints + " " + posicaoAtualAbsoluta);
+                    if (!verticeComplete((Integer) endpoints.getFirst())
+                            && !verticeComplete((Integer) endpoints.getSecond())) {
+                        Collection<Integer> percorrido = caminhoPercorrido.get(indiceAresta);
+                        if (!endpoints.getFirst().equals(v)) {
+                            throw new IllegalStateException("Vertices em sequencias incorrestas: " + v + " " + endpoints + " " + posicaoAtualAbsoluta);
+                        }
+                        addPendencia(v, endpoints, new ArrayList<>(percorrido));
+                        percorrido.clear();
+                        insumoTmp.removeEdge(indiceAresta);
+                        caminhoPercorrido.remove(indiceAresta);
+                        System.out.printf("-{%d}(%d,%d) ", indiceAresta, endpoints.getFirst(), endpoints.getSecond());
+                    } else {
+                        //Ignorado, pois o vertice apesar de incompleto faz parte da completude de outro vertice
+                        System.out.printf("i{%d}(%d,%d) ", indiceAresta, endpoints.getFirst(), endpoints.getSecond());
                     }
-                    addPendencia(v, endpoints, new ArrayList<>(percorrido));
-                    percorrido.clear();
-                    insumoTmp.removeEdge(indiceAresta);
-                    caminhoPercorrido.remove(indiceAresta);
-                    System.out.printf("-{%d}(%d,%d) ", indiceAresta, endpoints.getFirst(), endpoints.getSecond());
                 } else {
                     System.out.printf("**{%d}(%d,*) ", indiceAresta, v);
                 }
