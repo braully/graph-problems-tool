@@ -20,6 +20,35 @@ import java.util.Set;
  */
 public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSparseGraph {
 
+    public UndirectedSparseGraphTO() {
+        super();
+    }
+
+    public UndirectedSparseGraphTO(String strEdegdsGraph) {
+        this();
+        this.addEdgesFromString(strEdegdsGraph);
+    }
+
+    public void addEdgesFromString(String strEdges) {
+        String[] edges = null;
+        if (strEdges != null && (edges = strEdges.trim().split(",")) != null) {
+            try {
+                int countEdge = this.getEdgeCount();
+                for (String stredge : edges) {
+                    String[] vs = stredge.split("-");
+
+                    if (vs != null && vs.length >= 2) {
+                        Integer source = Integer.parseInt(vs[0].trim());
+                        Integer target = Integer.parseInt(vs[1].trim());
+                        this.addEdge(countEdge++, source, target);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public Collection<Pair<V>> getPairs() {
         Collection values = this.edges.values();
         return (Collection<Pair<V>>) values;

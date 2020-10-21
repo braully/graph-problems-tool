@@ -7,24 +7,24 @@ import java.util.Queue;
 
 public class BFSUtil {
 
-    Integer[] bfs = null;
+    public Integer[] bfs = null;
     private Queue<Integer> queue = null;
     int[] depthcount = new int[5];
 
-    BFSUtil(int size) {
+    public BFSUtil(int size) {
         bfs = new Integer[size];
         queue = new LinkedList<Integer>();
     }
 
-    void labelDistances(UndirectedSparseGraphTO graphTemplate, Integer v) {
+    public void labelDistances(UndirectedSparseGraphTO graphTemplate, Integer v) {
         bfs(graphTemplate, v);
     }
 
-    Integer getDistance(UndirectedSparseGraphTO graphTemplate, Integer u) {
+    public Integer getDistance(UndirectedSparseGraphTO graphTemplate, Integer u) {
         return bfs[u];
     }
 
-    void bfsRanking(UndirectedSparseGraphTO<Integer, Integer> subgraph, Integer v, Integer... fakeNeighbor) {
+    public void bfsRanking(UndirectedSparseGraphTO<Integer, Integer> subgraph, Integer v, Integer... fakeNeighbor) {
         for (int i = 0; i < bfs.length; i++) {
             bfs[i] = null;
         }
@@ -48,7 +48,7 @@ public class BFSUtil {
         }
     }
 
-    void visitVertexRanking(Integer v, Integer[] bfs,
+    public void visitVertexRanking(Integer v, Integer[] bfs,
             UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
         while (!queue.isEmpty()) {
             Integer poll = queue.poll();
@@ -73,9 +73,13 @@ public class BFSUtil {
 
     }
 
-    void incDepthcount(int[] depthcount) {
+    public void incDepthcount(int[] depthcount) {
         for (int i = 0; i < depthcount.length; i++) {
             this.depthcount[i] = this.depthcount[i] + depthcount[i];
         }
+    }
+
+    public void incBfs(UndirectedSparseGraphTO graph, Integer vertsrc, Integer verttg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

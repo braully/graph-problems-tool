@@ -55,16 +55,6 @@ public class GraphStatistics implements IGraphOperation {
     
      */
     public int girth(UndirectedSparseGraphTO<Integer, Integer> graph) {
-//        double girth = -1;
-//        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
-//        Collection<Integer> vertices = graph.getVertices();
-//        for (Integer v : vertices) {
-//            bdl.labelDistances(graph, v);
-//        }
-//        return girth;
-        /**
-         * Local inner class to represent vertices found at a certain depth.
-         */
         class Node {
             
             public int vertex, depth;
