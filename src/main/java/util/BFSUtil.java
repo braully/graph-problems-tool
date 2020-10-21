@@ -9,7 +9,7 @@ public class BFSUtil {
 
     public Integer[] bfs = null;
     private Queue<Integer> queue = null;
-    int[] depthcount = new int[5];
+    public int[] depthcount = new int[5];
 
     public BFSUtil(int size) {
         bfs = new Integer[size];
@@ -65,6 +65,24 @@ public class BFSUtil {
         }
     }
 
+    public void revisitVertexRanking(Integer v, Integer[] bfs,
+            UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
+        while (!queue.isEmpty()) {
+            Integer poll = queue.poll();
+            int depth = bfs[poll] + 1;
+            Collection<Integer> ns = (Collection<Integer>) subgraph1.
+                    getNeighborsUnprotected(poll);
+            for (Integer nv : ns) {
+                if (bfs[nv] > depth) {
+                    depthcount[bfs[nv]]--;
+                    bfs[nv] = depth;
+                    queue.add(nv);
+                    depthcount[depth]++;
+                }
+            }
+        }
+    }
+
     void bfs(UndirectedSparseGraphTO<Integer, Integer> subgraph, Integer v) {
         bfsRanking(subgraph, v);
     }
@@ -79,7 +97,14 @@ public class BFSUtil {
         }
     }
 
-    public void incBfs(UndirectedSparseGraphTO graph, Integer vertsrc, Integer verttg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void incBfs(UndirectedSparseGraphTO graph, Integer vroot, Integer newvert) {
+        if (newvert != null) {
+            depthcount[bfs[newvert]]--;
+            bfs[newvert] = 1;
+            queue.add(newvert);
+            depthcount[1]++;
+            revisitVertexRanking(vroot, bfs, graph);
+
+        }
     }
 }

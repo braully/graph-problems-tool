@@ -86,6 +86,10 @@ public class BFSUpdateTest {
                     Assert.assertEquals(bfs.bfs[i], bfsaux.bfs[i]);
                     Assert.assertEquals(bfs.bfs[i], bfsinc.bfs[i]);
                 }
+                for (int i = 0; i < bfs.depthcount.length; i++) {
+                    Assert.assertEquals(bfs.depthcount[i], bfsaux.depthcount[i]);
+                    Assert.assertEquals(bfs.depthcount[i], bfsinc.depthcount[i]);
+                }
             }
         }
     }
