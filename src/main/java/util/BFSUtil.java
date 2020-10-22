@@ -11,6 +11,33 @@ public class BFSUtil {
     private Queue<Integer> queue = null;
     public int[] depthcount = new int[5];
 
+    Integer[] bfsBkp = null;
+    int[] depthcountBkp = null;
+
+    public void backup() {
+        if (bfsBkp == null) {
+            Integer[] bfsBkp = new Integer[bfs.length];
+            int[] depthcountBkp = new int[5];
+        }
+        for (int i = 0; i < bfs.length; i++) {
+            bfsBkp[i] = bfs[i];
+        }
+        for (int i = 0; i < depthcount.length; i++) {
+            depthcountBkp[i] = depthcount[i];
+        }
+    }
+
+    public void load() {
+        if (bfsBkp != null) {
+            for (int i = 0; i < bfs.length; i++) {
+                bfs[i] = bfsBkp[i];
+            }
+            for (int i = 0; i < depthcount.length; i++) {
+                depthcount[i] = depthcountBkp[i];
+            }
+        }
+    }
+
     public BFSUtil(int size) {
         bfs = new Integer[size];
         queue = new LinkedList<Integer>();
