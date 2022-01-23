@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.*;
 
-
 public class GraphG6Generator extends AbstractGraphGenerator {
 
     static final Logger log = Logger.getLogger(GraphG6Generator.class);
@@ -31,11 +30,10 @@ public class GraphG6Generator extends AbstractGraphGenerator {
     public UndirectedSparseGraphTO<Integer, Integer> generateGraph(Map parameters) {
         String g6code = getStringParameter(parameters, N_VERTICES);
 
-
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         try {
             graph = UtilGraph.loadGraphG6(g6code);
-            String name = "G6" + graph.getVertexCount() + ",M" + graph.getEdgeCount();
+            String name = "G6-n" + graph.getVertexCount() + "-m" + graph.getEdgeCount();
             graph.setName(name);
             log.info("Graph: " + name);
             String s = GraphConvertToNKIndex.graphToNMIndexedCode(graph);
@@ -44,7 +42,6 @@ public class GraphG6Generator extends AbstractGraphGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         return graph;
     }
