@@ -459,6 +459,9 @@
                             .data(vertex)
                             .enter().append("g")
                             .attr("class", "node")
+                            .attr("class", function (d) {
+                                return 'node ' + 'node-' + d.name;
+                            })
                             .on("click", singclick)
                             .on("dblclick", dblclick)
                             .call(force.drag);
@@ -529,15 +532,15 @@
                           if (selected_node) {
                               console.log('remove:');
                               console.log(selected_node);
-                              console.log('from:');
-                              console.log(vertex);
-                              console.log('remove links ');
                               //vertex.remove(selected_node);
 //                            nodes.splice(nodes.indexOf(selectedNode), 1);
 //                            spliceLinksForNode(selectedNode);
+                              var tgname = '.target-'+selected_node.name;
+                              var scname = '.source-'+selected_node.name;
+                              console.log('Remove links with: ' + scname + ', ' + tgname);
+                              d3.select(tgname).remove();
+                              d3.select(scname).remove();  
                               d3.select('.last_selected').remove();
-                              d3.select('.target-'+selected_node.name).remove();
-                              d3.select('.source-'+selected_node.name).remove();  
                           }
                           selected_node = null;
                           //restart();
