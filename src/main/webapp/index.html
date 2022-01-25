@@ -438,20 +438,16 @@
                     });
 
                     var edges = graph.normalizedPairs.map(function (d) {
-                        return {"source": d[0], "target": d[1], "value": 2, "origin": d, "left": true, "right": true};
+                        return {"source": d[0], "target": d[1], "value": 1, "origin": d, "left": true, "right": true};
                     });
                     force.nodes(vertex).links(edges).start();
 
                     var link = svg.selectAll(".link")
-                            .data(edges)
-                            .enter().append("line")
+                            .data(edges).enter().append("line")
                             .attr("class", "link")
                             .attr("class", function (d) {
                                 return 'link ' + 'source-' + d.source.name + ' target-' + d.target.name;
-                            })
-                            .style("stroke-width", function (d) {
-                                return Math.sqrt(d.value);
-                            });
+                            }).style("stroke-width", function (d) { return d.value; });
 
                     var nodes = svg.selectAll(".node")
                             .data(vertex)
@@ -506,10 +502,15 @@
                         console.log('select: ');
                         console.log(d);
 
+                        var tgname = 'line.target-' + d.name;
+                        var scname = 'line.source-' + d.name;
+
                         if (selected_node !== null) {
                             if(selected_node === d){
                                 d3.selectAll('.last_selected').classed("last_selected", false);
                                 d3.select(this).classed("node_selected", false);
+                                d3.selectAll(scname).style("stroke-width", function (e) { return --e.value; });
+                                d3.selectAll(tgname).style("stroke-width", function (e) { return --e.value; });
                                 selected_node = null;
                                 return;
                             }
@@ -517,9 +518,12 @@
                             d3.selectAll('.last_selected').classed("last_selected", false);
                         }
                         selected_node = d;
-                        d3.select(this).classed("node_selected", true);
                         d3.select(this).classed("last_selected", true);
-
+                        if(!d3.select(this).classed("node_selected")){
+                            d3.select(this).classed("node_selected", true);
+                            d3.selectAll(scname).style("stroke-width", function (e) { return ++e.value; });
+                            d3.selectAll(tgname).style("stroke-width", function (e) { return ++e.value; });
+                        }
                         console.log('ok');
                     }
 
