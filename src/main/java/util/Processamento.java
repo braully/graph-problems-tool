@@ -175,8 +175,16 @@ public class Processamento {
                             Integer numEdge = Integer.parseInt(matcher.group(1));
                             Integer e1 = Integer.parseInt(matcher.group(2));
                             Integer e2 = Integer.parseInt(matcher.group(3));
+                            if (bfsalg.getDistance(insumo, e1) != 0) {
+                                bfsalg.bfs(insumo, e1);
+                            }
+                            if (bfsalg.getDistance(insumo, e2) != 4) {
+                                System.out.println("Fail on add edge...breaking: " + e1 + " " + e2);
+                                break;
+                            }
                             List<Integer> caminho = UtilProccess.strToList(matcher.group(4));
                             Integer aresta = addEdge(e1, e2);
+                            bfsalg.incBfs(insumo, e1, e2);
                             if (!numEdge.equals(aresta)) {
                                 throw new IllegalStateException(String.format("Incorrect load info edge %d expected %d for: %s ", aresta, numEdge, str));
                             }
