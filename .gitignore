@@ -20,3 +20,6 @@
 /c-projects/graph-caratheodory-parallel/graphNCaratheodory.o
 /nb-configuration.xml
 /dependency-reduced-pom.xml
+c-projects/blank-c/last-compilation.log
+.gitignore
+*/**/last-compilation.log
