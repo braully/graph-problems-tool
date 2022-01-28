@@ -210,7 +210,7 @@
                             <h2>Graph</h2>
                         </div>
 
-                        <div class="panel-body">
+                        <div class="panel-body" id="panel-grafo">
                             <div id="grafo" class="form-group" style="height: 1000px;">
 
                             </div>
@@ -379,7 +379,7 @@
                     }
                     var fr = new FileReader();
                     fr.onload = function (e) {
-//                        console.log(e);
+//                        //console.log(e);
                         var fileName = $scope.file.name.toLowerCase();
                         if (fileName.endsWith(".json")) {
                             var graph = JSON.parse(e.target.result);
@@ -408,8 +408,8 @@
                             $scope.updateGraph();
                         }
                     };
-//                    console.log('Scope.file');
-//                    console.log($scope.file);
+//                    //console.log('Scope.file');
+//                    //console.log($scope.file);
                     fr.readAsText($scope.file);
                 };
                 $scope.updateGraph = function () {
@@ -499,8 +499,8 @@
                     }
 
                     function singclick(d) {
-                        console.log('select: ');
-                        console.log(d);
+                        //console.log('select: ');
+                        //console.log(d);
 
                         var tgname = 'line.target-' + d.name;
                         var scname = 'line.source-' + d.name;
@@ -514,7 +514,7 @@
                                 selected_node = null;
                                 return;
                             }
-                            console.log(selected_node);
+                            //console.log(selected_node);
                             d3.selectAll('.last_selected').classed("last_selected", false);
                         }
                         selected_node = d;
@@ -524,7 +524,7 @@
                             d3.selectAll(scname).style("stroke-width", function (e) { return ++e.value; });
                             d3.selectAll(tgname).style("stroke-width", function (e) { return ++e.value; });
                         }
-                        console.log('ok');
+                        //console.log('ok');
                     }
 
                     function dragstart(d) {
@@ -532,8 +532,13 @@
                     }
 
                     function keydown() {
-                        d3.event.preventDefault();
-                        console.log('keydown: ');
+                        // //console.log('keydown on: ');
+                        
+                        if(document.activeElement === document.body){ 
+                            d3.event.preventDefault();
+                        } else {
+                            return;
+                        }
 
                         if (!selected_node)
                             return;
@@ -541,14 +546,14 @@
                         switch (d3.event.keyCode) {
                             case 46: // delete
                                 if (selected_node) {
-                                    console.log('remove:');
-                                    console.log(selected_node);
+                                    //console.log('remove:');
+                                    //console.log(selected_node);
                                     //vertex.remove(selected_node);
 //                            nodes.splice(nodes.indexOf(selectedNode), 1);
 //                            spliceLinksForNode(selectedNode);
                                     var tgname = 'line.target-' + selected_node.name;
                                     var scname = 'line.source-' + selected_node.name;
-                                    console.log('Remove links with: ' + scname + ', ' + tgname);
+                                    //console.log('Remove links with: ' + scname + ', ' + tgname);
                                     d3.selectAll(tgname).remove();
                                     d3.selectAll(scname).remove();
                                     d3.select('.last_selected').remove();
@@ -561,6 +566,7 @@
                         }
                     }
 
+                    // d3.select("#panel-grafo").on('keydown', keydown);
                     d3.select(window).on('keydown', keydown);
                 };
                 $scope.generateGraph = function () {
