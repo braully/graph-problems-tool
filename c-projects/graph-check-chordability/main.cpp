@@ -22,14 +22,13 @@ int N_vertices;
 
 
 // Declarations
-void graphAdjMatrixFromFile(char *fileName);
 bool edge(int i, int j);
 bool cmp_second(std::pair<int, int> a, std::pair<int, int> b);
 int find(std::vector<int>& parent, int i);
 void unite(std::vector<int>& parent, int x, int y);
 std::vector<std::set<int>> connected_components(std::set<int> vertices);
-order max_card_search();
-bool zero_fill_in(order ord);
+order max_card_search(std::set<int> X_set);
+bool zero_fill_in(order ord, std::set<int> X_set);
 
 //Definitions
 
@@ -142,33 +141,36 @@ std::vector<std::set<int>> connected_components(std::set<int> vertices) {
 	return result;
 }
 
-// Orders the vertices of a graph by maximum cardinality search
-order max_card_search() {
+// Orders the vertices of a graph in X_set by maximum cardinality search
+order max_card_search(std::set<int> X_set) {
+	std::vector<int> X(X_set.begin(), X_set.end());
+	int N = X.size();
+
 	// We use a vector of sets, each one having
 	// the vertices with i numbered neighboors
 	// sets[i].count(j) = 1 if vertex j is in set i
 	// sets[i].count(j) = 0 if it is not
 	std::vector<std::set<int>> sets;
-	sets.resize(N_vertices);
+	sets.resize(N);
 
-	// size[i] is the number of numbered neighbors to vertex i
+	// size[i] is the number of numbered neighbors to the vertex in position i
 	std::vector <int> size;
-	size.resize(N_vertices);
+	size.resize(N);
 
 	// ord has the ordenation
 	order ord;
-	ord.ord.resize(N_vertices);
-	ord.vert.resize(N_vertices);
+	ord.ord.resize(N);
+	ord.vert.resize(N);
 
 	// All vertices have 0 numbered neighbors in the beginning
-	for (int i = 0; i < N_vertices; i++)
-		sets[0].insert(i);
+	for (int i = 0; i < N; i++)
+		sets[0].insert(X[i]);
 
 	// j is the biggest with set not empty
 	int j = 0;
 
 	// For each vertex 
-	for (int i = N_vertices - 1; i >= 0; i--) {
+	for (int i = N - 1; i >= 0; i--) {
 
 		// Gets any vertex with the biggest number of numbered neighbors
 		while (sets[j].empty())
@@ -177,18 +179,19 @@ order max_card_search() {
 		sets[j].erase(v);
 
 		// Vertex v receives number i
-		ord.ord[v] = i;
+		int v_index = distance(X.begin(), find(X.begin(), X.end(), v));
+		ord.ord[v_index] = i;
 		ord.vert[i] = v;
-		size[v] = -1;
+		size[v_index] = -1;
 
 		// For each edge (v, w) such that w is unumbered
 		// adds 1 to the number of numbered vertices of w
 		// and places it in the next set
-		for (int w = 0; w < N_vertices; w++) {
-			if (edge(v, w) && size[w] >= 0) {
-				sets[size[w]].erase(w);
+		for (int w = 0; w < N; w++) {
+			if (edge(v, X[w]) && size[w] >= 0) {
+				sets[size[w]].erase(X[w]);
 				size[w]++;
-				sets[size[w]].insert(w);
+				sets[size[w]].insert(X[w]);
 			}
 		}
 
@@ -201,36 +204,41 @@ order max_card_search() {
 
 // Checks if the fill in based on a vertex ordenation of the graph
 // is empty (so the graph is chordal) or not
+// Considers only vertices in X_set
 // Returns true to empty fill in
 // Returns false otherwise
-bool zero_fill_in(order ord){
+bool zero_fill_in(order ord, std::set<int> X_set) {
+	std::vector<int> X(X_set.begin(), X_set.end());
+	int N = X.size();
 	// f[v] is the follower of v, i.e. the neighbor of v
 	// with the smallest ordering that is bigger than v's
 	std::vector<int> f;
-	f.resize(N_vertices);
+	f.resize(N);
 
 	// index[v] is the biggest vertex between v and
 	// v's already processed neighbors 
 	std::vector<int> index;
-	index.resize(N_vertices);
+	index.resize(N);
 
 	// We begin processing the vertex with the smallest ordering (i)
-	for (int i = 0; i < N_vertices; i++) {
+	for (int i = 0; i < N; i++) {
 		int w = ord.vert[i];
-		f[w] = w;
-		index[w] = i;
+		int w_index = distance(X.begin(), find(X.begin(), X.end(), w));
+		f[w_index] = w;
+		index[w_index] = i;
 
 		// For each neighbor v of w with ordering smaller than w
 		// that it's already processed neighbors have ordering
 		// smaller than w too: connect w to v and to it's followers
 		// that respect the same properties
-		for (int v = 0; v < N_vertices; v++) {
-			if (edge(w, v) && ord.ord[v] < i) {
-				int x = v;
-				while (index[x] < i) {
+		for (int v = 0; v < N; v++) {
+			if (edge(w, X[v]) && ord.ord[v] < i) {
+				int x = X[v];
+				int x_index = distance(X.begin(), find(X.begin(), X.end(), x));
+				while (index[x_index] < i) {
 					// w is an already processed neighbor of x with
 					// bigger ordering, so we update index[x]
-					index[x] = i;
+					index[x_index] = i;
 
 					// We would have to connect x to w in the fill in,
 					// so if it isn't connected, the fill in is not empty
@@ -239,13 +247,14 @@ bool zero_fill_in(order ord){
 						return false;
 
 					// We repeat with the follower of x
-					x = f[x];
+					x = f[x_index];
+					x_index = distance(X.begin(), find(X.begin(), X.end(), x));
 				}
 
 				// If the last follower of v has itself as a follower,
 				// it shall follow w
-				if (f[x] == x)
-					f[x] = w;
+				if (f[x_index] == x)
+					f[x_index] = w;
 			}
 		}
 	}
@@ -265,16 +274,17 @@ int main(int argc, char** argv) {
 		for (int i = 0; i < N_vertices; i++)
 			X.insert(i);
 
-		if (connected_components(X).size() != 1) {
-			std::cout << "The graph is not connected!\n";
-			return 0;
+		std::vector<std::set<int>> components = connected_components(X);
+
+		for (auto& component : components) {
+			if (!zero_fill_in(max_card_search(component), component)) {
+				std::cout << "The graph is not chordal\n";
+				free(mat);
+				return 0;
+			}
 		}
 
-		if (zero_fill_in(max_card_search()))
-			std::cout << "The graph is chordal\n";
-		else
-			std::cout << "The graph is not chordal\n";
-		
+		std::cout << "The graph is chordal\n";
 		free(mat);
 	}
 	return 0;
