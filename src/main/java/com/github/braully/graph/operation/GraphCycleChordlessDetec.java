@@ -36,16 +36,18 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
             size = 6;
 //            throw new IllegalArgumentException("Input invalid (not integer): " + graph.getInputData());
         }
-
+        Integer cycleSize = 0;
         Collection cycle = null;
         if (size >= 2) {
             cycle = findCycleBruteForce(graph, size);
         }
         if (cycle != null) {
             response.put("Cycle find ", cycle);
+            cycleSize = cycle.size();
         } else {
             response.put("Cycle not find ", 0);
         }
+        response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, cycleSize);
         return response;
     }
 

@@ -21,36 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.braully.graph.operation;
+package util;
 
-import com.github.braully.graph.UndirectedSparseGraphTO;
-import java.util.List;
-import org.junit.Test;
+import com.github.braully.graph.BatchExecuteOperation;
 
 /**
  *
- * @author Braully Rocha da Silva
+ * @author strike
  */
-public class GraphCycleChordlessDetecTest {
+public class Batch extends BatchExecuteOperation {
 
-    String strGraph = "4-2,3-0,3-2,2-0,1-3,1-0,";
-
-    UndirectedSparseGraphTO graphForTest1 = new UndirectedSparseGraphTO(strGraph);
-
-    public GraphCycleChordlessDetecTest() {
+    public static void main(String... args) {
+        Batch executor = new Batch();
+        executor.processMain(args);
     }
-
-    @Test
-    public void testFindCycleBruteForce() {
-        System.out.println("findCycleBruteForce");
-        UndirectedSparseGraphTO<Integer, Integer> graph = this.graphForTest1.clone();
-        int currentSize = 4;
-        GraphCycleChordlessDetec instance = new GraphCycleChordlessDetec();
-        List<Integer> result = instance.findCycleBruteForce(graph, currentSize);
-        System.out.println("Cycle: " + result);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-
 }
