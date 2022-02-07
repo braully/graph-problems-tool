@@ -29,6 +29,8 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
         this.addEdgesFromString(strEdegdsGraph);
     }
 
+    private List<V> cacheVertices;
+
     public void addEdgesFromString(String strEdges) {
         String[] edges = null;
         if (strEdges != null && (edges = strEdges.trim().split(",")) != null) {
@@ -101,11 +103,19 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
 
     @Override
     public Collection getVertices() {
-        Collection vals = super.getVertices();
-        List listVals = new ArrayList();
-        listVals.addAll(vals);
-        Collections.sort(listVals);
-        return listVals;
+        return cacheVertices();
+    }
+
+    public List cacheVertices() {
+        if (cacheVertices == null) {
+            Collection vals = super.getVertices();
+            List listVals = new ArrayList();
+            listVals.addAll(vals);
+            Collections.sort(listVals);
+            cacheVertices = listVals;
+        }
+        return cacheVertices;
+
     }
 
     public Collection<Pair<V>> getNormalizedPairs() {
@@ -146,6 +156,18 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
                 this.addVertex(o);
             }
         }
+    }
+
+    @Override
+    public boolean removeVertex(Object vertex) {
+        clearCachedVertices();
+        return super.removeVertex(vertex);
+    }
+
+    @Override
+    public boolean addVertex(Object vertex) {
+        clearCachedVertices();
+        return super.addVertex(vertex);
     }
 
     public Collection getDegrees() {
@@ -306,6 +328,14 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
             }
         }
         return -1;
+    }
+
+    public Integer verticeByIndex(int v) {
+        return (Integer) cacheVertices().get(v);
+    }
+
+    private void clearCachedVertices() {
+        cacheVertices = null;
     }
 
 }
