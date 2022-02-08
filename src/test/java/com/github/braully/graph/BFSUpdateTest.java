@@ -68,9 +68,9 @@ public class BFSUpdateTest {
     @Test
     public void testUpdateBfs() {
         String[] edges = null;
-        BFSUtil bfs = new BFSUtil(graph.getVertexCount());
-        BFSUtil bfsaux = new BFSUtil(graph.getVertexCount());
-        BFSUtil bfsinc = new BFSUtil(graph.getVertexCount());
+        BFSUtil bfs = BFSUtil.newBfsUtilSimple(graph.getVertexCount());
+        BFSUtil bfsaux = BFSUtil.newBfsUtilSimple(graph.getVertexCount());
+        BFSUtil bfsinc = BFSUtil.newBfsUtilSimple(graph.getVertexCount());
 
         for (Integer vertsrc : addEdges.keySet()) {
             bfs.labelDistances(graph, vertsrc);

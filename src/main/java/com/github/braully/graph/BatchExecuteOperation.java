@@ -8,6 +8,7 @@ package com.github.braully.graph;
 import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
 import com.github.braully.graph.operation.GraphCaratheodoryHeuristicHybrid;
 import com.github.braully.graph.operation.GraphCountEdges;
+import com.github.braully.graph.operation.GraphCycleChordlessDetec;
 import com.github.braully.graph.operation.GraphHullNumber;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -50,7 +51,8 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumber(),
         new GraphHullNumberHeuristicV1(),
-        new GraphCountEdges()
+        new GraphCountEdges(),
+        new GraphCycleChordlessDetec()
     };
 
     @Override
@@ -68,7 +70,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         return operations;
     }
 
-    void processMain(String... args) {
+    protected void processMain(String... args) {
         Options options = new Options();
         OptionGroup exec = new OptionGroup();
         exec.setRequired(false);
@@ -147,7 +149,8 @@ public class BatchExecuteOperation implements IBatchExecute {
                     processFileMat(operation, dir);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(BatchExecuteOperation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         } else if (inputFilePath.toLowerCase().endsWith(".g6")) {
             try {
@@ -155,7 +158,8 @@ public class BatchExecuteOperation implements IBatchExecute {
                     processFileG6(operation, dir);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(BatchExecuteOperation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         } else if (inputFilePath.toLowerCase().endsWith(".g6.gz")) {
             try {
@@ -163,7 +167,8 @@ public class BatchExecuteOperation implements IBatchExecute {
                     processFileG6GZ(operation, dir);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(BatchExecuteOperation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -595,7 +600,8 @@ public class BatchExecuteOperation implements IBatchExecute {
             try {
                 f.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(BatchExecuteOperation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
         return f;

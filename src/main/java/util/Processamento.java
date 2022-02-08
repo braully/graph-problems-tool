@@ -129,9 +129,9 @@ public class Processamento {
         this.numAretasFinais = ((k * k + 1) * k) / 2;
         this.numArestasIniciais = this.insumo.getEdgeCount();
 
-        bfsalg = new BFSUtil(numVertices);
-        bfsRanking = new BFSUtil(numVertices);
-        bfsRankingSegundaOpcao = new BFSUtil(numVertices);
+        bfsalg = BFSUtil.newBfsUtilSimple(numVertices);
+        bfsRanking = BFSUtil.newBfsUtilSimple(numVertices);
+        bfsRankingSegundaOpcao = BFSUtil.newBfsUtilSimple(numVertices);
     }
 
     void loadLastCaminho() {
@@ -508,9 +508,9 @@ public class Processamento {
         sub.caminhoPercorrido = UtilProccess.cloneMap(caminhoPercorrido);
 //        sub.caminhosPossiveis = UtilTmp.cloneMap(caminhosPossiveis);
         sub.historicoRanking = new TreeMap<>();
-        sub.bfsalg = new BFSUtil(numVertices);
-        sub.bfsRanking = new BFSUtil(numVertices);
-        sub.bfsRankingSegundaOpcao = new BFSUtil(numVertices);
+        sub.bfsalg = BFSUtil.newBfsUtilSimple(numVertices);
+        sub.bfsRanking = BFSUtil.newBfsUtilSimple(numVertices);
+        sub.bfsRankingSegundaOpcao = BFSUtil.newBfsUtilSimple(numVertices);
 
         /* verboses */
         sub.verbose = this.verbose;
@@ -768,7 +768,7 @@ public class Processamento {
                 if (bfsRanking.bfs[v] == 4) {
                     BFSUtil bfstmp = rankingTmp.get(v);
                     if (bfstmp == null) {
-                        rankingTmp.put(v, new BFSUtil(numVertices));
+                        rankingTmp.put(v, BFSUtil.newBfsUtilSimple(numVertices));
                     }
                 }
             }
