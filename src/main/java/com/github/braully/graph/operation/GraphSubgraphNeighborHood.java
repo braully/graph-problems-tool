@@ -17,17 +17,20 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 
-public class GraphSubgraph implements IGraphOperation {
+public class GraphSubgraphNeighborHood extends GraphSubgraph  implements IGraphOperation {
 
-    static final String type = "General";
-    static final String description = "Subgraph";
+    static final String description = "Subgraph N[S]";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        Integer khop = 0;
         Set<Integer> setN = new HashSet<>();
         setN.addAll(graph.getSet());
+        for (Object v : graph.getSet()) {
+            setN.addAll(graph.getNeighbors((Integer)v));
+        }
 
         /* Processar a buscar pelo hullset e hullnumber */
         Map<String, Object> response = new HashMap<>();
@@ -41,32 +44,7 @@ public class GraphSubgraph implements IGraphOperation {
         return response;
     }
 
-    public UndirectedSparseGraphTO subGraphInduced(UndirectedGraph graph, Set<Integer> setN){
-        UndirectedSparseGraphTO subgraph = new UndirectedSparseGraphTO();
-        Integer khop = 0;
 
-        Filter<Integer, Integer> filter = new KNeighborhoodFilter<Integer, Integer>(setN, khop, KNeighborhoodFilter.EdgeType.IN_OUT);
-        Graph<Integer, Integer> newGraph = filter.apply(graph);
-
-        Collection<Integer> vertices = newGraph.getVertices();
-
-        for (Integer v : vertices) {
-            subgraph.addVertex(v);
-        }
-        Collection<Integer> edges = newGraph.getEdges();
-
-        for (Integer e : edges) {
-            Pair endpoints = newGraph.getEndpoints(e);
-            Integer first = (Integer) endpoints.getFirst();
-            Integer second = (Integer) endpoints.getSecond();
-            subgraph.addEdge(first, second);
-        }
-        return subgraph;
-    } 
-
-    public String getTypeProblem() {
-        return type;
-    }
 
     public String getName() {
         return description;

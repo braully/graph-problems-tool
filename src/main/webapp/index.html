@@ -434,7 +434,7 @@
                             .attr("height", height);
 
                     var vertex = graph.normalizedVertices.map(function (d) {
-                        return {"name": graph.vertices[d] + (graph.vertices[d] != d ? " (" + d + ")" : ""), "group": 1};
+                        return {"idname": graph.vertices[d], "name": graph.vertices[d] + (graph.vertices[d] != d ? " (" + d + "º)" : ""), "group": 1};
                     });
 
                     var edges = graph.normalizedPairs.map(function (d) {
@@ -446,7 +446,7 @@
                             .data(edges).enter().append("line")
                             .attr("class", "link")
                             .attr("class", function (d) {
-                                return 'link ' + 'source-' + d.source.name + ' target-' + d.target.name;
+                                return 'link ' + 'source-' + d.source.idname + ' target-' + d.target.idname;
                             }).style("stroke-width", function (d) { return d.value; });
 
                     var nodes = svg.selectAll(".node")
@@ -454,7 +454,7 @@
                             .enter().append("g")
                             .attr("class", "node")
                             .attr("class", function (d) {
-                                return 'node ' + 'node-' + d.name;
+                                return 'node ' + 'node-' + d.idname;
                             })
                             .on("click", singclick)
                             .on("dblclick", dblclick)
@@ -502,8 +502,8 @@
                         //console.log('select: ');
                         //console.log(d);
 
-                        var tgname = 'line.target-' + d.name;
-                        var scname = 'line.source-' + d.name;
+                        var tgname = 'line.target-' + d.idname;
+                        var scname = 'line.source-' + d.idname;
 
                         if (selected_node !== null) {
                             if(selected_node === d){
@@ -551,8 +551,8 @@
                                     //vertex.remove(selected_node);
 //                            nodes.splice(nodes.indexOf(selectedNode), 1);
 //                            spliceLinksForNode(selectedNode);
-                                    var tgname = 'line.target-' + selected_node.name;
-                                    var scname = 'line.source-' + selected_node.name;
+                                    var tgname = 'line.target-' + selected_node.idname;
+                                    var scname = 'line.source-' + selected_node.idname;
                                     //console.log('Remove links with: ' + scname + ', ' + tgname);
                                     d3.selectAll(tgname).remove();
                                     d3.selectAll(scname).remove();
