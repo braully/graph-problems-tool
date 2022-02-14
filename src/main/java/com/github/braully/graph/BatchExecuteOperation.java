@@ -53,7 +53,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphHullNumberHeuristicV1(),
         new GraphCountEdges(),
         new GraphCycleChordlessDetec(),
-        new CycleHullCheck()
+        new tmp.CycleHullCheck()
     };
 
     @Override
