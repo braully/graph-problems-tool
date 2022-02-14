@@ -99,7 +99,6 @@ public class BFSUtil {
                 if (bfs[nv] == null) {
                     bfs[nv] = depth;
                     queue.add(nv);
-                    depthcount[depth]++;
                 }
             }
         }
