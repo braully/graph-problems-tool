@@ -55,44 +55,46 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
         Collection vertices = graph.getVertices();
         List<Integer> cycle = null;
         int veticesCount = vertices.size();
-        MapCountOpt mcount = new MapCountOpt(veticesCount);
-        BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(veticesCount);
-        bfsUtil.labelDistancesCompactMatrix(graph);
+        if (currentSize < veticesCount) {
+            MapCountOpt mcount = new MapCountOpt(veticesCount);
+            BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(veticesCount);
+            bfsUtil.labelDistancesCompactMatrix(graph);
 
-        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSize);
-        Boolean isCycle = null;
-        while (combinationsIterator.hasNext()) {
-            int[] currentSet = combinationsIterator.next();
-            mcount.clear();
-            isCycle = null;
-            for (int iv : currentSet) {
-                Integer v = graph.verticeByIndex(iv);
-                for (int iw : currentSet) {
-                    Integer w = graph.verticeByIndex(iw);
-                    if (bfsUtil.get(v, w) == 1) {
-                        Integer inc = mcount.inc(v);
-                        if (inc > 2) {
-                            //V tem mais de dois vizinhos no ciclo, 
-                            // não é permitido em um ciclo chordless
-                            isCycle = false;
-                            break;
+            Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSize);
+            Boolean isCycle = null;
+            while (combinationsIterator.hasNext()) {
+                int[] currentSet = combinationsIterator.next();
+                mcount.clear();
+                isCycle = null;
+                for (int iv : currentSet) {
+                    Integer v = graph.verticeByIndex(iv);
+                    for (int iw : currentSet) {
+                        Integer w = graph.verticeByIndex(iw);
+                        if (bfsUtil.get(v, w) == 1) {
+                            Integer inc = mcount.inc(v);
+                            if (inc > 2) {
+                                //V tem mais de dois vizinhos no ciclo, 
+                                // não é permitido em um ciclo chordless
+                                isCycle = false;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (isCycle == null) {
-                isCycle = true;
-                for (int iv : currentSet) {
-                    Integer v = graph.verticeByIndex(iv);
-                    isCycle = isCycle && mcount.getCount(v) == 2;
+                if (isCycle == null) {
+                    isCycle = true;
+                    for (int iv : currentSet) {
+                        Integer v = graph.verticeByIndex(iv);
+                        isCycle = isCycle && mcount.getCount(v) == 2;
+                    }
                 }
-            }
-            if (isCycle) {
-                cycle = new ArrayList<>();
-                for (int i : currentSet) {
-                    cycle.add(i);
+                if (isCycle) {
+                    cycle = new ArrayList<>();
+                    for (int i : currentSet) {
+                        cycle.add(i);
+                    }
+                    break;
                 }
-                break;
             }
         }
         return cycle;
