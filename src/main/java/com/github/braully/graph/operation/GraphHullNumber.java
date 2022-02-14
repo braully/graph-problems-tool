@@ -150,7 +150,6 @@ public class GraphHullNumber implements IGraphOperation {
             return false;
         }
         Set<Integer> fecho = new HashSet<>();
-        Collection vertices = graph.getVertices();
         int[] aux = new int[graph.getVertexCount()];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
@@ -164,7 +163,7 @@ public class GraphHullNumber implements IGraphOperation {
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
             fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighbors(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
             for (int vertn : neighbors) {
                 if (vertn == verti) {
                     continue;
