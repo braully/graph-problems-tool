@@ -4,6 +4,7 @@ import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,15 +53,16 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
     }
 
     public List<Integer> findCycleBruteForce(UndirectedSparseGraphTO<Integer, Integer> graph, int currentSize) {
-        Collection vertices = graph.getVertices();
+        List<Integer> vertices = (List<Integer>) graph.getVertices();
         List<Integer> cycle = null;
         int veticesCount = vertices.size();
         if (currentSize < veticesCount) {
-            MapCountOpt mcount = new MapCountOpt(veticesCount);
-            BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(veticesCount);
+            Integer maxV = Collections.max(vertices) + 1;
+            MapCountOpt mcount = new MapCountOpt(maxV);
+            BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(maxV);
             bfsUtil.labelDistancesCompactMatrix(graph);
 
-            Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSize);
+            Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(veticesCount, currentSize);
             Boolean isCycle = null;
             while (combinationsIterator.hasNext()) {
                 int[] currentSet = combinationsIterator.next();
