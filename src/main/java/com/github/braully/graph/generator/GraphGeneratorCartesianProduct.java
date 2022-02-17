@@ -40,7 +40,21 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
         UndirectedSparseGraphTO<Integer, Integer> graph1 = new UndirectedSparseGraphTO<>();
         graph1.setName("H");
         graph1.addEdgesFromString(strEdges1);
-
+		
+		// Seting vertex positions
+		int nvertices0 = graph0.getVertexCount();
+        int nvertices1 = graph1.getVertexCount();
+		int[] positionX = new int[nvertices0*nvertices1];
+		int[] positionY = new int[nvertices0*nvertices1];
+		for (int i = 0; i < nvertices0; i++){
+			for (int j = 0; j < nvertices1; j++){
+				positionX[i*nvertices0+j] = i;
+				positionY[i*nvertices0+j] = j;
+			}
+		}
+		
+		// Positions (x,y) to a vertex v are (positionX[v], positionY[v])
+		
         return cartesianProduct(graph0, graph1);
     }
 
