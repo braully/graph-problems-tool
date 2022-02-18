@@ -108,7 +108,7 @@ public class GraphHullSetP3 implements IGraphOperation {
             Integer verti = mustBeIncluded.remove();
             hsp3g.add(verti);
             includedSequence.add(verti);
-            Collection<Integer> neighbors = graph.getNeighbors(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
 
             for (int vertn : neighbors) {
                 if (vertn == verti) {

@@ -136,7 +136,7 @@ public class GraphHullNumber implements IGraphOperation {
             if (checkIfHullSet(graph, currentSet)) {
                 hullSet = new HashSet<>(currentSetSize);
                 for (int i : currentSet) {
-                    hullSet.add(i);
+                    hullSet.add(graph.verticeByIndex(i));
                 }
                 break;
             }
@@ -150,13 +150,14 @@ public class GraphHullNumber implements IGraphOperation {
             return false;
         }
         Set<Integer> fecho = new HashSet<>();
-        int[] aux = new int[graph.getVertexCount()];
+        int[] aux = new int[(Integer) graph.maxVertex() + 1];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
         }
 
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer v : currentSet) {
+        for (Integer iv : currentSet) {
+            Integer v = graph.verticeByIndex(iv);
             mustBeIncluded.add(v);
             aux[v] = INCLUDED;
         }

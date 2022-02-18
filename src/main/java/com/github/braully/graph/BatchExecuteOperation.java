@@ -153,6 +153,15 @@ public class BatchExecuteOperation implements IBatchExecute {
                 Logger.getLogger(BatchExecuteOperation.class
                         .getName()).log(Level.SEVERE, null, ex);
             }
+        } else if (inputFilePath.toLowerCase().endsWith(".adj")) {
+            try {
+                for (IGraphOperation operation : operationsToExecute) {
+                    processFileAdj(operation, dir);
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (inputFilePath.toLowerCase().endsWith(".g6")) {
             try {
                 for (IGraphOperation operation : operationsToExecute) {
@@ -232,6 +241,8 @@ public class BatchExecuteOperation implements IBatchExecute {
                                 processFileMat(operation, file, dirname);
                             }
                             graphCount++;
+                        } else if (name.toLowerCase().endsWith(".adj")) {
+                            processFileAdjList(operation, file, dirname);
                         } else if (name.toLowerCase().endsWith(".g6")) {
                             processFileG6(operation, file, dirname, contProcess);
                         } else if (name.toLowerCase().endsWith(".g6.gz")) {
@@ -250,6 +261,20 @@ public class BatchExecuteOperation implements IBatchExecute {
 
     void processFileMat(IGraphOperation operation, File file) throws IOException {
         processFileMat(operation, file, null);
+    }
+
+    void processFileAdj(IGraphOperation operation, File file) throws IOException {
+        processFileAdjList(operation, file, null);
+    }
+
+    void processFileAdjList(IGraphOperation operation, File file,
+            String dirname) throws IOException {
+        if (verbose) {
+            System.out.println("Processing file: " + file.getName());
+        }
+        UndirectedSparseGraphTO loadGraphAdjMatrix = UtilGraph.loadGraphAdjList(new FileInputStream(file));
+        loadGraphAdjMatrix.setName(file.getName());
+        String processGraph = processGraph(operation, loadGraphAdjMatrix, dirname, 0);
     }
 
     void processFileMat(IGraphOperation operation, File file,
@@ -311,7 +336,6 @@ public class BatchExecuteOperation implements IBatchExecute {
                 writer.close();
                 r.close();
             } catch (Exception e) {
-
             }
         }
     }
@@ -381,7 +405,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         }
 
         String group = loadGraphAdjMatrix.getName();
-        String id = group.replaceAll(".mat", "").replaceAll(".g6", "").replaceAll(".json", "").replaceAll(".gz", "");
+        String id = group.replaceAll(".mat", "").replaceAll(".g6", "").replaceAll(".json", "").replaceAll(".gz", "").replaceAll(".adj", "");
         try {
             int indexOf = indexOf(group, "\\d");
             if (indexOf > 0) {
@@ -396,8 +420,20 @@ public class BatchExecuteOperation implements IBatchExecute {
 
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
         String formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
+
+        File resultFile = null;
+        BufferedWriter writer = null;
+        BufferedReader r = null;
+
+        try {
+            writer = new BufferedWriter(new FileWriter(resultFile, true));
+            resultFile = null;//getResultFile(operation, file, dirname);
+            r = new BufferedReader(new InputStreamReader(new FileInputStream(resultFile)));
+        } catch (Exception e) {
+            
+        }
 //            if (output == null) {
-//                System.out.println(formatResult);
+                System.out.println(formatResult);
 //            } else {
 //                try {
 //                    output.write(formatResult);
@@ -406,7 +442,6 @@ public class BatchExecuteOperation implements IBatchExecute {
 //                    System.err.println(formatResult);
 //                }
 //            }
-
         return formatResult;
     }
 

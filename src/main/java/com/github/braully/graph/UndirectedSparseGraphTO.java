@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author braully
  */
-public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSparseGraph {
+public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends UndirectedSparseGraph {
 
     public UndirectedSparseGraphTO() {
         super();
@@ -104,6 +104,11 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
     @Override
     public Collection getVertices() {
         return cacheVertices();
+    }
+
+    public <V> V maxVertex() {
+        V max = (V) Collections.max(this.cacheVertices());
+        return max;
     }
 
     public List cacheVertices() {

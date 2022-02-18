@@ -322,6 +322,58 @@ public class UtilGraph {
         return ret;
     }
 
+    public static UndirectedSparseGraphTO<Integer, Integer> loadGraphAdjList(InputStream uploadedInputStream) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        try {
+            if (uploadedInputStream != null) {
+                BufferedReader r = new BufferedReader(new InputStreamReader(uploadedInputStream));
+                List<String> lines = new ArrayList<>();
+                String readLine = null;
+                Integer verticeCount = 0;
+                ret = new UndirectedSparseGraphTO<>();
+
+                while ((readLine = r.readLine()) != null) {
+                    if (!readLine.trim().isEmpty()
+                            && !readLine.trim().startsWith("#")
+                            && !readLine.trim().matches("\\D+.*")) {
+                        readLine = readLine.replaceAll("\\s\\s+", " ");
+                        lines.add(readLine);
+//                        System.out.println(readLine);
+                        String[] split = readLine.trim().split(" ");
+                        if (split != null && split.length > 0) {
+                            ret.addVertex(Integer.parseInt(split[0].trim()));
+                            verticeCount = verticeCount + 1;
+                        }
+                    }
+                }
+                int edgeCount = 0;
+                for (int i = 0; i < lines.size(); i++) {
+                    String line = lines.get(i);
+//                    System.out.println("Line: " + line);
+                    if (line != null) {
+                        String[] split = line.trim().split(" ");
+//                        System.out.print("s= " + split[0]);
+                        if (split != null && split.length > 1) {
+                            Integer s = Integer.parseInt(split[0].trim());
+//                            System.out.print("t= ");
+                            for (int j = 1; j < split.length; j++) {
+//                                System.out.print(split[j]);
+//                                System.out.print(", ");
+                                Integer t = Integer.parseInt(split[j].trim());
+                                ret.addEdge(edgeCount++, s, t);
+                            }
+                        }
+//                        System.out.println();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("error", e);
+            logWebconsole.info("Error: format invalid --" + e.getLocalizedMessage());
+        }
+        return ret;
+    }
+
     /*
      Code from:  https://github.com/bingmann/BispanningGame/blob/master/src/net/panthema/BispanningGame/Graph6.java
      */
@@ -510,6 +562,8 @@ public class UtilGraph {
                     ret = UtilGraph.loadGraphG6(uploadedInputStream);
                 } else if (tmpFileName.endsWith("es")) {
                     ret = UtilGraph.loadGraphES(uploadedInputStream);
+                } else if (tmpFileName.endsWith("adj")) {
+                    ret = UtilGraph.loadGraphAdjList(uploadedInputStream);
                 }
                 if (ret != null) {
                     ret.setName(fileName);

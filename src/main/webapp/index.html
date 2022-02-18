@@ -389,7 +389,8 @@
                             }
                             $scope.graph = graph;
                         } else if (fileName.endsWith(".csr")
-                                || fileName.endsWith(".mat") || fileName.endsWith(".g6") || fileName.endsWith(".es")) {
+                                || fileName.endsWith(".mat") || fileName.endsWith(".g6") 
+                                || fileName.endsWith(".es")  || fileName.endsWith(".adj") ) {
                             var url = 'rest/graph/upload-file-graph';
                             var fd = new FormData();
                             fd.append("file", e.target.result);
