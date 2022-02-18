@@ -31,6 +31,13 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
 
     private List<V> cacheVertices;
 
+    public UndirectedSparseGraphTO(int nvertices) {
+        this();
+        for (int i = 0; i < nvertices; i++) {
+            this.addVertex(i);
+        }
+    }
+
     public void addEdgesFromString(String strEdges) {
         String[] edges = null;
         if (strEdges != null && (edges = strEdges.trim().split(",")) != null) {

@@ -391,7 +391,7 @@ public class UtilGraph {
 
         int numEdge = 0;
 
-        graph = new UndirectedSparseGraphTO();
+        graph = new UndirectedSparseGraphTO(n);
 
         for (int j = 1; j < n; ++j) {
             for (int i = 0; i < j; ++i) {
