@@ -389,8 +389,8 @@
                             }
                             $scope.graph = graph;
                         } else if (fileName.endsWith(".csr")
-                                || fileName.endsWith(".mat") || fileName.endsWith(".g6") 
-                                || fileName.endsWith(".es")  || fileName.endsWith(".adj") ) {
+                                || fileName.endsWith(".mat") || fileName.endsWith(".g6")
+                                || fileName.endsWith(".es") || fileName.endsWith(".adj")) {
                             var url = 'rest/graph/upload-file-graph';
                             var fd = new FormData();
                             fd.append("file", e.target.result);
@@ -434,13 +434,30 @@
                             .attr("width", width)
                             .attr("height", height);
 
+                    var posX = d3.scale.linear()
+                            .range([0, width])
+                            .domain([-(width/2), width/2]);
+                    var posY = d3.scale.linear()
+                            .range([0, height])
+                            .domain([-(height/2), height/2]);
+
                     var vertex = graph.normalizedVertices.map(function (d) {
-                        return {"idname": graph.vertices[d], "name": graph.vertices[d] + (graph.vertices[d] != d ? " (" + d + "º)" : ""), "group": 1};
+                        return {"idname": graph.vertices[d],
+                            "name": graph.vertices[d] + (graph.vertices[d] != d ? " (" + d + "º)" : ""),
+                            "group": 1,
+                            "x": posX(graph.positionX != null ? graph.positionX[d] : Math.floor(Math.random() * width)),
+                            "y": posY(graph.positionY != null ? graph.positionY[d] :  Math.floor(Math.random() * height))
+                        };
                     });
+                    
+                    vertex.forEach(function(d) { d.cx = d.x; d.cy = d.y; });
+
 
                     var edges = graph.normalizedPairs.map(function (d) {
                         return {"source": d[0], "target": d[1], "value": 1, "origin": d, "left": true, "right": true};
                     });
+                    
+                    
                     force.nodes(vertex).links(edges).start();
 
                     var link = svg.selectAll(".link")
@@ -448,7 +465,9 @@
                             .attr("class", "link")
                             .attr("class", function (d) {
                                 return 'link ' + 'source-' + d.source.idname + ' target-' + d.target.idname;
-                            }).style("stroke-width", function (d) { return d.value; });
+                            }).style("stroke-width", function (d) {
+                        return d.value;
+                    });
 
                     var nodes = svg.selectAll(".node")
                             .data(vertex)
@@ -456,6 +475,12 @@
                             .attr("class", "node")
                             .attr("class", function (d) {
                                 return 'node ' + 'node-' + d.idname;
+                            })
+                            .attr("cx", function (d) {
+                                return d.cx;
+                            })
+                            .attr("cy", function (d) {
+                                return d.cy;
                             })
                             .on("click", singclick)
                             .on("dblclick", dblclick)
@@ -469,11 +494,13 @@
                                     return d3.rgb(color(d.group)).darker().toString();
                                 return color(d.group);
                             }).call(force.drag);
+
                     nodes.append("text").attr("dx", 6)
                             .attr("dy", ".35em")
                             .text(function (d) {
                                 return d.name;
                             });
+
                     force.on("tick", function () {
                         link.attr("x1", function (d) {
                             return d.source.x;
@@ -507,11 +534,15 @@
                         var scname = 'line.source-' + d.idname;
 
                         if (selected_node !== null) {
-                            if(selected_node === d){
+                            if (selected_node === d) {
                                 d3.selectAll('.last_selected').classed("last_selected", false);
                                 d3.select(this).classed("node_selected", false);
-                                d3.selectAll(scname).style("stroke-width", function (e) { return --e.value; });
-                                d3.selectAll(tgname).style("stroke-width", function (e) { return --e.value; });
+                                d3.selectAll(scname).style("stroke-width", function (e) {
+                                    return --e.value;
+                                });
+                                d3.selectAll(tgname).style("stroke-width", function (e) {
+                                    return --e.value;
+                                });
                                 selected_node = null;
                                 return;
                             }
@@ -520,10 +551,14 @@
                         }
                         selected_node = d;
                         d3.select(this).classed("last_selected", true);
-                        if(!d3.select(this).classed("node_selected")){
+                        if (!d3.select(this).classed("node_selected")) {
                             d3.select(this).classed("node_selected", true);
-                            d3.selectAll(scname).style("stroke-width", function (e) { return ++e.value; });
-                            d3.selectAll(tgname).style("stroke-width", function (e) { return ++e.value; });
+                            d3.selectAll(scname).style("stroke-width", function (e) {
+                                return ++e.value;
+                            });
+                            d3.selectAll(tgname).style("stroke-width", function (e) {
+                                return ++e.value;
+                            });
                         }
                         //console.log('ok');
                     }
@@ -534,8 +569,8 @@
 
                     function keydown() {
                         // //console.log('keydown on: ');
-                        
-                        if(document.activeElement === document.body){ 
+
+                        if (document.activeElement === document.body) {
                             d3.event.preventDefault();
                         } else {
                             return;

@@ -5,7 +5,7 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.Map;
 import java.util.Collection;
 import java.util.ArrayList;
-*/
+ */
 
 import edu.uci.ics.jung.graph.util.Pair;
 import java.util.*;
@@ -40,34 +40,35 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
         UndirectedSparseGraphTO<Integer, Integer> graph1 = new UndirectedSparseGraphTO<>();
         graph1.setName("H");
         graph1.addEdgesFromString(strEdges1);
-		
-		// Seting vertex positions
-		int nvertices0 = graph0.getVertexCount();
-        int nvertices1 = graph1.getVertexCount();
-		int[] positionX = new int[nvertices0*nvertices1];
-		int[] positionY = new int[nvertices0*nvertices1];
-		for (int i = 0; i < nvertices0; i++){
-			for (int j = 0; j < nvertices1; j++){
-				positionX[i*nvertices0+j] = i;
-				positionY[i*nvertices0+j] = j;
-			}
-		}
-		
-		// Positions (x,y) to a vertex v are (positionX[v], positionY[v])
-		
-        return cartesianProduct(graph0, graph1);
-    }
 
-
-    // Calculates the cartesian product G x H of two graphs G and H
-    UndirectedSparseGraphTO<Integer, Integer> cartesianProduct (UndirectedSparseGraphTO<Integer, Integer> graph0, UndirectedSparseGraphTO<Integer, Integer> graph1){
+        // Seting vertex positions
         int nvertices0 = graph0.getVertexCount();
         int nvertices1 = graph1.getVertexCount();
-        
+        int[] positionX = new int[(nvertices0 * nvertices1)+2];
+        int[] positionY = new int[(nvertices0 * nvertices1)+2];
+        for (int i = 0; i < nvertices0; i++) {
+            for (int j = 0; j < nvertices1; j++) {
+                positionX[i * nvertices0 + j] = i;
+                positionY[i * nvertices0 + j] = j;
+            }
+        }
+
+        // Positions (x,y) to a vertex v are (positionX[v], positionY[v])
+        UndirectedSparseGraphTO<Integer, Integer> graph = cartesianProduct(graph0, graph1);
+        graph.setPositionX(positionX);
+        graph.setPositionY(positionY);
+        return graph;
+    }
+
+    // Calculates the cartesian product G x H of two graphs G and H
+    UndirectedSparseGraphTO<Integer, Integer> cartesianProduct(UndirectedSparseGraphTO<Integer, Integer> graph0, UndirectedSparseGraphTO<Integer, Integer> graph1) {
+        int nvertices0 = graph0.getVertexCount();
+        int nvertices1 = graph1.getVertexCount();
+
         // We order the vertices of the cartesian product by each element aij = (vi, uj) as its vertexes, a pair of vi in G and uj in H
         // To know (vi, uj) from aij, vi = aij/nvertices1, uj = aij%nvertices1
         // To know aij from (vi, uj), aij = vi*nvertices1 + uj
-        int nvertices = nvertices0*nvertices1;
+        int nvertices = nvertices0 * nvertices1;
 
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         graph.setName("G x H");
@@ -88,27 +89,27 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
         int edge_count = 0;
 
         // For each edge (vi, vj) in G, make (aim, ajm) for m from 0 to nvertices1
-        for (Integer e: edges0){
+        for (Integer e : edges0) {
             Pair p = (Pair) graph0.getEndpoints(e);
             int i = (int) p.getFirst();
             int j = (int) p.getSecond();
-            
-            for(int m = 0; m < nvertices1; m++){
-                int line = i*nvertices1 + m;
-                int column = j*nvertices1 + m;
+
+            for (int m = 0; m < nvertices1; m++) {
+                int line = i * nvertices1 + m;
+                int column = j * nvertices1 + m;
                 graph.addEdge(edge_count++, line, column);
             }
         }
 
         // For each edge (ui, uj) in H, make (ami, amj) for m from 0 to nvertices0
-        for (Integer e: edges1){
+        for (Integer e : edges1) {
             Pair p = (Pair) graph1.getEndpoints(e);
             int i = (int) p.getFirst();
             int j = (int) p.getSecond();
-            
-            for(int m = 0; m < nvertices0; m++){
-                int line = m*nvertices1 + i;
-                int column = m*nvertices1 + j;
+
+            for (int m = 0; m < nvertices0; m++) {
+                int line = m * nvertices1 + i;
+                int column = m * nvertices1 + j;
                 graph.addEdge(edge_count++, line, column);
             }
         }

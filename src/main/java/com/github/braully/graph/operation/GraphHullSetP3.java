@@ -25,6 +25,8 @@ public class GraphHullSetP3 implements IGraphOperation {
         long totalTimeMillis = -1;
         Collection<Integer> set = graphRead.getSet();
 
+        List<Integer> vertices = (List<Integer>) graphRead.getVertices();
+
         totalTimeMillis = System.currentTimeMillis();
         OperationConvexityGraphResult caratheodoryNumberGraph = null;
         if (set.size() >= 2) {
@@ -48,7 +50,7 @@ public class GraphHullSetP3 implements IGraphOperation {
         List<Integer> unreachable = new ArrayList<>();
 
         if (caratheodoryNumberGraph.auxProcessor != null && caratheodoryNumberGraph.auxProcessor.length > 0) {
-            for (int i = 0; i < caratheodoryNumberGraph.auxProcessor.length; i++) {
+            for (Integer i : vertices) {
                 int val = caratheodoryNumberGraph.auxProcessor[i];
                 if (val == 0) {
                     unreachable.add(i);
@@ -90,8 +92,8 @@ public class GraphHullSetP3 implements IGraphOperation {
     public OperationConvexityGraphResult hsp3aux(UndirectedSparseGraphTO<Integer, Integer> graph, int[] currentSet) {
         OperationConvexityGraphResult processedHullSet = null;
         Set<Integer> hsp3g = new HashSet<>();
-        int[] aux = new int[graph.getVertexCount()];
-        int[] auxc = new int[graph.getVertexCount()];
+        int[] aux = new int[(int) graph.maxVertex() + 1];
+        int[] auxc = new int[(int) graph.maxVertex() + 1];
         List<Integer> includedSequence = new ArrayList<>();
 
         for (int i = 0; i < aux.length; i++) {
