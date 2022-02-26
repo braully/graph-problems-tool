@@ -28,11 +28,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.spi.LoggingEvent;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import util.KeyValue;
 
 /**
  * REST Web Service -- Web Services Front end
@@ -117,12 +119,12 @@ public class GraphWS {
     }
 
     @ResponseBody
-    @RequestMapping("list-graph-operation")
-    public List<Map.Entry<String, String>> listGraphOperation() {
-        List<Map.Entry<String, String>> types = new ArrayList<>();
+    @RequestMapping(name = "list-graph-operation")
+    public List<KeyValue<String, String>> listGraphOperation() {
+        List<KeyValue<String, String>> types = new ArrayList<>();
         if (operators != null) {
             for (IGraphOperation operator : operators) {
-                types.add(new AbstractMap.SimpleEntry<String, String>(operator.getName(), operator.getTypeProblem()));
+                types.add(new KeyValue<String, String>(operator.getName(), operator.getTypeProblem()));
             }
         }
         return types;
@@ -130,11 +132,11 @@ public class GraphWS {
 
     @ResponseBody
     @RequestMapping("list-graph-generator")
-    public List<Map.Entry<String, String[]>> listGraphGenerator() {
-        List<Map.Entry<String, String[]>> types = new ArrayList<>();
+    public List<KeyValue<String, String[]>> listGraphGenerator() {
+        List<KeyValue<String, String[]>> types = new ArrayList<>();
         if (generators != null) {
             for (IGraphGenerator generator : generators) {
-                types.add(new AbstractMap.SimpleEntry<String, String[]>(generator.getDescription(), generator.getParameters()));
+                types.add(new KeyValue<String, String[]>(generator.getDescription(), generator.getParameters()));
             }
         }
         return types;
@@ -195,7 +197,6 @@ public class GraphWS {
 //        }
 //        return map;
 //    }
-
     @ResponseBody
     @RequestMapping("download-all-result")
     public void downloadGraphCsr() {
