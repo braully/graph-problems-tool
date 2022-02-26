@@ -436,28 +436,34 @@
 
                     var posX = d3.scale.linear()
                             .range([0, width])
-                            .domain([-(width/2), width/2]);
+                            .domain([-(width / 2), width / 2]);
                     var posY = d3.scale.linear()
                             .range([0, height])
-                            .domain([-(height/2), height/2]);
+                            .domain([-(height / 2), height / 2]);
 
                     var vertex = graph.normalizedVertices.map(function (d) {
                         return {"idname": graph.vertices[d],
-                            "name": graph.vertices[d] + (graph.vertices[d] != d ? " (" + d + "º)" : ""),
+                            "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
                             "group": 1,
-                            "x": posX(graph.positionX != null ? graph.positionX[d] : Math.floor(Math.random() * width)),
-                            "y": posY(graph.positionY != null ? graph.positionY[d] :  Math.floor(Math.random() * height))
+                            "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width)+1)*70,
+                            "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height)+1)* 70
+//                            "x": posX(graph.positionX !== null ? graph.positionX[d] + 70 : Math.floor(Math.random() * width)),
+//                            "y": posY(graph.positionY !== null ? graph.positionY[d] + 70 : Math.floor(Math.random() * height))
+                            , "fixed": graph.positionX !== null && graph.positionX[d] !== null
                         };
                     });
-                    
-                    vertex.forEach(function(d) { d.cx = d.x; d.cy = d.y; });
+
+                    vertex.forEach(function (d) {
+                        d.cx = d.x;
+                        d.cy = d.y;
+                    });
 
 
                     var edges = graph.normalizedPairs.map(function (d) {
                         return {"source": d[0], "target": d[1], "value": 1, "origin": d, "left": true, "right": true};
                     });
-                    
-                    
+
+
                     force.nodes(vertex).links(edges).start();
 
                     var link = svg.selectAll(".link")
@@ -489,6 +495,12 @@
                     nodes.append("circle")
                             .attr("class", "node")
                             .attr("r", 5)
+//                            .attr("cx", function (d) {
+//                                return d.cx;
+//                            })
+//                            .attr("cy", function (d) {
+//                                return d.cy;
+//                            })
                             .style("fill", function (d) {
                                 if (d === selected_node)
                                     return d3.rgb(color(d.group)).darker().toString();
