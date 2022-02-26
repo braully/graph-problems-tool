@@ -483,6 +483,8 @@ int main(int argc, char** argv) {
 			std::cout << *(max_set.rbegin());
 		std::cout << "}\n";
 		
+		std::cout << "Maximum Clique Cardinality = " << max_set.size()<<"\n";
+		
 		free(mat);
 	}
 	return 0;
