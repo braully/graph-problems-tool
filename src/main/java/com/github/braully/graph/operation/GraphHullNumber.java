@@ -82,7 +82,7 @@ public class GraphHullNumber implements IGraphOperation {
         return countIncluded;
     }
 
-    private Set<Integer> calcMinHullNumberGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
+    public Set<Integer> calcMinHullNumberGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Set<Integer> ceilling = calcCeillingHullNumberGraph(graph);
         Set<Integer> hullSet = ceilling;
         if (graph == null || graph.getVertices().isEmpty()) {
@@ -136,7 +136,7 @@ public class GraphHullNumber implements IGraphOperation {
             if (checkIfHullSet(graph, currentSet)) {
                 hullSet = new HashSet<>(currentSetSize);
                 for (int i : currentSet) {
-                    hullSet.add(i);
+                    hullSet.add(graph.verticeByIndex(i));
                 }
                 break;
             }
@@ -150,21 +150,21 @@ public class GraphHullNumber implements IGraphOperation {
             return false;
         }
         Set<Integer> fecho = new HashSet<>();
-        Collection vertices = graph.getVertices();
-        int[] aux = new int[graph.getVertexCount()];
+        int[] aux = new int[(Integer) graph.maxVertex() + 1];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
         }
 
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer v : currentSet) {
+        for (Integer iv : currentSet) {
+            Integer v = graph.verticeByIndex(iv);
             mustBeIncluded.add(v);
             aux[v] = INCLUDED;
         }
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
             fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighbors(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
             for (int vertn : neighbors) {
                 if (vertn == verti) {
                     continue;

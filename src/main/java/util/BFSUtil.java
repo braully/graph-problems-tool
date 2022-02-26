@@ -99,7 +99,6 @@ public class BFSUtil {
                 if (bfs[nv] == null) {
                     bfs[nv] = depth;
                     queue.add(nv);
-                    depthcount[depth]++;
                 }
             }
         }
@@ -152,7 +151,13 @@ public class BFSUtil {
         for (Integer vertsrc : (List<Integer>) graph.getVertices()) {
             labelDistances(graph, vertsrc);
             for (int j = 0; j < bfs.length; j++) {
-                set(vertsrc, j, bfs[j]);
+                if (vertsrc != null) {
+
+                    Integer va=  bfs[j];
+                    if (va != null) {
+                        set(vertsrc, j, va);
+                    }
+                }
             }
         }
     }

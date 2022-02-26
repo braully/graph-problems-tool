@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author braully
  */
-public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSparseGraph {
+public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends UndirectedSparseGraph {
 
     public UndirectedSparseGraphTO() {
         super();
@@ -30,6 +30,13 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
     }
 
     private List<V> cacheVertices;
+
+    public UndirectedSparseGraphTO(int nvertices) {
+        this();
+        for (int i = 0; i < nvertices; i++) {
+            this.addVertex(i);
+        }
+    }
 
     public void addEdgesFromString(String strEdges) {
         String[] edges = null;
@@ -104,6 +111,11 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
     @Override
     public Collection getVertices() {
         return cacheVertices();
+    }
+
+    public <V> V maxVertex() {
+        V max = (V) Collections.max(this.cacheVertices());
+        return max;
     }
 
     public List cacheVertices() {
@@ -197,6 +209,25 @@ public class UndirectedSparseGraphTO<V, E extends Number> extends UndirectedSpar
 
     public Collection getSet() {
         return set;
+    }
+
+    protected double[] positionX;
+    protected double[] positionY;
+
+    public void setPositionX(double[] positionX) {
+        this.positionX = positionX;
+    }
+
+    public void setPositionY(double[] positionY) {
+        this.positionY = positionY;
+    }
+
+    public double[] getPositionX() {
+        return positionX;
+    }
+
+    public double[] getPositionY() {
+        return positionY;
     }
 
     public void setSet(Collection setStr) {

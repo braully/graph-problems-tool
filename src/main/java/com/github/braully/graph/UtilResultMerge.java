@@ -72,9 +72,35 @@ public class UtilResultMerge {
         String[] inputs = cmd.getOptionValues("input");
         if (inputs == null) {
             inputs = new String[]{
-                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Dropbox/workspace/graph-caratheodory-np3/grafos-processamento/Almost_hypohamiltonian"
-//                "/media/dados/documentos/grafos-processamento/Almost_hypohamiltonian",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Cubic",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Cubic/cubic",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Vertex-transitive",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/diameter-2",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/triangle-free-4-chromatic",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/perihamiltoinian",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Quartic",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Maximal_triangle-free",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Hypohamiltonian_graphs",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/nut",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Snarks",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Eulerian",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Critical_H-free",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/perfect-graph",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Ramsey_numbers",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/mincaley",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Random",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Fullerenes",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Minimal_Ramsey",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/triangle-free-5-chromatic",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Highly_irregular",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/diameter-3",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Almost_hypohamiltonian",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/uniquely-hamiltonian",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Strongly_regular",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Alternating_plane",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/platypus",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Trees",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Planar"
+//                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "Documentos/grafos-processamento/Cubic",
 //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Critical_H-free",
 //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Highly_irregular",
 //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Hypohamiltonian_graphs",
@@ -84,7 +110,7 @@ public class UtilResultMerge {
 //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Vertex-transitive",
 //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Trees"
             };
-            excludes = new String[]{"carathe"};
+            excludes = new String[]{"arath", "number"};
             verbose = true;
         }
 
@@ -285,34 +311,34 @@ public class UtilResultMerge {
         List<String> opers = getOperationsSorted();
         int j = 1;
         for (String str : opers) {
-            if (str.equals(OPERACAO_REFERENCIA) || str.equals(OPERACAO_REFERENCIA_2)) {
-                System.out.print(str + " - T(s)");
-                System.out.print("\t");
-                System.out.print("Min");
-                System.out.print("\t");
-                System.out.print("Max");
-                System.out.print("\t");
-            } else {
-                System.out.print(str + " (" + j + ") - T(s)");
-                System.out.print("\t");
-                System.out.print("Media das Dif");
-                System.out.print("\t");
-                System.out.print("Pior resultado");
-                System.out.print("\t");
-                System.out.print("Acertos exatos ");
-                System.out.print("\t");
-                System.out.print("Quantidade");
-                System.out.print("\t");
-                System.out.print("Desconto");
-                System.out.print("\t");
-            }
+//            if (str.equals(OPERACAO_REFERENCIA) || str.equals(OPERACAO_REFERENCIA_2)) {
+            System.out.print(str + " - T(s)");
+            System.out.print("\t");
+            System.out.print("Min");
+            System.out.print("\t");
+            System.out.print("Max");
+            System.out.print("\t");
+//            } else {
+//                System.out.print(str + " (" + j + ") - T(s)");
+//                System.out.print("\t");
+//                System.out.print("Media das Dif");
+//                System.out.print("\t");
+//                System.out.print("Pior resultado");
+//                System.out.print("\t");
+//                System.out.print("Acertos exatos ");
+//                System.out.print("\t");
+//                System.out.print("Quantidade");
+//                System.out.print("\t");
+//                System.out.print("Desconto");
+//                System.out.print("\t");
+//            }
             j++;
         }
 
-        for (int i = 2; i <= maxCarat; i++) {
-            System.out.print("QNC" + i);
-            System.out.print("\t");
-        }
+//        for (int i = 2; i <= maxCarat; i++) {
+//            System.out.print("QNC" + i);
+//            System.out.print("\t");
+//        }
         System.out.println("");
 
         for (String key : listKeys) {

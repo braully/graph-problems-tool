@@ -4,6 +4,7 @@ import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,47 +53,50 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
     }
 
     public List<Integer> findCycleBruteForce(UndirectedSparseGraphTO<Integer, Integer> graph, int currentSize) {
-        Collection vertices = graph.getVertices();
+        List<Integer> vertices = (List<Integer>) graph.getVertices();
         List<Integer> cycle = null;
         int veticesCount = vertices.size();
-        MapCountOpt mcount = new MapCountOpt(veticesCount);
-        BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(veticesCount);
-        bfsUtil.labelDistancesCompactMatrix(graph);
+        if (currentSize < veticesCount) {
+            Integer maxV = Collections.max(vertices) + 1;
+            MapCountOpt mcount = new MapCountOpt(maxV);
+            BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(maxV);
+            bfsUtil.labelDistancesCompactMatrix(graph);
 
-        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSize);
-        Boolean isCycle = null;
-        while (combinationsIterator.hasNext()) {
-            int[] currentSet = combinationsIterator.next();
-            mcount.clear();
-            isCycle = null;
-            for (int iv : currentSet) {
-                Integer v = graph.verticeByIndex(iv);
-                for (int iw : currentSet) {
-                    Integer w = graph.verticeByIndex(iw);
-                    if (bfsUtil.get(v, w) == 1) {
-                        Integer inc = mcount.inc(v);
-                        if (inc > 2) {
-                            //V tem mais de dois vizinhos no ciclo, 
-                            // não é permitido em um ciclo chordless
-                            isCycle = false;
-                            break;
+            Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(veticesCount, currentSize);
+            Boolean isCycle = null;
+            while (combinationsIterator.hasNext()) {
+                int[] currentSet = combinationsIterator.next();
+                mcount.clear();
+                isCycle = null;
+                for (int iv : currentSet) {
+                    Integer v = graph.verticeByIndex(iv);
+                    for (int iw : currentSet) {
+                        Integer w = graph.verticeByIndex(iw);
+                        if (bfsUtil.get(v, w) == 1) {
+                            Integer inc = mcount.inc(v);
+                            if (inc > 2) {
+                                //V tem mais de dois vizinhos no ciclo, 
+                                // não é permitido em um ciclo chordless
+                                isCycle = false;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (isCycle == null) {
-                isCycle = true;
-                for (int iv : currentSet) {
-                    Integer v = graph.verticeByIndex(iv);
-                    isCycle = isCycle && mcount.getCount(v) == 2;
+                if (isCycle == null) {
+                    isCycle = true;
+                    for (int iv : currentSet) {
+                        Integer v = graph.verticeByIndex(iv);
+                        isCycle = isCycle && mcount.getCount(v) == 2;
+                    }
                 }
-            }
-            if (isCycle) {
-                cycle = new ArrayList<>();
-                for (int i : currentSet) {
-                    cycle.add(i);
+                if (isCycle) {
+                    cycle = new ArrayList<>();
+                    for (int i : currentSet) {
+                        cycle.add(i);
+                    }
+                    break;
                 }
-                break;
             }
         }
         return cycle;
