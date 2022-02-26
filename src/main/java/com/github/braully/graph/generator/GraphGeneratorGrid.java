@@ -77,14 +77,12 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
         }
 
         // Seting vertex positions
-        int nvertices0 = graph0.getVertexCount();
-        int nvertices1 = graph1.getVertexCount();
-        int[] positionX = new int[nvertices0 * nvertices1];
-        int[] positionY = new int[nvertices0 * nvertices1];
-        for (int i = 0; i < nvertices0; i++) {
-            for (int j = 0; j < nvertices1; j++) {
-                positionX[i * nvertices0 + j] = i;
-                positionY[i * nvertices0 + j] = j;
+        double[] positionX = new double[N * M];
+        double[] positionY = new double[N * M];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                positionX[i * M + j] = j+1;
+                positionY[i * M + j] = i+1;
             }
         }
 

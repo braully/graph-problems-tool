@@ -1,11 +1,7 @@
 package com.github.braully.graph.generator;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-/*
-import java.util.Map;
-import java.util.Collection;
-import java.util.ArrayList;
- */
+import java.util.Random;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import java.util.*;
@@ -14,7 +10,8 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
 
     static final String STRING_EDGES0 = "Edge-string of graph G";
     static final String STRING_EDGES1 = "Edge-string of graph H";
-    static final String[] parameters = {STRING_EDGES0, STRING_EDGES1};
+	static final String RANDOM_IMPACT = "Drawing randomness (recommended = 0.7)";
+    static final String[] parameters = {STRING_EDGES0, STRING_EDGES1, RANDOM_IMPACT};
     static final String description = "Castesian Product G x H";
 
     @Override
@@ -31,9 +28,14 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
     public UndirectedSparseGraphTO<Integer, Integer> generateGraph(Map parameters) {
 
         String strEdges0 = getStringParameter(parameters, STRING_EDGES0);
+		if (strEdges0 == null)
+			strEdges0 = "0-1, 1-2, 2-0";
         String strEdges1 = getStringParameter(parameters, STRING_EDGES1);
-
-        UndirectedSparseGraphTO<Integer, Integer> graph0 = new UndirectedSparseGraphTO<>();
+		if (strEdges1 == null)
+			strEdges1 = "0-1, 1-2, 2-3, 3-0, 3-1";
+		double r_impact = getDoubleParameter(parameters, RANDOM_IMPACT);
+        
+		UndirectedSparseGraphTO<Integer, Integer> graph0 = new UndirectedSparseGraphTO<>();
         graph0.setName("G");
         graph0.addEdgesFromString(strEdges0);
 
@@ -42,14 +44,20 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
         graph1.addEdgesFromString(strEdges1);
 
         // Seting vertex positions
-        int nvertices0 = graph0.getVertexCount();
-        int nvertices1 = graph1.getVertexCount();
-        int[] positionX = new int[(nvertices0 * nvertices1)+2];
-        int[] positionY = new int[(nvertices0 * nvertices1)+2];
-        for (int i = 0; i < nvertices0; i++) {
-            for (int j = 0; j < nvertices1; j++) {
-                positionX[i * nvertices0 + j] = i;
-                positionY[i * nvertices0 + j] = j;
+        int N = graph0.getVertexCount();
+        int M = graph1.getVertexCount();
+        double[] positionX = new double[(N * M)];
+        double[] positionY = new double[(N * M)];
+		Random rand = new Random();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+				double i_f = i;
+				double j_f = j;
+				double N_f = N;
+				double M_f = M;
+				double r = rand.nextDouble(); // number beteween 0 and 1
+                positionX[i * M + j] = j_f+1+r*r_impact;
+                positionY[i * M + j] = i_f+1+r*r_impact;
             }
         }
 
