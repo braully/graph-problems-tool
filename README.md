@@ -25,7 +25,7 @@
    Netbeans 8 recommended.
 
 ## Demo
-   http://gpt.braully.eti.br/
+   http://graph-problems-tool.herokuapp.com/
 
 ## References and Libraries
 
