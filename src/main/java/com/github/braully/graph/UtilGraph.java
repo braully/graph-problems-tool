@@ -389,7 +389,7 @@ public class UtilGraph {
         ByteReader6 br6 = new ByteReader6(strGraph);
 //        int n = br6.get_number();
         int n = br6.getGraphSize();
-        System.out.println("n=" + n);
+//        System.out.println("n=" + n);
 //        System.out.println("n2=" + br6.getGraphSize());
 
         int numEdge = 0;
