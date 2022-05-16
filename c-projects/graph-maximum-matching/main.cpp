@@ -244,21 +244,24 @@ public:
 
 // Input the number of vertices and adjacency matrix
 // Prints the maximum independent set
+// ISSUE: Some graphs are being readed with three integers (-65 -117 -113) in the beginning of the matrix
 int main(int argc, char** argv) {
 	if (argc > 1){
 		graphAdjMatrixFromFile(argv[1]);
-		cout << "Got matrix\n";
+		//cout << "Got matrix\n";
 
 		Blossom bm(N_vertices);
 
+        /*
 		for (int i = 0; i < N_vertices; i++)
-        for (int j = 0; j < N_vertices; j++)
-            if (edge(i, j))
-                bm.addEdge(i, j);
+            for (int j = 0; j < N_vertices; j++)
+                if (edge(i, j))
+                    bm.addEdge(i, j);
+        */
 
-		cout << "passed\n";
+		//cout << "passed\n";
 		int res = bm.edmondsBlossomAlgorithm();
-		cout << "solved\n";
+		//cout << "solved\n";
 
 		// Printing the maximum matching
 		if (!res)
