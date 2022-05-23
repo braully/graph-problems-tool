@@ -162,6 +162,15 @@ public class BatchExecuteOperation implements IBatchExecute {
                 Logger.getLogger(BatchExecuteOperation.class
                         .getName()).log(Level.SEVERE, null, ex);
             }
+        } else if (inputFilePath.toLowerCase().endsWith(".es")) {
+            try {
+                for (IGraphOperation operation : operationsToExecute) {
+                    processFileES(operation, dir);
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(BatchExecuteOperation.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (inputFilePath.toLowerCase().endsWith(".g6")) {
             try {
                 for (IGraphOperation operation : operationsToExecute) {
@@ -243,6 +252,8 @@ public class BatchExecuteOperation implements IBatchExecute {
                             graphCount++;
                         } else if (name.toLowerCase().endsWith(".adj")) {
                             processFileAdjList(operation, file, dirname);
+                        } else if (name.toLowerCase().endsWith(".es")) {
+                            processFileES(operation, file, dirname);
                         } else if (name.toLowerCase().endsWith(".g6")) {
                             processFileG6(operation, file, dirname, contProcess);
                         } else if (name.toLowerCase().endsWith(".g6.gz")) {
@@ -261,6 +272,20 @@ public class BatchExecuteOperation implements IBatchExecute {
 
     void processFileMat(IGraphOperation operation, File file) throws IOException {
         processFileMat(operation, file, null);
+    }
+
+    void processFileES(IGraphOperation operation, File file) throws IOException {
+        processFileES(operation, file, null);
+    }
+
+    void processFileES(IGraphOperation operation, File file,
+            String dirname) throws IOException {
+        if (verbose) {
+            System.out.println("Processing file: " + file.getName());
+        }
+        UndirectedSparseGraphTO loadGraphAdjMatrix = UtilGraph.loadGraphES(new FileInputStream(file));
+        loadGraphAdjMatrix.setName(file.getName());
+        String processGraph = processGraph(operation, loadGraphAdjMatrix, dirname, 0);
     }
 
     void processFileAdj(IGraphOperation operation, File file) throws IOException {
@@ -430,10 +455,10 @@ public class BatchExecuteOperation implements IBatchExecute {
             resultFile = null;//getResultFile(operation, file, dirname);
             r = new BufferedReader(new InputStreamReader(new FileInputStream(resultFile)));
         } catch (Exception e) {
-            
+
         }
 //            if (output == null) {
-                System.out.println(formatResult);
+        System.out.println(formatResult);
 //            } else {
 //                try {
 //                    output.write(formatResult);

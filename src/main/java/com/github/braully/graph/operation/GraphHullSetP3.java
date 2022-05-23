@@ -73,11 +73,14 @@ public class GraphHullSetP3 implements IGraphOperation {
         Collections.sort(complement);
 
         response.put(OperationConvexityGraphResult.PARAM_NAME_CONVEX_HULL, hslist);
-        response.put("Frontier H(S)", frontier);
-        response.put("Unreachable", unreachable);
-        response.put("Set(S)", set);
-        response.put("N[" + set + "]", closedNeighbor);
-        response.put("V(G)-N[" + set + "]", complement);
+        if (graphRead.getVertexCount() < 100) {
+            response.put("Frontier H(S)", frontier);
+            response.put("Unreachable", unreachable);
+            response.put("Set(S)", set);
+            response.put("N[" + set + "]", closedNeighbor);
+            response.put("V(G)-N[" + set + "]", complement);
+        }
+
         response.put(OperationConvexityGraphResult.PARAM_NAME_INCLUDED_SEQUENCE, caratheodoryNumberGraph.includedSequence);
         return response;
     }

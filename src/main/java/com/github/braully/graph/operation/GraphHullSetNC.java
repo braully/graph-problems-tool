@@ -83,22 +83,22 @@ public class GraphHullSetNC implements IGraphOperation {
         response.put("Set(S)", set);
 //            response.put("N[" + set + "]", closedNeighbor);
 //            response.put("V(G)-N[" + set + "]", complement);
-        System.out.println("\nIncludade sequence n:{");
+        //System.out.println("\nIncludade sequence n:{");
         Set<Integer> includeat = new HashSet<>();
         for (Integer v : hsGraph.includedSequence) {
-            System.out.print(v + ":" + includedSequenceN.get(v) + ", ");
+            //System.out.print(v + ":" + includedSequenceN.get(v) + ", ");
             includeat.add(v);
             Collection<Integer> ns = graphRead.getNeighborsUnprotected(v);
             for (Integer vn : ns) {
                 Collection<Integer> vnn = graphRead.getNeighborsUnprotected(vn);
                 if (vnn.size() > 3) {
                     if (includeat.containsAll(vnn)) {
-                        System.out.println("\n[" + vn + "]");
+                        //System.out.println("\n[" + vn + "]");
                     }
                 }
             }
         }
-        System.out.println("}\n");
+        //System.out.println("}\n");
 
 //        response.put("Viz", hsGraph.vizs);
 //        response.put("Pot", hsGraph.verticesPotenciais);
@@ -137,7 +137,9 @@ public class GraphHullSetNC implements IGraphOperation {
         Queue<Integer> mustBeIncluded2 = new ArrayDeque<>();
 
         Set<Integer> vizs = new HashSet<>();
+        int iteracao = 0;
 
+//        //System.out.println("Iteracao-" + iteracao + ": ");
         for (Integer v : currentSet) {
             mustBeIncluded.add(v);
             aux[v] = PROCESSED;
@@ -145,6 +147,7 @@ public class GraphHullSetNC implements IGraphOperation {
             hsp3g.add(v);
             includedSequence.add(v);
             includedSequenceN.get(v).add(v);
+            //System.out.print(v + ":" + includedSequenceN.get(v) + ", ");
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(v);
             vizs.addAll(neighbors);
             for (int vertn : neighbors) {
@@ -162,6 +165,8 @@ public class GraphHullSetNC implements IGraphOperation {
                 }
             }
         }
+//        //System.out.println();
+
         mustBeIncluded.addAll(mustBeIncluded2);
         mustBeIncluded2.clear();
 
@@ -181,15 +186,15 @@ public class GraphHullSetNC implements IGraphOperation {
         }
         processedHullSet.verticesPotenciais = verticesPotenciais;
 
-        System.out.println("Vertice incluidos a priori: ");
-        System.out.println(mustBeIncluded);
-
+//        //System.out.println("Vertice incluidos a priori: ");
+//        //System.out.println(mustBeIncluded);
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
             if (aux[verti] == PROCESSED) {
                 continue;
             }
             hsp3g.add(verti);
+//            //System.out.print(verti + ":" + includedSequenceN.get(verti) + ", ");
             includedSequence.add(verti);
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
 
@@ -208,13 +213,16 @@ public class GraphHullSetNC implements IGraphOperation {
             }
             aux[verti] = PROCESSED;
         }
-
+        //System.out.println();
+        iteracao++;
+        //System.out.println("Iteracao-" + iteracao + ": ");
         while (!mustBeIncluded2.isEmpty()) {
             Integer verti = mustBeIncluded2.remove();
             if (aux[verti] == PROCESSED) {
                 continue;
             }
             hsp3g.add(verti);
+            //System.out.print(verti + ":" + includedSequenceN.get(verti) + ", ");
             includedSequence.add(verti);
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
 
@@ -225,14 +233,22 @@ public class GraphHullSetNC implements IGraphOperation {
                 if (vertn != verti && aux[vertn] < INCLUDED) {
                     aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
                     if (aux[vertn] == INCLUDED) {
-                        mustBeIncluded2.add(vertn);
+                        mustBeIncluded.add(vertn);
                     }
                     auxc[vertn] = auxc[vertn] + auxc[verti];
                     includedSequenceN.get(vertn).add(verti);
                 }
             }
+            if (mustBeIncluded2.isEmpty() && !mustBeIncluded.isEmpty()) {
+                mustBeIncluded2.addAll(mustBeIncluded);
+                mustBeIncluded.clear();
+                //System.out.println();
+                iteracao++;
+                //System.out.println("Iteracao-" + iteracao + ": ");
+            }
             aux[verti] = PROCESSED;
         }
+        //System.out.println();
 
         Set<Integer> setCurrent = new HashSet<>();
         for (int i : currentSet) {

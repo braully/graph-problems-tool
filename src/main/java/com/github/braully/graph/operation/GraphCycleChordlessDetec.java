@@ -61,11 +61,15 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
             MapCountOpt mcount = new MapCountOpt(maxV);
             BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(maxV);
             bfsUtil.labelDistancesCompactMatrix(graph);
-
+            int curPos = -1;
             Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(veticesCount, currentSize);
             Boolean isCycle = null;
             while (combinationsIterator.hasNext()) {
                 int[] currentSet = combinationsIterator.next();
+                if (curPos != currentSet[currentSet.length - 1]) {
+                    System.out.println("new cycle: " + curPos + " " + currentSet[currentSet.length - 1]);
+                    curPos = currentSet[currentSet.length - 1];
+                }
                 mcount.clear();
                 isCycle = null;
                 for (int iv : currentSet) {

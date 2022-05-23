@@ -29,10 +29,19 @@ public class GraphHullNumber implements IGraphOperation {
     public final int INCLUDED = 2;
     public final int NEIGHBOOR_COUNT_INCLUDED = 1;
 
+    Integer sizeStart = null;
+
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Integer hullNumber = -1;
         Set<Integer> minHullSet = null;
+        sizeStart = null;
+        try {
+            String inputData = graph.getInputData();
+            sizeStart = Integer.parseInt(inputData);
+        } catch (Exception e) {
+
+        }
 
         try {
             minHullSet = calcMinHullNumberGraph(graph);
@@ -100,6 +109,11 @@ public class GraphHullNumber implements IGraphOperation {
             }
         }
         currentSize = Math.max(currentSize, countOneNeigh);
+        
+        if(sizeStart != null){
+            log.info("Start size (input param):" + sizeStart);
+            currentSize = sizeStart;
+        }
 
         while (currentSize < maxSizeSet) {
             Set<Integer> hs = findHullSetBruteForce(graph, currentSize);
@@ -124,12 +138,12 @@ public class GraphHullNumber implements IGraphOperation {
         return ceilling;
     }
 
-    public Set<Integer> findHullSetBruteForce(UndirectedSparseGraphTO<Integer, Integer> graph, int currentSetSize) {
+    public Set<Integer> findHullSetBruteForce(UndirectedSparseGraphTO<Integer, Integer> graph, 
+            int currentSetSize) {
         Set<Integer> hullSet = null;
         if (graph == null || graph.getVertexCount() <= 0) {
             return hullSet;
         }
-        Collection vertices = graph.getVertices();
         Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSetSize);
         while (combinationsIterator.hasNext()) {
             int[] currentSet = combinationsIterator.next();

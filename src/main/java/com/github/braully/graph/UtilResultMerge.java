@@ -72,45 +72,45 @@ public class UtilResultMerge {
         String[] inputs = cmd.getOptionValues("input");
         if (inputs == null) {
             inputs = new String[]{
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Cubic/cubic",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Vertex-transitive",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/diameter-2",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Cubic/cubic",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Vertex-transitive",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/diameter-2",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/triangle-free-4-chromatic",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/perihamiltoinian",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Quartic",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Maximal_triangle-free",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Hypohamiltonian_graphs",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Quartic",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Maximal_triangle-free",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Hypohamiltonian_graphs",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/nut",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Snarks",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Eulerian",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Critical_H-free",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Snarks",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Eulerian",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Critical_H-free",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/perfect-graph",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Ramsey_numbers",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Ramsey_numbers",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/mincaley",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Random",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Random",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Fullerenes",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Minimal_Ramsey",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Minimal_Ramsey",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/triangle-free-5-chromatic",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Highly_irregular",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Highly_irregular",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/diameter-3",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Almost_hypohamiltonian",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Almost_hypohamiltonian",
                 com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/uniquely-hamiltonian",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Strongly_regular",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Alternating_plane",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/platypus",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Trees",
-                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Planar"
-//                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "Documentos/grafos-processamento/Cubic",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Critical_H-free",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Highly_irregular",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Hypohamiltonian_graphs",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Maximal_triangle-free",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Minimal_Ramsey",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Strongly_regular",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Vertex-transitive",
-//                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Trees"
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Strongly_regular",
+                //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Alternating_plane",
+                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/platypus", //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Trees",
+            //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "grafos-processamento/Planar"
+            //                com.github.braully.graph.DatabaseFacade.HOME_DIRECTORY + "Documentos/grafos-processamento/Cubic",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Critical_H-free",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Highly_irregular",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Hypohamiltonian_graphs",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Maximal_triangle-free",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Minimal_Ramsey",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Strongly_regular",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Vertex-transitive",
+            //                com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "Documentos/grafos-processamento/Trees"
             };
-            excludes = new String[]{"arath", "number"};
+//            excludes = new String[]{"arath", "number"};
+            excludes = new String[]{"arath", "cycle"};
             verbose = true;
         }
 

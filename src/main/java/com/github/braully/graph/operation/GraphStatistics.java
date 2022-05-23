@@ -25,11 +25,15 @@ public class GraphStatistics implements IGraphOperation {
             DistanceStatistics distanceStatistics = new DistanceStatistics();
             double diameter = distanceStatistics.diameter(graph);
             response.put("Diameter", diameter);
-            int girth = girth(graph);
-            if (girth > 0) {
-                response.put("Girth", girth);
-            } else {
-                response.put("Girth", "infinity");
+            try {
+                int girth = girth(graph);
+                if (girth > 0) {
+                    response.put("Girth", girth);
+                } else {
+                    response.put("Girth", "infinity");
+                }
+            } catch (Exception e) {
+                log.warn("fail on girth", e);
             }
             
             response.put("n", graph.getVertexCount());
