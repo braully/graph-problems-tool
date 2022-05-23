@@ -29,6 +29,7 @@ void graphAdjMatrixFromFile(char *fileName) {
     FILE * filePointer;
     char line[1000];
     filePointer = fopen(fileName, "r");
+    //fgets(line, 4, filePointer); // to ignore title
     fgets(line, 1000, filePointer);
 
     int i = 0;
@@ -100,6 +101,7 @@ public:
         father.resize(V); // father[v] = u if v came from u in the forest
         base.resize(V); // Base[v]=u if v is in a contracted blossom of base u
         inq.resize(V); // inq[v] = true if v is in queue
+        inb.resize(V); // inb[v] = true if v is in blossom
         ed.assign(V, vector<bool>(V)); // ed[i][j] = true if {i, j} is in E
     }
 
@@ -113,7 +115,7 @@ public:
 
     // Returns the least commom ancestor of u and v in a tree of same root
     int LCA(int root, int u, int v){
-        vector<bool> inp; // inp[v] = true if v is in the path
+        vector<bool> inp(V); // inp[v] = true if v is in the path
         inp.assign(inp.size(), false);
 
         while (true){
@@ -246,18 +248,21 @@ public:
 // Prints the maximum independent set
 // ISSUE: Some graphs are being readed with three integers (-65 -117 -113) in the beginning of the matrix
 int main(int argc, char** argv) {
-	if (argc > 1){
+    if (argc > 1){
 		graphAdjMatrixFromFile(argv[1]);
 		//cout << "Got matrix\n";
 
 		Blossom bm(N_vertices);
 
-        /*
-		for (int i = 0; i < N_vertices; i++)
-            for (int j = 0; j < N_vertices; j++)
+		for (int i = 0; i < N_vertices; i++){
+            for (int j = 0; j < N_vertices; j++){
                 if (edge(i, j))
                     bm.addEdge(i, j);
-        */
+                //cout << edge(i,j) << ' ';
+            }
+            cout <<'\n';
+        }
+            
 
 		//cout << "passed\n";
 		int res = bm.edmondsBlossomAlgorithm();
