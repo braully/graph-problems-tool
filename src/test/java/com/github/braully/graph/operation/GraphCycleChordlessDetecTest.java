@@ -24,8 +24,19 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import com.github.braully.graph.UtilGraph;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.junit.Test;
+import util.BFSUtil;
+import util.MapCountOpt;
 
 /**
  *
@@ -51,6 +62,80 @@ public class GraphCycleChordlessDetecTest {
 //        assertEquals(expResult, result);
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
+    }
+
+    @Test
+    public void testFindAllCyclesBruteForce() throws FileNotFoundException, IOException {
+        System.out.println("findCycleBruteForce");
+        UndirectedSparseGraphTO<Integer, Integer> graph = UtilGraph.loadGraphES(new FileInputStream("./grafo-moore-50.es"));
+        int contCycle = 0;
+        int currentSize = 5;
+        Integer vind = 47;
+        List<Integer> vertices = new ArrayList<>(graph.getVertices());
+        vertices.remove(vind);
+
+        int[] setcheck = new int[5 + 1];
+        setcheck[0] = vind;
+
+        List<Integer> cycle = null;
+        int veticesCount = vertices.size();
+        if (currentSize < veticesCount) {
+            Integer maxV = Collections.max(vertices) + 1;
+            MapCountOpt mcount = new MapCountOpt(maxV);
+            BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(maxV);
+            bfsUtil.labelDistancesCompactMatrix(graph);
+            int curPos = -1;
+            Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(veticesCount, currentSize);
+            Boolean isCycle = null;
+            while (combinationsIterator.hasNext()) {
+                int[] currentSet = combinationsIterator.next();
+//                if (curPos != currentSet[currentSet.length - 1]) {
+////                    System.out.println("new cycle: " + curPos + " " + currentSet[currentSet.length - 1]);
+//                    curPos = currentSet[currentSet.length - 1];
+//                }
+                mcount.clear();
+                isCycle = null;
+                for (int i = 0; i < currentSet.length; i++) {
+                    setcheck[i + 1] = vertices.get(currentSet[i]);
+                }
+                for (int iv : setcheck) {
+                    Integer v = iv;
+                    for (int iw : setcheck) {
+                        Integer w = iw;
+                        if (bfsUtil.get(v, w) == 1) {
+                            Integer inc = mcount.inc(v);
+                            if (inc > 2) {
+                                //V tem mais de dois vizinhos no ciclo, 
+                                // não é permitido em um ciclo chordless
+                                isCycle = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (isCycle == null) {
+                    isCycle = true;
+                    for (int iv : setcheck) {
+                        Integer v = iv;
+                        isCycle = isCycle && mcount.getCount(v) == 2;
+                    }
+                }
+                if (isCycle) {
+                    cycle = new ArrayList<>();
+                    for (int i : setcheck) {
+                        cycle.add(i);
+                    }
+                    contCycle++;
+                    System.out.printf("%4d-", contCycle);
+                    System.out.println(cycle);
+//                    break;
+                }
+            }
+            System.out.println("V: " + vind);
+            System.out.println("Cycle count:  " + contCycle);
+        }
+
     }
 
 }

@@ -28,7 +28,7 @@ import org.apache.commons.cli.*;
  *
  * @author Braully Rocha da Silva
  */
-public class UtilResultMerge {
+public class UtilResultToDatabase {
 
     public static String OPERACAO_REFERENCIA = "Nº Caratheodory (Binary Java)";
     public static String OPERACAO_REFERENCIA_2 = "Hull Number (Java)";

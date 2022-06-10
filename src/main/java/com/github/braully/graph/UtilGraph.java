@@ -387,7 +387,10 @@ public class UtilGraph {
         }
 
         ByteReader6 br6 = new ByteReader6(strGraph);
-        int n = br6.get_number();
+//        int n = br6.get_number();
+        int n = br6.getGraphSize();
+//        System.out.println("n=" + n);
+//        System.out.println("n2=" + br6.getGraphSize());
 
         int numEdge = 0;
 
@@ -417,7 +420,11 @@ public class UtilGraph {
     }
 
     static class ByteReader6 {
+//http://users.cecs.anu.edu.au/~bdm/data/formats.html
 
+        static final int BIAS6 = 63;
+        static final int MAXBYTE = 126;
+        static final int SMALLN = 62;
         private byte[] mBytes;
         private int mSize, mPos, mBit;
 
@@ -430,6 +437,38 @@ public class UtilGraph {
         // ! whether k bits are available
         boolean have_bits(int k) {
             return (mPos + (mBit + k - 1) / 6) < mSize;
+        }
+
+        public int getGraphSize() {
+            return graphsize(mBytes);
+        }
+
+        public int graphsize(byte[] s) {
+            int ip = 0;
+            int n;
+
+            if (s[0] == ':' || s[0] == '&') {
+                ip++;
+            }
+
+            n = s[ip++] - BIAS6;
+
+            if (n > SMALLN) {
+                n = s[ip++] - BIAS6;
+                if (n > SMALLN) {
+                    n = s[ip++] - BIAS6;
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                } else {
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                    n = (n << 6) | (s[ip++] - BIAS6);
+                }
+            }
+            mPos = ip;
+            return n;
         }
 
         // ! return the next integer encoded in graph6

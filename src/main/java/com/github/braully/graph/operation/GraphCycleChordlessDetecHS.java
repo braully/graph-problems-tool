@@ -14,12 +14,14 @@ import org.apache.log4j.Logger;
 import util.BFSUtil;
 import util.MapCountOpt;
 
-public class GraphCycleChordlessDetec implements IGraphOperation {
+public class GraphCycleChordlessDetecHS implements IGraphOperation {
 
     static final String type = "General";
-    static final String description = "Cycle chordless detect";
+    static final String description = "Cycle chordless H(S)";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
+
+    protected GraphHullNumber hullNumber = new GraphHullNumber();
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -61,17 +63,15 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
             MapCountOpt mcount = new MapCountOpt(maxV);
             BFSUtil bfsUtil = BFSUtil.newBfsUtilCompactMatrix(maxV);
             bfsUtil.labelDistancesCompactMatrix(graph);
-            int curPos = -1;
+
             Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(veticesCount, currentSize);
             Boolean isCycle = null;
+             Boolean isHullSet = null;
             while (combinationsIterator.hasNext()) {
                 int[] currentSet = combinationsIterator.next();
-                if (curPos != currentSet[currentSet.length - 1]) {
-                    System.out.println("new cycle: " + curPos + " " + currentSet[currentSet.length - 1]);
-                    curPos = currentSet[currentSet.length - 1];
-                }
                 mcount.clear();
                 isCycle = null;
+                isHullSet = null;
                 for (int iv : currentSet) {
                     Integer v = graph.verticeByIndex(iv);
                     for (int iw : currentSet) {
@@ -99,6 +99,7 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
                     for (int i : currentSet) {
                         cycle.add(i);
                     }
+                    isHullSet = hullNumber.checkIfHullSet(graph, currentSet);
                     break;
                 }
             }

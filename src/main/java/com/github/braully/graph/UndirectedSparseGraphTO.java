@@ -368,5 +368,4 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
     private void clearCachedVertices() {
         cacheVertices = null;
     }
-
 }

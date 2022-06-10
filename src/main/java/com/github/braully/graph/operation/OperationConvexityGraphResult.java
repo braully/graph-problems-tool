@@ -30,6 +30,8 @@ public class OperationConvexityGraphResult {
     List<Integer> includedSequence;
     long totalTimeMillis;
     Integer caratheodoryNumber;
+    Set<Integer> vizs;
+    Set<Integer> verticesPotenciais;
 
     Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
