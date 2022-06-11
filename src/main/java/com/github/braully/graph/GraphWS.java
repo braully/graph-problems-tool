@@ -29,7 +29,9 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,7 +121,7 @@ public class GraphWS {
     }
 
     @ResponseBody
-    @RequestMapping(name = "list-graph-operation")
+    @RequestMapping("list-graph-operation")
     public List<KeyValue<String, String>> listGraphOperation() {
         List<KeyValue<String, String>> types = new ArrayList<>();
         if (operators != null) {
@@ -252,8 +254,10 @@ public class GraphWS {
     }
 
     @ResponseBody
-    @RequestMapping("operation")
-    public Map<String, Object> operation(String jsonGraph) {
+    @RequestMapping(path = "operation", method = RequestMethod.POST
+//            , consumes = "text/plain"
+    )
+    public Map<String, Object> operation(@RequestBody String jsonGraph) {
         Map<String, Object> result = null;
 
         try {
