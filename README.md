@@ -2,12 +2,12 @@
 
 ## Requiriments
    Maven 3.x
-   Java 8
+   Java 11
    Gcc (optional)
    G++(optional)
    Cuda 8.0 (optional)
 
-   Para usuarios do ubuntu, uma instalação facilitada de todas as dependências pode ser feita utilizando o seguinte comando: sudo apt-get install maven gcc g++ openjdk-[8]-jdk
+   Para usuarios do ubuntu, uma instalação facilitada de todas as dependências pode ser feita utilizando o seguinte comando: sudo apt-get install maven gcc g++ openjdk-[11]-jdk
 
 
 ## Compile 
