@@ -7,7 +7,7 @@
    G++(optional)
    Cuda 8.0 (optional)
 
-   Para usuarios do ubuntu, uma instalação facilitada de todas as dependências pode ser feita utilizando o seguinte comando: sudo apt-get install maven gcc g++ openjdk-[11]-jdk
+   Para usuarios do ubuntu, uma instalação facilitada de todas as dependências pode ser feita utilizando o seguinte comando: sudo apt-get install maven gcc g++ openjdk-11-jdk
 
 
 ## Compile 
