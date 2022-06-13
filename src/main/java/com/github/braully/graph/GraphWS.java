@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -397,15 +396,10 @@ public class GraphWS {
     }
 
     @ResponseBody
-    @RequestMapping(path = "upload-file-graph", method = RequestMethod.POST,
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public UndirectedSparseGraphTO<Integer, Integer>
-            uploadFileGraph(
-                    //@RequestPart("file") 
-                    @RequestParam(value = "file", required = true) //
-                    MultipartFile file) {
-//    public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestBody MultipartFile file,
-//            @RequestParam String fileName) {
+    @RequestMapping(value = "upload-file-graph2", method = RequestMethod.POST,
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestParam("file") MultipartFile file) {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
         String fName = file.getName();
         try {
@@ -432,6 +426,5 @@ public class GraphWS {
             log.log(Level.SEVERE, "", e);
         }
         return ret;
-
     }
 }

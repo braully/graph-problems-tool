@@ -116,9 +116,13 @@
                         </div>
 
                         <div class="form-group">
+                            <form method="post" action="rest/graph/upload-file-graph" 
+                                  enctype="multipart/form-data">
                             <input name="file" id="file" 
                                    class="form-control" type="file"
                                    ng-file-select="onFileSelect($file)">
+                            <input type="submit" class="btn btn-primary btn-sm" value="Upload" >
+                            </form>
                         </div>
                         <div class="form-group pull-right">
                             <button class="btn btn-primary btn-sm" 
@@ -395,11 +399,26 @@
                             //https://gist.github.com/ramingar/6f54691f57ddf370d9a0
                             //https://stackoverflow.com/questions/44725549/how-to-use-angularjs-http-to-send-multipart-form-data
                             var fd = new FormData();
+//                            fd.append("file", e.target.result);
+//                            fd.append("fileName", $scope.file.name);
+//                            $http.post(url, fd, {headers: {'Content-Type': undefined}})
+//                                    .success(function (graph) {
+//                                        $scope.graph = graph;
+//                                    }
+//                                    );
+
+                            url = '/file-up';
+                            //https://gist.github.com/ramingar/6f54691f57ddf370d9a0
+                            //https://stackoverflow.com/questions/44725549/how-to-use-angularjs-http-to-send-multipart-form-data
+                            fd = new FormData();
                             fd.append("file", e.target.result);
-                            fd.append("fileName", $scope.file.name);
-                                $http.post(url, fd, {headers: {'Content-Type': undefined}})
-                                    .success(function (graph) {$scope.graph = graph;}
-                            );
+//                            fd.append("fileName", $scope.file.name);
+                            $http.post(url, fd, {headers: {'Content-Type': undefined}})
+                                    .success(function (graph) {
+                                        $scope.graph = graph;
+                                    }
+                                    );
+
                         } else {
                             window.alert('File invalid');
                             return;
@@ -425,7 +444,7 @@
 
                     var selected_node = null;
                     var color = d3.scale.category20();
-                    
+
                     var force = d3.layout.force()
                             .charge(-120)
                             .linkDistance(250)
@@ -450,8 +469,8 @@
                         return {"idname": graph.vertices[d],
                             "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
                             "group": 1,
-                            "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width)+1)*70,
-                            "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height)+1)* 70
+                            "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width) + 1) * 70,
+                            "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height) + 1) * 70
 //                            "x": posX(graph.positionX !== null ? graph.positionX[d] + 70 : Math.floor(Math.random() * width)),
 //                            "y": posY(graph.positionY !== null ? graph.positionY[d] + 70 : Math.floor(Math.random() * height))
                             , "fixed": graph.positionX !== null && graph.positionX[d] !== null
