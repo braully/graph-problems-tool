@@ -72,7 +72,7 @@
         </div>
 
         <div class="container-fluid" ng-app="appCaratheodroyNumber" 
-             ng-controller="caratheodoryNumberController">
+             ng-controller="caratheodoryNumberController" id="controllerId">
             <div class="row">
                 <div class="col-md-3">
                     <fieldset>
@@ -124,6 +124,9 @@
                                        ng-file-select="onFileSelect($file)">
                                 <input type="submit" class="btn btn-primary btn-sm" 
                                        value="Upload" id="btnFormUpload" >
+                                
+                                <input type="submit" class="btn btn-primary btn-sm" 
+                                       value="Upload2" id="btnSubmit" >                                
                             </form>
                         </div>
                         <div class="form-group pull-right">
@@ -320,7 +323,8 @@
 
         <script>
             var app = angular.module('appCaratheodroyNumber', []);
-            app.controller('caratheodoryNumberController', function ($scope, $http, $timeout) {
+            app.controller('caratheodoryNumberController', 
+            function ($scope, $http, $timeout) {
                 $scope.nvertices = 5;
                 $scope.minDegree = 1;
                 $scope.maxDegree = 2.0;
@@ -388,48 +392,44 @@
                         window.alert('File invalid');
                         return;
                     }
-                    var fr = new FileReader();
-                    fr.onload = function (e) {
-//                        //console.log(e);
-                        var fileName = $scope.file.name.toLowerCase();
-                        if (fileName.endsWith(".json")) {
-                            var graph = JSON.parse(e.target.result);
-                            if (!graph || !graph.vertices || !graph.pairs) {
-                                window.alert('File format invalid');
-                                return;
+                    var fileName = $scope.file.name.toLowerCase();
+                    if (!(fileName.endsWith(".csr") || fileName.endsWith(".mat") || fileName.endsWith(".g6")
+                        || fileName.endsWith(".es") || fileName.endsWith(".adj"))){
+                         window.alert('File format invalid');
+                    }
+                    var url = 'rest/graph/upload-file-graph';
+                    var form = $('#formUp')[0];
+                    var data = new FormData(form);
+                    $.ajax({
+                        type: "POST",
+                        enctype: 'multipart/form-data',
+                        url: "/rest/graph/upload-file-graph",
+                        data: data,
+                        //http://api.jquery.com/jQuery.ajax/
+                        //https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+                        processData: false, //prevent jQuery from automatically transforming the data into a query string
+                        contentType: false,
+                        cache: false,
+                        timeout: 600000,
+                        success: function (data) {
+//                            console.log("SUCCESS : ", data);
+                            var ang = angular.element(document.getElementById('controllerId')).scope();
+                            var graph = data;
+                            if (graph) {
+                                $scope.graph = graph;
+                                if (!graph.name) {
+                                    $scope.graph.name = $scope.file.name;
+                                }
+                                $scope.$apply();
+                                $scope.updateGraph();
                             }
-                            $scope.graph = graph;
-                        } else if (fileName.endsWith(".csr")
-                                || fileName.endsWith(".mat") || fileName.endsWith(".g6")
-                                || fileName.endsWith(".es") || fileName.endsWith(".adj")) {
-                            var url = 'rest/graph/upload-file-graph';
-                            //https://gist.github.com/ramingar/6f54691f57ddf370d9a0
-                            //https://stackoverflow.com/questions/44725549/how-to-use-angularjs-http-to-send-multipart-form-data
-                            var fd = new FormData();
-                            fd.append("file", e.target.result);
-                            fd.append("fileName", $scope.file.name);
-                            $http.post(url, fd, {headers: {'Content-Type': undefined}})
-                                    .then(function (graph) {
-                                        $scope.graph = graph.data;
-                                    }
-                                    );
-                            //https://gist.github.com/ramingar/6f54691f57ddf370d9a0
-                            //https://stackoverflow.com/questions/44725549/how-to-use-angularjs-http-to-send-multipart-form-data
-                        } else {
-                            window.alert('File invalid');
-                            return;
+                        },
+                        error: function (e) {
+//                            console.log("ERROR : ", e);
                         }
-                        if ($scope.graph) {
-                            if (!$scope.graph.name) {
-                                $scope.graph.name = $scope.file.name;
-                            }
-                            $scope.updateGraph();
-                        }
-                    };
-//                    //console.log('Scope.file');
-//                    //console.log($scope.file);
-                    fr.readAsText($scope.file);
+                    });
                 };
+                
                 $scope.updateGraph = function () {
                     var graph = $scope.graph;
                     var width = $("#grafo").width();
@@ -729,7 +729,7 @@
 
                 $scope.generateGraph();
                 $scope.pollerConsoleOutput = function () {
-                    $http.post('rest/graph/process-status', $scope.lastProcessing).then(function () {
+                    $http.post('rest/graph/process-status', $scope.lastProcessing).then(function (res) {
                         var r = res.data;
                         $scope.processing = res.data.processing;
                         if (r.last) {
@@ -766,6 +766,49 @@
                     }
                 };
             });
+            
+            $(document).ready(function () {
+                $("#btnSubmit").click(function (event) {
+                    event.preventDefault();
+                    fire_ajax_submit();});
+            });
+            
+            function fire_ajax_submit() {
+                var form = $('#formUp')[0];
+                var data = new FormData(form);
+                data.append("CustomField", "This is some extra data, testing");
+                $("#btnSubmit").prop("disabled", true);
+                $.ajax({
+                    type: "POST",
+                    enctype: 'multipart/form-data',
+                    url: "/rest/graph/upload-file-graph",
+                    data: data,
+                    //http://api.jquery.com/jQuery.ajax/
+                    //https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+                    processData: false, //prevent jQuery from automatically transforming the data into a query string
+                    contentType: false,
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data) {
+                        $("#result").text(data);
+                        console.log("SUCCESS : ", data);
+                        $("#btnSubmit").prop("disabled", false);
+                        $scope.graph = graph.data;
+                        $scope.$apply();
+                        if ($scope.graph) {
+                            if (!$scope.graph.name) {
+                                $scope.graph.name = $scope.file.name;
+                            }
+                            $scope.updateGraph();
+                        }
+                    },
+                    error: function (e) {
+                        $("#result").text(e.responseText);
+                        console.log("ERROR : ", e);
+                        $("#btnSubmit").prop("disabled", false);
+                    }
+                });
+            }
         </script>
     </body>
 </html>

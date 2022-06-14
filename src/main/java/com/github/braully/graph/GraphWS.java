@@ -27,7 +27,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.spi.LoggingEvent;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -401,8 +403,10 @@ public class GraphWS {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestParam("file") MultipartFile file) {
+//    public ResponseEntity<?> uploadFileGraph(@RequestParam("file") MultipartFile file) {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
-        String fName = file.getName();
+//        String fName = file.getName();
+        String fName = file.getOriginalFilename();
         try {
             InputStream uploadedInputStream = file.getInputStream();
 
@@ -425,7 +429,9 @@ public class GraphWS {
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "", e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+//        return new ResponseEntity(ret, HttpStatus.OK);
         return ret;
     }
 }
