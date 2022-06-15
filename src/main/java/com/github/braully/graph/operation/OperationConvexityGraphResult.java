@@ -24,7 +24,7 @@ public class OperationConvexityGraphResult {
     public static final String PARAM_NAME_INCLUDED_SEQUENCE = "Included sequence";
 
     Set<Integer> caratheodorySet;
-    Set<Integer> convexHull;
+    public Set<Integer> convexHull;
     int[] auxProcessor;
     Set<Integer> partial;
     List<Integer> includedSequence;
