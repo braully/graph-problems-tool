@@ -169,7 +169,7 @@ public class ReorderIncludeSequence {
     public void testHsForall() throws FileNotFoundException, IOException {
         GraphHullSetNC subgraph = new GraphHullSetNC();
         UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./estripado-esqueleto-grafo-moore-50.es"));
-        String viz = "0, 6, 1, 7";
+        String viz = "0, 6, 49";
         Set<Integer> set = new LinkedHashSet<>();
         String[] split = viz.split(",");
         for (String str : split) {

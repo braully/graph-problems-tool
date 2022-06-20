@@ -23,7 +23,7 @@ public class GraphHullSetNC implements IGraphOperation {
     public static final int INCLUDED = 2;
     public static final int PROCESSED = 3;
 
-    protected LinkedHashMap<Integer, List<Integer>> includedSequenceN = new LinkedHashMap<>();
+    public LinkedHashMap<Integer, List<Integer>> includedSequenceN = new LinkedHashMap<>();
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         long totalTimeMillis = -1;

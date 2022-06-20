@@ -27,12 +27,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.spi.LoggingEvent;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -397,17 +398,15 @@ public class GraphWS {
     }
 
     @ResponseBody
-    @RequestMapping(path = "upload-file-graph", method = RequestMethod.POST,
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public UndirectedSparseGraphTO<Integer, Integer>
-            uploadFileGraph(
-                    //@RequestPart("file") 
-                    @RequestParam(value = "file", required = true) //
-                    MultipartFile file) {
-//    public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestBody MultipartFile file,
-//            @RequestParam String fileName) {
+    @RequestMapping(value = "upload-file-graph", method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestParam("file") MultipartFile file) {
+//    public ResponseEntity<?> uploadFileGraph(@RequestParam("file") MultipartFile file) {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
-        String fName = file.getName();
+//        String fName = file.getName();
+        String fName = file.getOriginalFilename();
         try {
             InputStream uploadedInputStream = file.getInputStream();
 
@@ -430,8 +429,9 @@ public class GraphWS {
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "", e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+//        return new ResponseEntity(ret, HttpStatus.OK);
         return ret;
-
     }
 }

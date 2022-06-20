@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package tmp;
+package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.operation.GraphCycleChordlessDetec;
