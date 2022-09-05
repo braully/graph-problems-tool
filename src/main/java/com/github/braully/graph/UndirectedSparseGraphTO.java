@@ -211,22 +211,22 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
         return set;
     }
 
-    protected double[] positionX;
-    protected double[] positionY;
+    protected Double[] positionX;
+    protected Double[] positionY;
 
-    public void setPositionX(double[] positionX) {
+    public void setPositionX(Double[] positionX) {
         this.positionX = positionX;
     }
 
-    public void setPositionY(double[] positionY) {
+    public void setPositionY(Double[] positionY) {
         this.positionY = positionY;
     }
 
-    public double[] getPositionX() {
+    public Double[] getPositionX() {
         return positionX;
     }
 
-    public double[] getPositionY() {
+    public Double[] getPositionY() {
         return positionY;
     }
 

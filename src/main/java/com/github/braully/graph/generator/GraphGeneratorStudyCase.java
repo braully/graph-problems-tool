@@ -5,7 +5,6 @@ import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.GraphHullSetNC;
 import com.github.braully.graph.operation.GraphSubgraph;
 import com.github.braully.graph.operation.OperationConvexityGraphResult;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,16 +18,26 @@ import java.util.logging.Logger;
 
 public class GraphGeneratorStudyCase extends AbstractGraphGenerator {
 
+    public static final double DIAMETRO = 50;
+    public static final double X_CENTER = 500 / 2;
+    public static final double Y_CENTER = 500 / 2;
+
     static final String description = "Study case";
 
     static final String CYCLE = "Cyle";
     static final String INNER = "Inner";
+    static final String GRAPH = "Graph";
 
-    static final String[] parameters = {CYCLE, INNER};
+    static final String[] parameters = {GRAPH, CYCLE, INNER};
 
-    static String DEFAULT_CYCLE = "0, 56, 3249";
-    static String DEFAULT_INNER = "222,";
-
+//    static String DEFAULT_CYCLE = "0, 56, 3249";
+//    static String DEFAULT_INNER = "222,";
+//    static String DEFAULT_GRAPH = "esqueleto-ultimo-grafo-moore.es";
+//
+    static String DEFAULT_CYCLE = "0, 6, 49";
+    static String DEFAULT_INNER = "22,";
+//    static String DEFAULT_GRAPH = "esqueleto-grafo-moore-50.es";
+    static String DEFAULT_GRAPH = "grafo-moore-50.es";
     UndirectedSparseGraphTO<Integer, Integer> graphES = null;
 
     @Override
@@ -55,13 +64,24 @@ public class GraphGeneratorStudyCase extends AbstractGraphGenerator {
             inner = DEFAULT_INNER;
         }
 
-        try {
-            String grafoFile = "esqueleto-ultimo-grafo-moore.es";
-            InputStream openStream = Thread.currentThread().getContextClassLoader().getResource(grafoFile).openStream();
-            graphES = UtilGraph.loadGraphES(openStream);
-        } catch (Exception ex) {
-            Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
+        String grafoFile = getStringParameter(parameters, GRAPH);
+
+        if (grafoFile == null || grafoFile.isEmpty()) {
+            grafoFile = DEFAULT_GRAPH;
+            try {
+                InputStream openStream = Thread.currentThread().getContextClassLoader().getResource(grafoFile).openStream();
+                graphES = UtilGraph.loadGraphES(openStream);
+            } catch (Exception ex) {
+                Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
+        } else {
+            try {
+                graphES = UtilGraph.loadGraphG6(grafoFile);
+            } catch (Exception ex) {
+                Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
         }
         GraphHullSetNC hullOp = new GraphHullSetNC();
         GraphSubgraph subGrapOp = new GraphSubgraph();
@@ -100,9 +120,24 @@ public class GraphGeneratorStudyCase extends AbstractGraphGenerator {
         Collections.sort(na);
         Collections.sort(nss);
 
+        subSet.addAll(nss);
         subSet.addAll(setInner);
 
+        Double[] xs = new Double[subSet.size()];
+        Double[] ys = new Double[subSet.size()];
+
+        double angulo = 0;
+        double anguloOff = (Math.PI * 2) / hsGraph.convexHull.size();
+
+        for (int i = 0; i < hsGraph.convexHull.size(); i++) {
+            xs[i] = DIAMETRO * Math.cos(angulo) + X_CENTER;
+            ys[i] = DIAMETRO * Math.sin(angulo) + Y_CENTER;
+            angulo += anguloOff;
+        }
+
         UndirectedSparseGraphTO<Integer, Integer> graph = subGrapOp.subGraphInduced(graphES, subSet);
+//        graph.setPositionX(xs);
+//        graph.setPositionY(ys);
         return graph;
     }
 }

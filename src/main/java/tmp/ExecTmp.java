@@ -42,24 +42,24 @@ import java.util.Set;
  * @author strike
  */
 public class ExecTmp {
-
+    
     public static void main(String... args) throws FileNotFoundException, IOException {
         GraphHullSetNC subgraph = new GraphHullSetNC();
 //        UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./estripado-esqueleto-grafo-moore-50.es"));
-//        UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./esqueleto-grafo-moore-50.es"));
-//        String viz = "0, 6, 49";
-        UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./esqueleto-ultimo-grafo-moore.es"));
-        String viz = "0, 56, 3249";
+        UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./esqueleto-grafo-moore-50.es"));
+        String viz = "0, 6, 49";
+//        UndirectedSparseGraphTO<Integer, Integer> graphES = UtilGraph.loadGraphES(new FileInputStream("./esqueleto-ultimo-grafo-moore.es"));
+//        String viz = "0, 56, 3249";
         Set<Integer> set = new LinkedHashSet<>();
         String[] split = viz.split(",");
         for (String str : split) {
             int parseInt = Integer.parseInt(str.trim());
             set.add(parseInt);
         }
-
+        
         List<Integer> na = new ArrayList<>();
         OperationConvexityGraphResult hsGraph = subgraph.hsp3(graphES, set);
-
+        
         for (Integer v : (Collection<Integer>) graphES.getVertices()) {
             if (hsGraph.convexHull.contains(v)) {
                 continue;
@@ -70,7 +70,7 @@ public class ExecTmp {
             }
         }
         Collections.sort(na);
-
+        
         for (Integer sa : na) {
 //        for (Integer sa : new Integer[]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46}) {
             LinkedHashSet<Integer> seta = new LinkedHashSet<>();
@@ -82,7 +82,7 @@ public class ExecTmp {
                 System.out.println(sa + ": não é envoltoria");
 //                System.out.println(hsGraph.toMap());
             } else {
-                System.out.println(sa + ": ok");
+                System.out.println(sa + " (" + graphES.degree(sa) + ") : ok");
             }
         }
     }
