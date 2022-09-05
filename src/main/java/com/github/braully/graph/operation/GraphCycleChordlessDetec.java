@@ -2,6 +2,7 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,8 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
     static final String description = "Cycle chordless detect";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
+
+    GraphSubgraph graphSubgraph = new GraphSubgraph();
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -56,6 +59,7 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
         List<Integer> vertices = (List<Integer>) graph.getVertices();
         List<Integer> cycle = null;
         int veticesCount = vertices.size();
+        BFSDistanceLabeler<Integer, Integer> bfs = new BFSDistanceLabeler();
         if (currentSize < veticesCount) {
             Integer maxV = Collections.max(vertices) + 1;
             MapCountOpt mcount = new MapCountOpt(maxV);
@@ -67,7 +71,7 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
             while (combinationsIterator.hasNext()) {
                 int[] currentSet = combinationsIterator.next();
                 if (curPos != currentSet[currentSet.length - 1]) {
-                    System.out.println("new cycle: " + curPos + " " + currentSet[currentSet.length - 1]);
+//                    System.out.println("new cycle: " + curPos + " " + currentSet[currentSet.length - 1]);
                     curPos = currentSet[currentSet.length - 1];
                 }
                 mcount.clear();
@@ -99,6 +103,19 @@ public class GraphCycleChordlessDetec implements IGraphOperation {
                     for (int i : currentSet) {
                         cycle.add(i);
                     }
+                    UndirectedSparseGraphTO subGraphInduced = graphSubgraph.subGraphInduced(graph, cycle);
+                    Integer v0 = subGraphInduced.verticeByIndex(0);
+                    bfs.labelDistances(subGraphInduced, v0);
+                    for (Integer v : currentSet) {
+                        int distance = bfs.getDistance(subGraphInduced, v);
+                        if (distance < 0) {
+                            cycle = null;
+                            break;
+                        }
+                    }
+//                    break;
+                }
+                if (cycle != null) {
                     break;
                 }
             }

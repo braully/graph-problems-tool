@@ -35,7 +35,7 @@ public class GraphSubgraph implements IGraphOperation {
         return response;
     }
 
-    public UndirectedSparseGraphTO subGraphInduced(UndirectedSparseGraphTO graph, Set<Integer> setN) {
+    public UndirectedSparseGraphTO subGraphInduced(UndirectedSparseGraphTO graph, Collection<Integer> setN) {
         UndirectedSparseGraphTO subgraph = new UndirectedSparseGraphTO();
 
         for (Integer v : setN) {

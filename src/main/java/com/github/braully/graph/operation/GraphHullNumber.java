@@ -15,12 +15,14 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 
 public class GraphHullNumber implements IGraphOperation {
-
+    
     static final String type = "P3-Convexity";
     static final String description = "Hull Number (Java)";
-
+    
     private static final Logger log = Logger.getLogger(GraphWS.class);
-
+    
+    public static GraphHullNumberHeuristicV1 heuristic = new GraphHullNumberHeuristicV1();
+    
     public static final String PARAM_NAME_HULL_NUMBER = "number";
     public static final String PARAM_NAME_HULL_SET = "set";
     public static final String PARAM_NAME_SERIAL_TIME = "serial";
@@ -59,7 +61,7 @@ public class GraphHullNumber implements IGraphOperation {
         response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, hullNumber);
         return response;
     }
-
+    
     public int addVertToS(Integer verti, Set<Integer> s,
             UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] aux) {
@@ -67,12 +69,12 @@ public class GraphHullNumber implements IGraphOperation {
         if (verti == null || aux[verti] >= INCLUDED) {
             return countIncluded;
         }
-
+        
         aux[verti] = aux[verti] + INCLUDED;
         if (s != null) {
             s.add(verti);
         }
-
+        
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         mustBeIncluded.add(verti);
         while (!mustBeIncluded.isEmpty()) {
@@ -94,15 +96,17 @@ public class GraphHullNumber implements IGraphOperation {
     public Set<Integer> calcMinHullNumberGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Set<Integer> ceilling = calcCeillingHullNumberGraph(graph);
         Set<Integer> hullSet = ceilling;
-        if (graph == null || graph.getVertices().isEmpty()) {
+        if (graph == null || graph.getVertexCount() == 0) {
             return ceilling;
         }
         int maxSizeSet = ceilling.size();
         int currentSize = 1;
         int countOneNeigh = 0;
-
+        
         Collection<Integer> vertices = graph.getVertices();
-
+        
+        log.debug("Graph: " + graph.getName() + " n=" + vertices.size());
+        
         for (Integer i : vertices) {
             if (graph.degree(i) == 1) {
                 countOneNeigh++;
@@ -116,21 +120,27 @@ public class GraphHullNumber implements IGraphOperation {
         }
 
         while (currentSize < maxSizeSet) {
+            log.debug("trying size: " + currentSize);
             Set<Integer> hs = findHullSetBruteForce(graph, currentSize);
             if (hs != null && !hs.isEmpty()) {
                 hullSet = hs;
                 break;
             }
+            log.debug("not found");
             currentSize++;
         }
         return hullSet;
     }
-
+    
     private Set<Integer> calcCeillingHullNumberGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Set<Integer> ceilling = new HashSet<>();
         if (graph != null) {
-            Collection<Integer> vertices = graph.getVertices();
-
+            Collection<Integer> vertices = heuristic.buildOptimizedHullSet(graph);
+            
+            if (vertices == null || vertices.isEmpty()) {
+                vertices = graph.getVertices();
+            }
+            
             if (vertices != null) {
                 ceilling.addAll(vertices);
             }
@@ -157,7 +167,7 @@ public class GraphHullNumber implements IGraphOperation {
         }
         return hullSet;
     }
-
+    
     public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] currentSet) {
         if (currentSet == null || currentSet.length == 0) {
@@ -168,7 +178,7 @@ public class GraphHullNumber implements IGraphOperation {
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
         }
-
+        
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         for (Integer iv : currentSet) {
             Integer v = graph.verticeByIndex(iv);
@@ -194,7 +204,7 @@ public class GraphHullNumber implements IGraphOperation {
         }
         return fecho.size() == graph.getVertexCount();
     }
-
+    
     public void includeVertex(UndirectedSparseGraphTO<Integer, Integer> graph, Set<Integer> fecho, int[] aux, int i) {
         fecho.add(i);
         aux[i] = INCLUDED;
@@ -209,13 +219,13 @@ public class GraphHullNumber implements IGraphOperation {
             }
         }
     }
-
+    
     public String getTypeProblem() {
         return type;
     }
-
+    
     public String getName() {
         return description;
     }
-
+    
 }

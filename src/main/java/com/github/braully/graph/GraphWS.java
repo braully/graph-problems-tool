@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.braully.graph.generator.GraphGeneratorRandom;
 import com.github.braully.graph.generator.IGraphGenerator;
 import com.github.braully.graph.operation.IGraphOperation;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 import edu.uci.ics.jung.graph.AbstractGraph;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,24 +24,28 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.reflections.Reflections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import util.KeyValue;
 
 /**
  * REST Web Service -- Web Services Front end
  *
  * @author braully
  */
-@Path("graph")
+@RestController
+@RequestMapping("rest/graph")
 public class GraphWS {
 
     private static final Logger log = Logger.getLogger(GraphWS.class.getSimpleName());
@@ -60,10 +61,10 @@ public class GraphWS {
 
     private static ExecuteOperation executeOperation = new ExecuteOperation();
 
-    @Context
+    @Autowired
     private HttpServletRequest request;
 
-    @Context
+    @Autowired
     private HttpServletResponse response;
 
     private List<IGraphGenerator> generators = new ArrayList<>();
@@ -113,46 +114,41 @@ public class GraphWS {
         }
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("list-result")
+    @RequestMapping("list-result")
+    @ResponseBody
     public List<DatabaseFacade.RecordResultGraph> listResults() {
         List<DatabaseFacade.RecordResultGraph> allResults = DatabaseFacade.getAllResults();
         return allResults;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("list-graph-operation")
-    public List<Map.Entry<String, String>> listGraphOperation() {
-        List<Map.Entry<String, String>> types = new ArrayList<>();
+    @ResponseBody
+    @RequestMapping("list-graph-operation")
+    public List<KeyValue<String, String>> listGraphOperation() {
+        List<KeyValue<String, String>> types = new ArrayList<>();
         if (operators != null) {
             for (IGraphOperation operator : operators) {
-                types.add(new AbstractMap.SimpleEntry<String, String>(operator.getName(), operator.getTypeProblem()));
+                types.add(new KeyValue<String, String>(operator.getName(), operator.getTypeProblem()));
             }
         }
         return types;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("list-graph-generator")
-    public List<Map.Entry<String, String[]>> listGraphGenerator() {
-        List<Map.Entry<String, String[]>> types = new ArrayList<>();
+    @ResponseBody
+    @RequestMapping("list-graph-generator")
+    public List<KeyValue<String, String[]>> listGraphGenerator() {
+        List<KeyValue<String, String[]>> types = new ArrayList<>();
         if (generators != null) {
             for (IGraphGenerator generator : generators) {
-                types.add(new AbstractMap.SimpleEntry<String, String[]>(generator.getDescription(), generator.getParameters()));
+                types.add(new KeyValue<String, String[]>(generator.getDescription(), generator.getParameters()));
             }
         }
         return types;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("open-graph")
-    public UndirectedSparseGraphTO<Integer, Integer> openGraphSaved(@Context UriInfo info) {
-        MultivaluedMap<String, String> multiParams = info.getQueryParameters();
-        Map<String, String> params = getTranslageParams(multiParams);
+    @ResponseBody
+    @RequestMapping("open-graph")
+    public UndirectedSparseGraphTO<Integer, Integer> openGraphSaved(@RequestParam Map<String, String> allRequestParams) {
+        Map<String, String> params = allRequestParams;
         String nameGraph = params.get("graph");
         AbstractGraph<Integer, Integer> graph = null;
         if (nameGraph != null) {
@@ -169,12 +165,10 @@ public class GraphWS {
         return (UndirectedSparseGraphTO) graph;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("generate-graph")
-    public UndirectedSparseGraphTO<Integer, Integer> generateGraph(@Context UriInfo info) {
-        MultivaluedMap<String, String> multiParams = info.getQueryParameters();
-        Map<String, String> params = getTranslageParams(multiParams);
+    @ResponseBody
+    @RequestMapping("generate-graph")
+    public UndirectedSparseGraphTO<Integer, Integer> generateGraph(@RequestParam Map<String, String> allRequestParams) {
+        Map<String, String> params = allRequestParams;
         String typeGraph = params.get("key");
         AbstractGraph<Integer, Integer> graph = null;
         if (typeGraph != null) {
@@ -196,21 +190,18 @@ public class GraphWS {
         return (UndirectedSparseGraphTO) graph;
     }
 
-    Map<String, String> getTranslageParams(MultivaluedMap<String, String> multiParams) {
-        Map<String, String> map = new HashMap<>();
-        if (multiParams != null) {
-            Set<String> keySet = multiParams.keySet();
-            for (String key : keySet) {
-                map.put(key, multiParams.getFirst(key));
-            }
-        }
-        return map;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-//    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("download-all-result")
+//    Map<String, String> getTranslageParams(MultivaluedMap<String, String> multiParams) {
+//        Map<String, String> map = new HashMap<>();
+//        if (multiParams != null) {
+//            Set<String> keySet = multiParams.keySet();
+//            for (String key : keySet) {
+//                map.put(key, multiParams.getFirst(key));
+//            }
+//        }
+//        return map;
+//    }
+    @ResponseBody
+    @RequestMapping("download-all-result")
     public void downloadGraphCsr() {
         try {
             response.setHeader("Content-Disposition", "attachment; filename=\"" + "all-result" + ".zip\"");
@@ -224,10 +215,8 @@ public class GraphWS {
         }
     }
 
-    @POST
-//    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("download-graph-csr")
+    @ResponseBody
+    @RequestMapping("download-graph-csr")
     public void downloadGraphCsr(String jsonGraph) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -246,10 +235,8 @@ public class GraphWS {
         }
     }
 
-    @POST
-//    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("download-graph-mat")
+    @ResponseBody
+    @RequestMapping("download-graph-mat")
     public void downloadGraphMat(String jsonGraph) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -267,11 +254,11 @@ public class GraphWS {
         }
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("operation")
-    public Map<String, Object> operation(String jsonGraph) {
+    @ResponseBody
+    @RequestMapping(path = "operation", method = RequestMethod.POST
+    //            , consumes = "text/plain"
+    )
+    public Map<String, Object> operation(@RequestBody String jsonGraph) {
         Map<String, Object> result = null;
 
         try {
@@ -310,10 +297,8 @@ public class GraphWS {
         return result;
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("batch-operation")
+    @ResponseBody
+    @RequestMapping("batch-operation")
     public Map<String, Object> batchOperation(String jsonGraph) {
         Map<String, Object> result = null;
         try {
@@ -364,10 +349,8 @@ public class GraphWS {
         return bf;
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("process-status")
+    @ResponseBody
+    @RequestMapping("process-status")
     public Map<String, Object> processStatus(Long lastTime) {
         Map<String, Object> map = new HashMap<>();
         List<String> lines = new ArrayList<>();
@@ -399,10 +382,8 @@ public class GraphWS {
         return map;
     }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("process-cancel")
+    @ResponseBody
+    @RequestMapping("process-cancel")
     public Map<String, Object> cancelProcess() {
         synchronized (executeOperation) {
             try {
@@ -416,18 +397,21 @@ public class GraphWS {
         return null;
     }
 
-    @POST
-    @Path("upload-file-graph")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public UndirectedSparseGraphTO<Integer, Integer>
-            uploadFileGraph(@FormDataParam("file") InputStream uploadedInputStream,
-                    @FormDataParam("file") FormDataContentDisposition fileDetail,
-                    @FormDataParam("fileName") String fileName) {
+    @ResponseBody
+    @RequestMapping(value = "upload-file-graph", method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public UndirectedSparseGraphTO<Integer, Integer> uploadFileGraph(@RequestParam("file") MultipartFile file) {
+//    public ResponseEntity<?> uploadFileGraph(@RequestParam("file") MultipartFile file) {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
+//        String fName = file.getName();
+        String fName = file.getOriginalFilename();
         try {
-            if (fileName != null && !fileName.trim().isEmpty()) {
-                String tmpFileName = fileName.trim().toLowerCase();
+            InputStream uploadedInputStream = file.getInputStream();
+
+            if (fName != null && !fName.trim().isEmpty()) {
+                String tmpFileName = fName.trim().toLowerCase();
                 if (tmpFileName.endsWith("csr")) {
                     ret = UtilGraph.loadGraphCsr(uploadedInputStream);
                 } else if (tmpFileName.endsWith("mat")) {
@@ -440,13 +424,14 @@ public class GraphWS {
                     ret = UtilGraph.loadGraphAdjList(uploadedInputStream);
                 }
                 if (ret != null) {
-                    ret.setName(fileName);
+                    ret.setName(fName);
                 }
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "", e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+//        return new ResponseEntity(ret, HttpStatus.OK);
         return ret;
-
     }
 }

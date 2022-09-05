@@ -6,46 +6,46 @@ import edu.uci.ics.jung.graph.util.Pair;
 import java.util.*;
 
 public class GraphGeneratorGrid extends AbstractGraphGenerator {
-    
+
     static final String N_VERTICES = "N";
     static final String M_VERTICES = "M";
     static final String[] parameters = {N_VERTICES, M_VERTICES};
     static final String description = "Grid N x M";
     static final Integer DEFAULT_NVERTICES = 5;
-    
+
     @Override
     public String[] getParameters() {
         return parameters;
     }
-    
+
     @Override
     public String getDescription() {
         return description;
     }
-    
+
     @Override
     public UndirectedSparseGraphTO<Integer, Integer> generateGraph(Map parameters) {
         Integer N = getIntegerParameter(parameters, N_VERTICES);
         Integer M = getIntegerParameter(parameters, M_VERTICES);
-        
+
         if (N == null) {
             N = DEFAULT_NVERTICES;
         }
-        
+
         if (M == null) {
             M = DEFAULT_NVERTICES;
         }
-        
+
         UndirectedSparseGraphTO<Integer, Integer> graph0 = new UndirectedSparseGraphTO<>();
         UndirectedSparseGraphTO<Integer, Integer> graph1 = new UndirectedSparseGraphTO<>();
-        
+
         graph0.setName("P" + N_VERTICES);
         graph1.setName("P" + M_VERTICES);
-        
+
         List<Integer> vertexElegibles;
         Integer[] vertexs;
         int countEdge;
-        
+
         vertexElegibles = new ArrayList<>(N);
         vertexs = new Integer[N];
         for (int i = 0; i < N; i++) {
@@ -53,14 +53,14 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
             vertexs[i] = i;
             graph0.addVertex(vertexs[i]);
         }
-        
+
         countEdge = 0;
         for (int i = 0; i < N - 1; i++) {
             Integer source = vertexs[i];
             Integer target = vertexs[i] + 1;
             graph0.addEdge(countEdge++, source, target);
         }
-        
+
         vertexElegibles = new ArrayList<>(M);
         vertexs = new Integer[M];
         for (int i = 0; i < M; i++) {
@@ -68,7 +68,7 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
             vertexs[i] = i;
             graph1.addVertex(vertexs[i]);
         }
-        
+
         countEdge = 0;
         for (int i = 0; i < M - 1; i++) {
             Integer source = vertexs[i];
@@ -77,12 +77,12 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
         }
 
         // Seting vertex positions
-        double[] positionX = new double[N * M];
-        double[] positionY = new double[N * M];
+        Double[] positionX = new Double[N * M];
+        Double[] positionY = new Double[N * M];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < M; j++) {
-                positionX[i * M + j] = j+1;
-                positionY[i * M + j] = i+1;
+                positionX[i * M + j] = (double) j + 1;
+                positionY[i * M + j] = (double) i + 1;
             }
         }
 
@@ -103,10 +103,10 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
         // To know (vi, uj) from aij, vi = aij/nvertices1, uj = aij%nvertices1
         // To know aij from (vi, uj), aij = vi*nvertices1 + uj
         int nvertices = nvertices0 * nvertices1;
-        
+
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         graph.setName("G x H");
-        
+
         List<Integer> vertexElegibles = new ArrayList<>(nvertices);
         Integer[] vertexs = new Integer[nvertices];
         for (int i = 0; i < nvertices; i++) {
@@ -114,12 +114,12 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
             vertexs[i] = i;
             graph.addVertex(vertexs[i]);
         }
-        
+
         List<Integer> edges0 = new ArrayList<>();
         edges0.addAll((Collection<Integer>) graph0.getEdges());
         List<Integer> edges1 = new ArrayList<>();
         edges1.addAll((Collection<Integer>) graph1.getEdges());
-        
+
         int edge_count = 0;
 
         // For each edge (vi, vj) in G, make (aim, ajm) for m from 0 to nvertices1
@@ -127,7 +127,7 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
             Pair p = (Pair) graph0.getEndpoints(e);
             int i = (int) p.getFirst();
             int j = (int) p.getSecond();
-            
+
             for (int m = 0; m < nvertices1; m++) {
                 int line = i * nvertices1 + m;
                 int column = j * nvertices1 + m;
@@ -140,15 +140,15 @@ public class GraphGeneratorGrid extends AbstractGraphGenerator {
             Pair p = (Pair) graph1.getEndpoints(e);
             int i = (int) p.getFirst();
             int j = (int) p.getSecond();
-            
+
             for (int m = 0; m < nvertices0; m++) {
                 int line = m * nvertices1 + i;
                 int column = m * nvertices1 + j;
                 graph.addEdge(edge_count++, line, column);
             }
         }
-        
+
         return graph;
     }
-    
+
 }

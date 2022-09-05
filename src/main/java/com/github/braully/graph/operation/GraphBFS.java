@@ -3,11 +3,12 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 public class GraphBFS implements IGraphOperation {
@@ -28,10 +29,16 @@ public class GraphBFS implements IGraphOperation {
             bdl.labelDistances(graph, roots);
             int vertexCount = graph.getVertexCount();
 
+            TreeMap<String, TreeSet<Integer>> tset = new TreeMap<>();
+
             for (Integer i = 0; i < vertexCount; i++) {
-                int distance = bdl.getDistance(graph, i);
-                response.put(i.toString(), distance);
+                Integer v = graph.verticeByIndex(i);
+                String strDist = "" + bdl.getDistance(graph, v);
+                tset.putIfAbsent(strDist, new TreeSet<>());
+                tset.get(strDist).add(v);
             }
+            response.putAll(tset);
+
         } catch (Exception ex) {
             log.error(null, ex);
         }

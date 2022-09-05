@@ -91,51 +91,55 @@ public class UtilCProjects {
 
     static Collection<IGraphOperation> listOperations() {
         List<IGraphOperation> operations = new ArrayList<>();
-        String dirpath = Thread.currentThread().getContextClassLoader().getResource(DEFAULT_C_SUPPROJECTS).getPath();
-        File dir = new File(dirpath);
-        File[] filesList = dir.listFiles();
-        for (File file : filesList) {
-            try {
-                File[] listFiles = file.listFiles();
-                for (File content : listFiles) {
-                    if (content.isFile() && content.getName().equalsIgnoreCase(DEFAULT_FILE_NAME_DESCRIPTOR)) {
-                        File binaryDir = new File(file, "bin");
-                        if (!binaryDir.exists()) {
-                            binaryDir = new File(file, "dist");
-                        }
-                        if (!binaryDir.exists()) {
-                            binaryDir = new File(file, "build");
-                        }
-                        if (!binaryDir.exists()) {
-                            binaryDir = file;
-                        }
-                        Iterator<File> iterateFiles = FileUtils.iterateFiles(binaryDir, null, true);
-                        File binaryExec = iterateFiles.next();
-                        while (!binaryExec.canExecute() && iterateFiles.hasNext()) {
-                            binaryExec = iterateFiles.next();
-                        }
-                        BufferedReader frConReader = new BufferedReader(new FileReader(content));
-                        String type = frConReader.readLine();
-                        while (type != null && type.startsWith("#")) {
-                            type = frConReader.readLine();
-                        }
-                        String operation = frConReader.readLine();
-                        while (operation != null && operation.startsWith("#")) {
-                            operation = frConReader.readLine();
-                        }
-                        String format = frConReader.readLine();
-                        while (format != null && format.startsWith("#")) {
-                            format = frConReader.readLine();
-                        }
-                        if (binaryExec != null && !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(operation) && !Strings.isNullOrEmpty(format)) {
-                            operation = OBS + operation;
-                            operations.add(new CBInaryOperation(binaryExec.getAbsolutePath(), type, operation, format));
+        try {
+            String dirpath = Thread.currentThread().getContextClassLoader().getResource(DEFAULT_C_SUPPROJECTS).getPath();
+            File dir = new File(dirpath);
+            File[] filesList = dir.listFiles();
+            for (File file : filesList) {
+                try {
+                    File[] listFiles = file.listFiles();
+                    for (File content : listFiles) {
+                        if (content.isFile() && content.getName().equalsIgnoreCase(DEFAULT_FILE_NAME_DESCRIPTOR)) {
+                            File binaryDir = new File(file, "bin");
+                            if (!binaryDir.exists()) {
+                                binaryDir = new File(file, "dist");
+                            }
+                            if (!binaryDir.exists()) {
+                                binaryDir = new File(file, "build");
+                            }
+                            if (!binaryDir.exists()) {
+                                binaryDir = file;
+                            }
+                            Iterator<File> iterateFiles = FileUtils.iterateFiles(binaryDir, null, true);
+                            File binaryExec = iterateFiles.next();
+                            while (!binaryExec.canExecute() && iterateFiles.hasNext()) {
+                                binaryExec = iterateFiles.next();
+                            }
+                            BufferedReader frConReader = new BufferedReader(new FileReader(content));
+                            String type = frConReader.readLine();
+                            while (type != null && type.startsWith("#")) {
+                                type = frConReader.readLine();
+                            }
+                            String operation = frConReader.readLine();
+                            while (operation != null && operation.startsWith("#")) {
+                                operation = frConReader.readLine();
+                            }
+                            String format = frConReader.readLine();
+                            while (format != null && format.startsWith("#")) {
+                                format = frConReader.readLine();
+                            }
+                            if (binaryExec != null && !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(operation) && !Strings.isNullOrEmpty(format)) {
+                                operation = OBS + operation;
+                                operations.add(new CBInaryOperation(binaryExec.getAbsolutePath(), type, operation, format));
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+
         }
         return operations;
     }

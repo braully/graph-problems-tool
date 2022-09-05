@@ -33,7 +33,7 @@ public class GraphG6Generator extends AbstractGraphGenerator {
         try {
             System.out.println("G6CODE: " + g6code);
             graph = UtilGraph.loadGraphG6(g6code);
-            String name = "G6" + graph.getVertexCount() + ",M" + graph.getEdgeCount();
+            String name = "G6-n" + graph.getVertexCount() + "-m" + graph.getEdgeCount();
             graph.setName(name);
             log.info("Graph: " + name);
 //            String s = GraphConvertToNKIndex.graphToNMIndexedCode(graph);
