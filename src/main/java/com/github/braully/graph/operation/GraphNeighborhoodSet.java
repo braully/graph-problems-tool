@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 public class GraphNeighborhoodSet implements IGraphOperation {
@@ -22,19 +21,19 @@ public class GraphNeighborhoodSet implements IGraphOperation {
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Collection<Integer> set = graph.getSet();
-        List<Integer> setx = new ArrayList<>();
-        List<Integer> setN = new ArrayList<>();
+        TreeSet<Integer> setx = new TreeSet<>();
+        TreeSet<Integer> setN = new TreeSet<>();
         List<Integer> setV = new ArrayList<>();
-        List<Integer> intersection = new ArrayList<>();
+        TreeSet<Integer> intersection = new TreeSet<>();
 
         for (Integer v : set) {
             setN.addAll(graph.getNeighbors(v));
             setx.add(v);
         }
 
-        intersection.addAll(graph.getNeighbors(setx.get(0)));
-        for (int i = 1; i < setx.size(); i++) {
-            intersection.retainAll(graph.getNeighbors(setx.get(i)));
+        intersection.addAll(graph.getNeighbors(setx.first()));
+        for (Integer v : setx) {
+            intersection.retainAll(graph.getNeighbors(v));
         }
 
         setV.addAll(graph.getVertices());
@@ -44,8 +43,8 @@ public class GraphNeighborhoodSet implements IGraphOperation {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            Collections.sort(setN);
-            Collections.sort(intersection);
+//            Collections.sort(setN);
+//            Collections.sort(intersection);
             Collections.sort(setV);
             response.put("N" + set + "|" + setN.size() + "|", setN);
             response.put("∩|" + intersection.size() + "|", intersection);

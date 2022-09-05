@@ -126,6 +126,11 @@
                         </div>
                         <div class="form-group pull-right">
                             <button class="btn btn-primary btn-sm" 
+                                    ng-click="downloadGraphSvg();">
+                                <span class="glyphicon glyphicon-circle-arrow-down"></span>
+                                Download (svg)
+                            </button>
+                            <button class="btn btn-primary btn-sm" 
                                     ng-click="downloadGraphCsr();">
                                 <span class="glyphicon glyphicon-circle-arrow-down"></span>
                                 Download (csr)
@@ -318,439 +323,447 @@
 
         <script>
             var app = angular.module('appCaratheodroyNumber', []);
-            app.controller('caratheodoryNumberController', 
-            function ($scope, $http, $timeout) {
-                $scope.nvertices = 5;
-                $scope.minDegree = 1;
-                $scope.maxDegree = 2.0;
-                $scope.results = null;
-                $scope.generators = null;
-                $scope.operations = null;
-                $scope.typeOperations = '';
-                $scope.operation = '';
-                $scope.processing = false;
-                $scope.lastProcessing = 0;
-                $scope.typeOperation = {};
-                $scope.typeGraph = {};
-                $scope.mapParam = new Map();
-                $scope.inputData = null;
-                $scope.outputConsole = [''];
-                $scope.graph = null;
-                $scope.file = null;
-                $scope.mapResult = new Map();
-                $scope.sortType = 'id';
-                $scope.searchName = '';
-                $scope.sortReverse = false;
-                $scope.caratheodory = {number: null, set: [], aux: [], hs: [], phs: []};
+            app.controller('caratheodoryNumberController',
+                    function ($scope, $http, $timeout) {
+                        $scope.nvertices = 5;
+                        $scope.minDegree = 1;
+                        $scope.maxDegree = 2.0;
+                        $scope.results = null;
+                        $scope.generators = null;
+                        $scope.operations = null;
+                        $scope.typeOperations = '';
+                        $scope.operation = '';
+                        $scope.processing = false;
+                        $scope.lastProcessing = 0;
+                        $scope.typeOperation = {};
+                        $scope.typeGraph = {};
+                        $scope.mapParam = new Map();
+                        $scope.inputData = null;
+                        $scope.outputConsole = [''];
+                        $scope.graph = null;
+                        $scope.file = null;
+                        $scope.mapResult = new Map();
+                        $scope.sortType = 'id';
+                        $scope.searchName = '';
+                        $scope.sortReverse = false;
+                        $scope.caratheodory = {number: null, set: [], aux: [], hs: [], phs: []};
 
-                $scope.downloadGraph = function () {
-                    var filename = 'graph-' + $scope.graph.name + '.json';
-                    var textContent = JSON.stringify($scope.graph, null, '\t');
-                    var blob = new Blob([textContent], {type: "text/plain;charset=utf-8"});
-                    saveAs(blob, filename);
-                };
+                        $scope.downloadGraphSvg = function () {
+                            var svg = d3.selectAll("svg")[0];
+                            var svgOuter = svg[0].outerHTML;
+                            var blob = new Blob([svgOuter], {type:"image/svg+xml;charset=utf-8"});
+                            var filename = 'graph-' + $scope.graph.name + '.svgs';
+                            saveAs(blob, filename);
+                        };
 
-                $scope.downloadGraphCsr = function () {
-                    $http.post('rest/graph/download-graph-csr', $scope.graph).then(function (textContent) {
-                        var filename = 'graph-' + $scope.graph.name + '.csr';
-                        var blob = new Blob([textContent.data], {type: "text/plain"});
-                        saveAs(blob, filename);
-                    });
-                };
+                        $scope.downloadGraph = function () {
+                            var filename = 'graph-' + $scope.graph.name + '.json';
+                            var textContent = JSON.stringify($scope.graph, null, '\t');
+                            var blob = new Blob([textContent], {type: "text/plain;charset=utf-8"});
+                            saveAs(blob, filename);
+                        };
 
-                $scope.downloadGraphMat = function () {
-                    $http.post('rest/graph/download-graph-mat', $scope.graph).then(function (textContent) {
-                        var filename = 'graph-' + $scope.graph.name + '.mat';
-                        var blob = new Blob([textContent.data], {type: "text/plain;charset=utf-8"});
-                        saveAs(blob, filename);
-                    });
-                };
-
-                $scope.downloadAllResult = function () {
-                    $http.get('rest/graph/download-all-result', {responseType: 'arraybuffer'}).then(function (response) {
-                        var filename = 'all-results.zip';
-                        var blob = new Blob([response.data], {type: "application/binary"});
-                        saveAs(blob, filename);
-                    });
-                };
-
-                $scope.openGraph = function (g) {
-                    $http.get('rest/graph/open-graph', {params: {graph: g}})
-                            .then(function (graph) {
-                                $scope.graph = graph.data;
-                                $scope.updateGraph();
+                        $scope.downloadGraphCsr = function () {
+                            $http.post('rest/graph/download-graph-csr', $scope.graph).then(function (textContent) {
+                                var filename = 'graph-' + $scope.graph.name + '.csr';
+                                var blob = new Blob([textContent.data], {type: "text/plain"});
+                                saveAs(blob, filename);
                             });
-                };
+                        };
 
-                $scope.uploadedFile = function () {
-                    if (!$scope.file) {
-                        window.alert('File invalid');
-                        return;
-                    }
-                    var fileName = $scope.file.name.toLowerCase();
-                    if (!(fileName.endsWith(".csr") || fileName.endsWith(".mat") || fileName.endsWith(".g6")
-                        || fileName.endsWith(".es") || fileName.endsWith(".adj"))){
-                         window.alert('File format invalid');
-                    }
-                    var url = 'rest/graph/upload-file-graph';
-                    var form = $('#formUp')[0];
-                    var data = new FormData(form);
-                    $.ajax({
-                        type: "POST",
-                        enctype: 'multipart/form-data',
-                        url: "/rest/graph/upload-file-graph",
-                        data: data,
-                        //http://api.jquery.com/jQuery.ajax/
-                        //https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
-                        processData: false, //prevent jQuery from automatically transforming the data into a query string
-                        contentType: false,
-                        cache: false,
-                        timeout: 600000,
-                        success: function (data) {
-//                            console.log("SUCCESS : ", data);
-                            var ang = angular.element(document.getElementById('controllerId')).scope();
-                            var graph = data;
-                            if (graph) {
-                                $scope.graph = graph;
-                                if (!graph.name) {
-                                    $scope.graph.name = $scope.file.name;
-                                }
-                                $scope.$apply();
-                                $scope.updateGraph();
+                        $scope.downloadGraphMat = function () {
+                            $http.post('rest/graph/download-graph-mat', $scope.graph).then(function (textContent) {
+                                var filename = 'graph-' + $scope.graph.name + '.mat';
+                                var blob = new Blob([textContent.data], {type: "text/plain;charset=utf-8"});
+                                saveAs(blob, filename);
+                            });
+                        };
+
+                        $scope.downloadAllResult = function () {
+                            $http.get('rest/graph/download-all-result', {responseType: 'arraybuffer'}).then(function (response) {
+                                var filename = 'all-results.zip';
+                                var blob = new Blob([response.data], {type: "application/binary"});
+                                saveAs(blob, filename);
+                            });
+                        };
+
+                        $scope.openGraph = function (g) {
+                            $http.get('rest/graph/open-graph', {params: {graph: g}})
+                                    .then(function (graph) {
+                                        $scope.graph = graph.data;
+                                        $scope.updateGraph();
+                                    });
+                        };
+
+                        $scope.uploadedFile = function () {
+                            if (!$scope.file) {
+                                window.alert('File invalid');
+                                return;
                             }
-                        },
-                        error: function (e) {
+                            var fileName = $scope.file.name.toLowerCase();
+                            if (!(fileName.endsWith(".csr") || fileName.endsWith(".mat") || fileName.endsWith(".g6")
+                                    || fileName.endsWith(".es") || fileName.endsWith(".adj"))) {
+                                window.alert('File format invalid');
+                            }
+                            var url = 'rest/graph/upload-file-graph';
+                            var form = $('#formUp')[0];
+                            var data = new FormData(form);
+                            $.ajax({
+                                type: "POST",
+                                enctype: 'multipart/form-data',
+                                url: "/rest/graph/upload-file-graph",
+                                data: data,
+                                //http://api.jquery.com/jQuery.ajax/
+                                //https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+                                processData: false, //prevent jQuery from automatically transforming the data into a query string
+                                contentType: false,
+                                cache: false,
+                                timeout: 600000,
+                                success: function (data) {
+//                            console.log("SUCCESS : ", data);
+                                    var ang = angular.element(document.getElementById('controllerId')).scope();
+                                    var graph = data;
+                                    if (graph) {
+                                        $scope.graph = graph;
+                                        if (!graph.name) {
+                                            $scope.graph.name = $scope.file.name;
+                                        }
+                                        $scope.$apply();
+                                        $scope.updateGraph();
+                                    }
+                                },
+                                error: function (e) {
 //                            console.log("ERROR : ", e);
-                        }
-                    });
-                };
-                
-                $scope.updateGraph = function () {
-                    var graph = $scope.graph;
-                    var width = $("#grafo").width();
-                    var height = $("#grafo").height();
-                    console.log('graph: ');
-                    console.log(graph);
-                    $("#grafo").html('');
+                                }
+                            });
+                        };
 
-                    var selected_node = null;
-                    var color = d3.scale.category20();
+                        $scope.updateGraph = function () {
+                            var graph = $scope.graph;
+                            var width = $("#grafo").width();
+                            var height = $("#grafo").height();
+                            console.log('graph: ');
+                            console.log(graph);
+                            $("#grafo").html('');
 
-                    var force = d3.layout.force()
-                            .charge(-120)
-                            .linkDistance(250)
-                            .size([width, height]);
+                            var selected_node = null;
+                            var color = d3.scale.category20();
 
-                    var drag = force.drag()
-                            .on("dragstart", dragstart);
+                            var force = d3.layout.force()
+                                    .charge(-120)
+                                    .linkDistance(250)
+                                    .size([width, height]);
 
-                    var svg = d3.select("#grafo")
-                            .append("svg")
-                            .attr("width", width)
-                            .attr("height", height);
+                            var drag = force.drag()
+                                    .on("dragstart", dragstart);
 
-                    var posX = d3.scale.linear()
-                            .range([0, width])
-                            .domain([-(width / 2), width / 2]);
-                    var posY = d3.scale.linear()
-                            .range([0, height])
-                            .domain([-(height / 2), height / 2]);
+                            var svg = d3.select("#grafo")
+                                    .append("svg")
+                                    .attr("width", width)
+                                    .attr("height", height);
 
-                    var vertex = graph.normalizedVertices.map(function (d) {
-                        return {"idname": graph.vertices[d],
-                            "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
-                            "group": 1,
-                            "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width) + 1) * 70,
-                            "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height) + 1) * 70
+                            var posX = d3.scale.linear()
+                                    .range([0, width])
+                                    .domain([-(width / 2), width / 2]);
+                            var posY = d3.scale.linear()
+                                    .range([0, height])
+                                    .domain([-(height / 2), height / 2]);
+
+                            var vertex = graph.normalizedVertices.map(function (d) {
+                                return {"idname": graph.vertices[d],
+                                    "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
+                                    "group": 1,
+                                    "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width) + 1) * 70,
+                                    "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height) + 1) * 70
 //                            "x": posX(graph.positionX !== null ? graph.positionX[d] + 70 : Math.floor(Math.random() * width)),
 //                            "y": posY(graph.positionY !== null ? graph.positionY[d] + 70 : Math.floor(Math.random() * height))
-                            , "fixed": graph.positionX !== null && graph.positionX[d] !== null
-                        };
-                    });
+                                    , "fixed": graph.positionX !== null && graph.positionX[d] !== null
+                                };
+                            });
 
-                    vertex.forEach(function (d) {
-                        d.cx = d.x;
-                        d.cy = d.y;
-                    });
-
-
-                    var edges = graph.normalizedPairs.map(function (d) {
-                        return {"source": d[0], "target": d[1], "value": 1, "origin": d, "left": true, "right": true};
-                    });
+                            vertex.forEach(function (d) {
+                                d.cx = d.x;
+                                d.cy = d.y;
+                            });
 
 
-                    force.nodes(vertex).links(edges).start();
+                            var edges = graph.normalizedPairs.map(function (d) {
+                                return {"source": d[0], "target": d[1], "value": 1, "origin": d, "left": true, "right": true};
+                            });
 
-                    var link = svg.selectAll(".link")
-                            .data(edges).enter().append("line")
-                            .attr("class", "link")
-                            .attr("class", function (d) {
-                                return 'link ' + 'source-' + d.source.idname + ' target-' + d.target.idname;
-                            }).style("stroke-width", function (d) {
-                        return d.value;
-                    });
 
-                    var nodes = svg.selectAll(".node")
-                            .data(vertex)
-                            .enter().append("g")
-                            .attr("class", "node")
-                            .attr("class", function (d) {
-                                return 'node ' + 'node-' + d.idname;
-                            })
-                            .attr("cx", function (d) {
-                                return d.cx;
-                            })
-                            .attr("cy", function (d) {
-                                return d.cy;
-                            })
-                            .on("click", singclick)
-                            .on("dblclick", dblclick)
-                            .call(force.drag);
+                            force.nodes(vertex).links(edges).start();
 
-                    nodes.append("circle")
-                            .attr("class", "node")
-                            .attr("r", 5)
+                            var link = svg.selectAll(".link")
+                                    .data(edges).enter().append("line")
+                                    .attr("class", "link")
+                                    .attr("class", function (d) {
+                                        return 'link ' + 'source-' + d.source.idname + ' target-' + d.target.idname;
+                                    }).style("stroke-width", function (d) {
+                                return d.value;
+                            });
+
+                            var nodes = svg.selectAll(".node")
+                                    .data(vertex)
+                                    .enter().append("g")
+                                    .attr("class", "node")
+                                    .attr("class", function (d) {
+                                        return 'node ' + 'node-' + d.idname;
+                                    })
+                                    .attr("cx", function (d) {
+                                        return d.cx;
+                                    })
+                                    .attr("cy", function (d) {
+                                        return d.cy;
+                                    })
+                                    .on("click", singclick)
+                                    .on("dblclick", dblclick)
+                                    .call(force.drag);
+
+                            nodes.append("circle")
+                                    .attr("class", "node")
+                                    .attr("r", 5)
 //                            .attr("cx", function (d) {
 //                                return d.cx;
 //                            })
 //                            .attr("cy", function (d) {
 //                                return d.cy;
 //                            })
-                            .style("fill", function (d) {
-                                if (d === selected_node)
-                                    return d3.rgb(color(d.group)).darker().toString();
-                                return color(d.group);
-                            }).call(force.drag);
+                                    .style("fill", function (d) {
+                                        if (d === selected_node)
+                                            return d3.rgb(color(d.group)).darker().toString();
+                                        return color(d.group);
+                                    }).call(force.drag);
 
-                    nodes.append("text").attr("dx", 6)
-                            .attr("dy", ".35em")
-                            .text(function (d) {
-                                return d.name;
+                            nodes.append("text").attr("dx", 6)
+                                    .attr("dy", ".35em")
+                                    .text(function (d) {
+                                        return d.name;
+                                    });
+
+                            force.on("tick", function () {
+                                link.attr("x1", function (d) {
+                                    return d.source.x;
+                                }).attr("y1", function (d) {
+                                    return d.source.y;
+                                }).attr("x2", function (d) {
+                                    return d.target.x;
+                                }).attr("y2", function (d) {
+                                    return d.target.y;
+                                });
+                                nodes.attr("transform", function (d) {
+                                    return "translate(" + d.x + "," + d.y + ")";
+                                }).attr("cx", function (d) {
+                                    return d.x;
+                                }).attr("cy", function (d) {
+                                    return d.y;
+                                });
                             });
-
-                    force.on("tick", function () {
-                        link.attr("x1", function (d) {
-                            return d.source.x;
-                        }).attr("y1", function (d) {
-                            return d.source.y;
-                        }).attr("x2", function (d) {
-                            return d.target.x;
-                        }).attr("y2", function (d) {
-                            return d.target.y;
-                        });
-                        nodes.attr("transform", function (d) {
-                            return "translate(" + d.x + "," + d.y + ")";
-                        }).attr("cx", function (d) {
-                            return d.x;
-                        }).attr("cy", function (d) {
-                            return d.y;
-                        });
-                    });
-                    function dblclick(d) {
-                        d3.select(this).classed("fixed", d.fixed = false);
-                        d3.select(this).classed("node_selected", false);
-                        d3.select(this).classed("last_selected", false);
-                        selected_node = null;
-                    }
-
-                    function singclick(d) {
-                        //console.log('select: ');
-                        //console.log(d);
-
-                        var tgname = 'line.target-' + d.idname;
-                        var scname = 'line.source-' + d.idname;
-
-                        if (selected_node !== null) {
-                            if (selected_node === d) {
-                                d3.selectAll('.last_selected').classed("last_selected", false);
+                            function dblclick(d) {
+                                d3.select(this).classed("fixed", d.fixed = false);
                                 d3.select(this).classed("node_selected", false);
-                                d3.selectAll(scname).style("stroke-width", function (e) {
-                                    return --e.value;
-                                });
-                                d3.selectAll(tgname).style("stroke-width", function (e) {
-                                    return --e.value;
-                                });
+                                d3.select(this).classed("last_selected", false);
                                 selected_node = null;
-                                return;
                             }
-                            //console.log(selected_node);
-                            d3.selectAll('.last_selected').classed("last_selected", false);
-                        }
-                        selected_node = d;
-                        d3.select(this).classed("last_selected", true);
-                        if (!d3.select(this).classed("node_selected")) {
-                            d3.select(this).classed("node_selected", true);
-                            d3.selectAll(scname).style("stroke-width", function (e) {
-                                return ++e.value;
-                            });
-                            d3.selectAll(tgname).style("stroke-width", function (e) {
-                                return ++e.value;
-                            });
-                        }
-                        //console.log('ok');
-                    }
 
-                    function dragstart(d) {
-                        d3.select(this).classed("fixed", d.fixed = true);
-                    }
+                            function singclick(d) {
+                                //console.log('select: ');
+                                //console.log(d);
 
-                    function keydown() {
-                        // //console.log('keydown on: ');
+                                var tgname = 'line.target-' + d.idname;
+                                var scname = 'line.source-' + d.idname;
 
-                        if (document.activeElement === document.body) {
-                            d3.event.preventDefault();
-                        } else {
-                            return;
-                        }
-
-                        if (!selected_node)
-                            return;
-
-                        switch (d3.event.keyCode) {
-                            case 46: // delete
-                                if (selected_node) {
-                                    //console.log('remove:');
+                                if (selected_node !== null) {
+                                    if (selected_node === d) {
+                                        d3.selectAll('.last_selected').classed("last_selected", false);
+                                        d3.select(this).classed("node_selected", false);
+                                        d3.selectAll(scname).style("stroke-width", function (e) {
+                                            return --e.value;
+                                        });
+                                        d3.selectAll(tgname).style("stroke-width", function (e) {
+                                            return --e.value;
+                                        });
+                                        selected_node = null;
+                                        return;
+                                    }
                                     //console.log(selected_node);
-                                    //vertex.remove(selected_node);
+                                    d3.selectAll('.last_selected').classed("last_selected", false);
+                                }
+                                selected_node = d;
+                                d3.select(this).classed("last_selected", true);
+                                if (!d3.select(this).classed("node_selected")) {
+                                    d3.select(this).classed("node_selected", true);
+                                    d3.selectAll(scname).style("stroke-width", function (e) {
+                                        return ++e.value;
+                                    });
+                                    d3.selectAll(tgname).style("stroke-width", function (e) {
+                                        return ++e.value;
+                                    });
+                                }
+                                //console.log('ok');
+                            }
+
+                            function dragstart(d) {
+                                d3.select(this).classed("fixed", d.fixed = true);
+                            }
+
+                            function keydown() {
+                                // //console.log('keydown on: ');
+
+                                if (document.activeElement === document.body) {
+                                    d3.event.preventDefault();
+                                } else {
+                                    return;
+                                }
+
+                                if (!selected_node)
+                                    return;
+
+                                switch (d3.event.keyCode) {
+                                    case 46: // delete
+                                        if (selected_node) {
+                                            //console.log('remove:');
+                                            //console.log(selected_node);
+                                            //vertex.remove(selected_node);
 //                            nodes.splice(nodes.indexOf(selectedNode), 1);
 //                            spliceLinksForNode(selectedNode);
-                                    var tgname = 'line.target-' + selected_node.idname;
-                                    var scname = 'line.source-' + selected_node.idname;
-                                    //console.log('Remove links with: ' + scname + ', ' + tgname);
-                                    d3.selectAll(tgname).remove();
-                                    d3.selectAll(scname).remove();
-                                    d3.select('.last_selected').remove();
+                                            var tgname = 'line.target-' + selected_node.idname;
+                                            var scname = 'line.source-' + selected_node.idname;
+                                            //console.log('Remove links with: ' + scname + ', ' + tgname);
+                                            d3.selectAll(tgname).remove();
+                                            d3.selectAll(scname).remove();
+                                            d3.select('.last_selected').remove();
+                                        }
+                                        selected_node = null;
+                                        //restart();
+                                        break;
+                                    default:
+                                        break;
                                 }
-                                selected_node = null;
-                                //restart();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    // d3.select("#panel-grafo").on('keydown', keydown);
-                    d3.select(window).on('keydown', keydown);
-                };
-                $scope.generateGraph = function () {
-                    $scope.mapParam['key'] = $scope.typeGraph.key;
-                    $http.get('rest/graph/generate-graph',
-                            {
-                                params: $scope.mapParam
                             }
-                    ).then(function (graph) {
-                        $scope.graph = graph.data;
-                        $scope.updateGraph();
-                    });
-                };
-                $scope.executeOperation = function () {
-                    $scope.graph.inputData = $scope.inputData;
-                    if ($scope.inputData)
-                        $scope.graph.set = $scope.inputData.split(',').map(Number);
-                    $scope.outputConsole = ['Processing...'];
-                    $scope.graph.operation = $scope.operation;
-                    $scope.processing = true;
-                    $http.post('rest/graph/operation', $scope.graph).then(function (carathe) {
-                        $scope.pollerConsoleOutput();
-                        var caratheodorydata = carathe.data;
-                        $scope.caratheodory = caratheodorydata;
-                        $scope.processing = false;
-                        $scope.outputConsole = [''];
-                        if (caratheodorydata) {
-                            $scope.mapResult = new Map();
-                            Object.keys(caratheodorydata).forEach(function (key) {
-                                $scope.mapResult[key] = caratheodorydata[key];
+
+                            // d3.select("#panel-grafo").on('keydown', keydown);
+                            d3.select(window).on('keydown', keydown);
+                        };
+                        $scope.generateGraph = function () {
+                            $scope.mapParam['key'] = $scope.typeGraph.key;
+                            $http.get('rest/graph/generate-graph',
+                                    {
+                                        params: $scope.mapParam
+                                    }
+                            ).then(function (graph) {
+                                $scope.graph = graph.data;
+                                $scope.updateGraph();
                             });
-                        }
-                    }, function (err) {
-                        $scope.processing = false;
-                        window.alert('Error: ' + err);
-                    });
-                };
-                $scope.batchExecuteOperation = function () {
-                    $scope.graph.inputData = $scope.inputData;
-                    if ($scope.inputData)
-                        $scope.graph.set = $scope.inputData.split(',').map(Number);
-                    $scope.outputConsole = ['Processing...'];
-                    $scope.graph.operation = $scope.operation;
-                    $scope.processing = true;
-                    $http.post('rest/graph/batch-operation', $scope.graph).then(function (carathe) {
-                        var carathe = caratheodorydata.data;
-                        $scope.pollerConsoleOutput();
-                        $scope.caratheodory = caratheodorydata;
-                        $scope.processing = false;
-                        $scope.outputConsole = [''];
-                        if (caratheodorydata) {
-                            $scope.mapResult = new Map();
-                            Object.keys(caratheodorydata).forEach(function (key) {
-                                $scope.mapResult[key] = caratheodorydata[key];
+                        };
+                        $scope.executeOperation = function () {
+                            $scope.graph.inputData = $scope.inputData;
+                            if ($scope.inputData)
+                                $scope.graph.set = $scope.inputData.split(',').map(Number);
+                            $scope.outputConsole = ['Processing...'];
+                            $scope.graph.operation = $scope.operation;
+                            $scope.processing = true;
+                            $http.post('rest/graph/operation', $scope.graph).then(function (carathe) {
+                                $scope.pollerConsoleOutput();
+                                var caratheodorydata = carathe.data;
+                                $scope.caratheodory = caratheodorydata;
+                                $scope.processing = false;
+                                $scope.outputConsole = [''];
+                                if (caratheodorydata) {
+                                    $scope.mapResult = new Map();
+                                    Object.keys(caratheodorydata).forEach(function (key) {
+                                        $scope.mapResult[key] = caratheodorydata[key];
+                                    });
+                                }
+                            }, function (err) {
+                                $scope.processing = false;
+                                window.alert('Error: ' + err);
                             });
-                        }
-                    }, function (err) {
-                        $scope.processing = false;
-                        window.alert('Error: ' + err);
-                    });
-                };
+                        };
+                        $scope.batchExecuteOperation = function () {
+                            $scope.graph.inputData = $scope.inputData;
+                            if ($scope.inputData)
+                                $scope.graph.set = $scope.inputData.split(',').map(Number);
+                            $scope.outputConsole = ['Processing...'];
+                            $scope.graph.operation = $scope.operation;
+                            $scope.processing = true;
+                            $http.post('rest/graph/batch-operation', $scope.graph).then(function (carathe) {
+                                var carathe = caratheodorydata.data;
+                                $scope.pollerConsoleOutput();
+                                $scope.caratheodory = caratheodorydata;
+                                $scope.processing = false;
+                                $scope.outputConsole = [''];
+                                if (caratheodorydata) {
+                                    $scope.mapResult = new Map();
+                                    Object.keys(caratheodorydata).forEach(function (key) {
+                                        $scope.mapResult[key] = caratheodorydata[key];
+                                    });
+                                }
+                            }, function (err) {
+                                $scope.processing = false;
+                                window.alert('Error: ' + err);
+                            });
+                        };
 
-                $scope.cancelOperation = function () {
-                    $http.post('rest/graph/process-cancel').then(function (result) {
-                        $scope.processing = false;
-                    }, function (err) {
-                        $scope.processing = false;
-                        window.alert('Error: ' + err);
-                    });
-                };
+                        $scope.cancelOperation = function () {
+                            $http.post('rest/graph/process-cancel').then(function (result) {
+                                $scope.processing = false;
+                            }, function (err) {
+                                $scope.processing = false;
+                                window.alert('Error: ' + err);
+                            });
+                        };
 
-                $http.get('rest/graph/list-graph-generator').then(function (gen) {
-                    $scope.generators = gen.data;
-                });
-
-                $http.get('rest/graph/list-result').then(function (rs) {
-                    $scope.results = rs.data;
-                });
-
-                $http.get('rest/graph/list-graph-operation').then(function (ops) {
-                    $scope.operations = ops.data;
-                    if (ops) {
-                        var op;
-                        $scope.typeOperations = new Set();
-                        ops.data.forEach(function (value) {
-                            $scope.typeOperations.add(value.value);
-                            $scope.typeOperation = value.value;
+                        $http.get('rest/graph/list-graph-generator').then(function (gen) {
+                            $scope.generators = gen.data;
                         });
-                        $scope.typeOperations = Array.from($scope.typeOperations);
-                    }
-                });
 
-                $scope.generateGraph();
-                $scope.pollerConsoleOutput = function () {
-                    $http.post('rest/graph/process-status', $scope.lastProcessing).then(function (res) {
-                        var r = res.data;
-                        $scope.processing = res.data.processing;
-                        if (r.last) {
-                            $scope.lastProcessing = r.last;
-                        }
-                        if (r.output)
-                            for (var i = r.output.length - 1; i >= 0; i--) {
-                                $scope.outputConsole.push(r.output[i]);
+                        $http.get('rest/graph/list-result').then(function (rs) {
+                            $scope.results = rs.data;
+                        });
+
+                        $http.get('rest/graph/list-graph-operation').then(function (ops) {
+                            $scope.operations = ops.data;
+                            if (ops) {
+                                var op;
+                                $scope.typeOperations = new Set();
+                                ops.data.forEach(function (value) {
+                                    $scope.typeOperations.add(value.value);
+                                    $scope.typeOperation = value.value;
+                                });
+                                $scope.typeOperations = Array.from($scope.typeOperations);
                             }
-                        if (r.result) {
-                            $scope.mapResult = new Map();
-                            Object.keys(r.result).forEach(function (key) {
-                                $scope.mapResult[key] = r.result[key];
+                        });
+
+                        $scope.generateGraph();
+                        $scope.pollerConsoleOutput = function () {
+                            $http.post('rest/graph/process-status', $scope.lastProcessing).then(function (res) {
+                                var r = res.data;
+                                $scope.processing = res.data.processing;
+                                if (r.last) {
+                                    $scope.lastProcessing = r.last;
+                                }
+                                if (r.output)
+                                    for (var i = r.output.length - 1; i >= 0; i--) {
+                                        $scope.outputConsole.push(r.output[i]);
+                                    }
+                                if (r.result) {
+                                    $scope.mapResult = new Map();
+                                    Object.keys(r.result).forEach(function (key) {
+                                        $scope.mapResult[key] = r.result[key];
+                                    });
+                                    $http.get('rest/graph/list-result').then(function (rs) {
+                                        $scope.results = rs.data;
+                                    });
+                                }
+                                if ($scope.processing)
+                                    $timeout($scope.pollerConsoleOutput, 10000);
+                                else
+                                    $timeout($scope.pollerConsoleOutput, 100000);
                             });
-                            $http.get('rest/graph/list-result').then(function (rs) {
-                                $scope.results = rs.data;
-                            });
-                        }
-                        if ($scope.processing)
-                            $timeout($scope.pollerConsoleOutput, 10000);
-                        else
-                            $timeout($scope.pollerConsoleOutput, 100000);
+                        };
+                        $scope.pollerConsoleOutput();
                     });
-                };
-                $scope.pollerConsoleOutput();
-            });
             app.directive("ngFileSelect", function () {
                 return {
                     link: function ($scope, el) {
@@ -761,13 +774,13 @@
                     }
                 };
             });
-            
+
             $(document).ready(function () {
                 $("#btnSubmit").click(function (event) {
                     event.preventDefault();
                     fire_ajax_submit();});
-            });
-            
+                });
+
             function fire_ajax_submit() {
                 var form = $('#formUp')[0];
                 var data = new FormData(form);

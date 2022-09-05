@@ -26,8 +26,9 @@ public class GraphGeneratorStudyCase extends AbstractGraphGenerator {
 
     static final String CYCLE = "Cyle";
     static final String INNER = "Inner";
+    static final String GRAPH = "Graph";
 
-    static final String[] parameters = {CYCLE, INNER};
+    static final String[] parameters = {GRAPH, CYCLE, INNER};
 
 //    static String DEFAULT_CYCLE = "0, 56, 3249";
 //    static String DEFAULT_INNER = "222,";
@@ -63,13 +64,24 @@ public class GraphGeneratorStudyCase extends AbstractGraphGenerator {
             inner = DEFAULT_INNER;
         }
 
-        try {
-            String grafoFile = DEFAULT_GRAPH;
-            InputStream openStream = Thread.currentThread().getContextClassLoader().getResource(grafoFile).openStream();
-            graphES = UtilGraph.loadGraphES(openStream);
-        } catch (Exception ex) {
-            Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
+        String grafoFile = getStringParameter(parameters, GRAPH);
+
+        if (grafoFile == null || grafoFile.isEmpty()) {
+            grafoFile = DEFAULT_GRAPH;
+            try {
+                InputStream openStream = Thread.currentThread().getContextClassLoader().getResource(grafoFile).openStream();
+                graphES = UtilGraph.loadGraphES(openStream);
+            } catch (Exception ex) {
+                Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
+        } else {
+            try {
+                graphES = UtilGraph.loadGraphG6(grafoFile);
+            } catch (Exception ex) {
+                Logger.getLogger(GraphGeneratorStudyCase.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
         }
         GraphHullSetNC hullOp = new GraphHullSetNC();
         GraphSubgraph subGrapOp = new GraphSubgraph();
