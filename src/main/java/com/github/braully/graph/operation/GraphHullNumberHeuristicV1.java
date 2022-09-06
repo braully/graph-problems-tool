@@ -1,8 +1,6 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
-import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +44,12 @@ public class GraphHullNumberHeuristicV1
         return response;
     }
 
+    public Set<Integer> findMinHullSetGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        return buildOptimizedHullSet(graph);
+
+    }
+
+//    @Override
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         Set<Integer> hullSet = null;
         Collection<Integer> vertices = graphRead.getVertices();
