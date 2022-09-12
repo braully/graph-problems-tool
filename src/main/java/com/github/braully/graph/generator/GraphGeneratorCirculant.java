@@ -33,6 +33,10 @@ public class GraphGeneratorCirculant extends AbstractGraphGenerator {
 
         String strEdges = getStringParameter(parameters, STRING_EDGES);
 
+        return generate(nvertices, strEdges);
+    }
+
+    public UndirectedSparseGraphTO<Integer, Integer> generate(Integer nvertices, String strEdges) throws NumberFormatException {
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         graph.setName("C(" + nvertices + ",{" + strEdges + "})");
 
@@ -63,4 +67,5 @@ public class GraphGeneratorCirculant extends AbstractGraphGenerator {
         }
         return graph;
     }
+
 }
