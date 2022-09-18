@@ -26,11 +26,12 @@ public class GraphCaratheodoryNumberBinary extends GraphCaratheodoryCheckSet {
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
-        OperationConvexityGraphResult processedCaratheodroySet = null;
         Map<String, Object> result = null;
         if (graph == null) {
             return result;
         }
+        OperationConvexityGraphResult processedCaratheodroySet = null;
+
         int vertexCount = graph.getVertexCount();
         int maxSizeSet = (vertexCount + 1) / 2;
         int currentSize = maxSizeSet;
