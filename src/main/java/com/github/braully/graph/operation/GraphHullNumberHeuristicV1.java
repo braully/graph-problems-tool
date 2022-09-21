@@ -52,7 +52,7 @@ public class GraphHullNumberHeuristicV1
 //    @Override
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         Collection<Integer> vertices = graphRead.getVertices();
-
+        Set<Integer> hullSet = null;
         Set<Integer> s = new HashSet<>();
         int vertexCount = graphRead.getVertexCount();
         int[] aux = new int[vertexCount];
@@ -65,7 +65,6 @@ public class GraphHullNumberHeuristicV1
                 sizeHs = sizeHs + addVertToS(v, s, graphRead, aux);
             }
         }
-        Set<Integer> hullSet = new HashSet<>(s);
 
         for (Integer v : vertices) {
             if (s.contains(v)) {
@@ -75,6 +74,9 @@ public class GraphHullNumberHeuristicV1
             if (hullSet == null || tmp.size() < hullSet.size()) {
                 hullSet = tmp;
             }
+        }
+        if (hullSet == null) {
+            hullSet = new HashSet<>(s);
         }
         return hullSet;
     }
