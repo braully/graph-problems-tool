@@ -35,15 +35,19 @@ public class GraphGeneratorRandomGilbert extends AbstractGraphGenerator {
         if (probability == null) {
             probability = DEFAULT_PROBABILITY;
         }
+        UndirectedSparseGraphTO<Integer, Integer> graph = generate(nvertices, probability);
+
+        return graph;
+    }
+
+    public UndirectedSparseGraphTO<Integer, Integer> generate(Integer nvertices, Double probability) {
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         graph.setName("G(" + nvertices + "," + probability + ")");
-
         Integer[] vertexs = new Integer[nvertices];
         for (int i = 0; i < nvertices; i++) {
             vertexs[i] = i;
             graph.addVertex(vertexs[i]);
         }
-
         Integer countEdge = 0;
         for (int i = 0; i < nvertices; i++) {
             for (int j = i + 1; j < nvertices; j++) {
@@ -53,7 +57,6 @@ public class GraphGeneratorRandomGilbert extends AbstractGraphGenerator {
                 }
             }
         }
-
         return graph;
     }
 
