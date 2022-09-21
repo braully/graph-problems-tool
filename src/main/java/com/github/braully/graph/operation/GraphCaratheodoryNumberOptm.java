@@ -17,20 +17,21 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
  *
  * @author Braully Rocha da Silva
  */
-public class GraphCaratheodoryNumberBinary extends GraphCaratheodoryCheckSet {
+public class GraphCaratheodoryNumberOptm extends GraphCaratheodoryCheckSet {
 
     static final String type = "P3-Convexity";
-    static final String description = "Caratheodory No. (Binary)";
+    static final String description = "Caratheodory No. Optm";
 
     public static final int THRESHOLD_HEURISTIC_FEED = 15;
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
-        OperationConvexityGraphResult processedCaratheodroySet = null;
         Map<String, Object> result = null;
         if (graph == null) {
             return result;
         }
+        OperationConvexityGraphResult processedCaratheodroySet = null;
+
         int vertexCount = graph.getVertexCount();
         int maxSizeSet = (vertexCount + 1) / 2;
         int currentSize = maxSizeSet;
