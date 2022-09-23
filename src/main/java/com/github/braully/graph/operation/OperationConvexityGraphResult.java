@@ -32,6 +32,7 @@ public class OperationConvexityGraphResult {
     Integer caratheodoryNumber;
     Set<Integer> vizs;
     Set<Integer> verticesPotenciais;
+    int iteracoes;
 
     Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
