@@ -32,6 +32,8 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
     public static String PARAM_NAME_ITERATION_NUMBER = "Iteration number";
     public static String PARAM_NAME_SET = "Set";
 
+    public int lastResult = 0;
+
     public String getTypeProblem() {
         return type;
     }
@@ -48,7 +50,7 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
         int currentSize = firstMinHullSetGraph.size();
 
         //
-        int maxNumberOfIterations = 0;
+        Integer maxNumberOfIterations = null;
         int currentSetSize = currentSize;
         Set<Integer> maxSet = new HashSet<>();
         Map<Integer, Integer> maxIntervalOperation = null;
@@ -61,7 +63,7 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
             if (checkIfHullSet(graph, currentSet)) {
                 Map<Integer, Integer> intervalOperation = intervalOperation(graph, currentSet);
                 Integer maxIteracoes = Collections.max(intervalOperation.values());
-                if (maxIteracoes != null && maxIteracoes > maxNumberOfIterations) {
+                if (maxIteracoes != null && (maxNumberOfIterations == null || maxIteracoes > maxNumberOfIterations)) {
                     maxNumberOfIterations = maxIteracoes;
                     maxIntervalOperation = intervalOperation;
                     maxSet.clear();
@@ -76,6 +78,8 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
         response.put(PARAM_NAME_SET, maxSet);
         response.put("Vertice:Iteracao", new TreeMap<>(maxIntervalOperation));
         response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, maxNumberOfIterations);
+        lastResult = maxNumberOfIterations;
+
         return response;
 
     }
