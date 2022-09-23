@@ -32,6 +32,8 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
     public static String PARAM_NAME_ITERATION_NUMBER = "Iteration number";
     public static String PARAM_NAME_SET = "Set";
 
+    public int lastResult = 0;
+
     public String getTypeProblem() {
         return type;
     }
@@ -76,6 +78,8 @@ public class GraphIterationNumberOptm extends GraphHullNumberOptm {
         response.put(PARAM_NAME_SET, maxSet);
         response.put("Vertice:Iteracao", new TreeMap<>(maxIntervalOperation));
         response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, maxNumberOfIterations);
+        lastResult = maxNumberOfIterations;
+
         return response;
 
     }
