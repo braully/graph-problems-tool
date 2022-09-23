@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import util.PairShort;
 
 public class GraphHullSetNC implements IGraphOperation {
 
@@ -81,27 +80,19 @@ public class GraphHullSetNC implements IGraphOperation {
         response.put("Frontier H(S)", frontier);
         response.put("Unreachable", unreachable);
         response.put("Set(S)", set);
-//            response.put("N[" + set + "]", closedNeighbor);
-//            response.put("V(G)-N[" + set + "]", complement);
-        //System.out.println("\nIncludade sequence n:{");
         Set<Integer> includeat = new HashSet<>();
         for (Integer v : hsGraph.includedSequence) {
-            //System.out.print(v + ":" + includedSequenceN.get(v) + ", ");
             includeat.add(v);
-            Collection<Integer> ns = graphRead.getNeighborsUnprotected(v);
-            for (Integer vn : ns) {
-                Collection<Integer> vnn = graphRead.getNeighborsUnprotected(vn);
-                if (vnn.size() > 3) {
-                    if (includeat.containsAll(vnn)) {
-                        //System.out.println("\n[" + vn + "]");
-                    }
-                }
-            }
+//            Collection<Integer> ns = graphRead.getNeighborsUnprotected(v);
+//            for (Integer vn : ns) {
+//                Collection<Integer> vnn = graphRead.getNeighborsUnprotected(vn);
+//                if (vnn.size() > 3) {
+//                    if (includeat.containsAll(vnn)) {
+//                        //System.out.println("\n[" + vn + "]");
+//                    }
+//                }
+//            }
         }
-        //System.out.println("}\n");
-
-//        response.put("Viz", hsGraph.vizs);
-//        response.put("Pot", hsGraph.verticesPotenciais);
         response.put("|H(S)|", hsGraph.convexHull.size());
         response.put(OperationConvexityGraphResult.PARAM_NAME_INCLUDED_SEQUENCE, hsGraph.includedSequence);
 
@@ -257,6 +248,7 @@ public class GraphHullSetNC implements IGraphOperation {
         processedHullSet.auxProcessor = aux;
         processedHullSet.convexHull = hsp3g;
         processedHullSet.includedSequence = includedSequence;
+        processedHullSet.iteracoes = iteracao;
         return processedHullSet;
     }
 

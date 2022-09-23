@@ -24,3 +24,9 @@ c-projects/blank-c/last-compilation.log
 .gitignore
 */**/last-compilation.log
 /src/main/resources/static/node_modules/
+/c-projects/graph-hull-number-serial/last-compilation.log.orig
+/c-projects/graph-hull-number-parallel/last-compilation.log.orig
+/c-projects/graph-hull-number-aprox-parallel/last-compilation.log.orig
+/c-projects/graph-hull-number-aprox/last-compilation.log.orig
+/c-projects/blank-cpp/last-compilation.log.orig
+/c-projects/blank-c/last-compilation.log.orig
