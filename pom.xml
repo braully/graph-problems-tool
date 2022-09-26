@@ -30,8 +30,12 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
+                <!--https://docs.spring.io/spring-boot/docs/current/maven-plugin/reference/htmlsingle/-->
                 <plugins>
-                    
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin> 
                 </plugins>
             </build>
         </profile>
@@ -43,7 +47,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>1.7.1</version>
+                        <version>3.4.0</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -62,19 +66,26 @@
                                         </filter>
                                     </filters>
                                     <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>util.Auto</mainClass>
-                                        </transformer>
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                             <resource>META-INF/spring.handlers</resource>
                                         </transformer>
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                             <resource>META-INF/spring.schemas</resource>
                                         </transformer>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                            <resource>META-INF/spring.factories</resource>
+                                        </transformer>
+                                        <!--<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />-->
                                     </transformers>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <mainClass>run.Batch</mainClass>
+                                    </transformer>
                                 </configuration>
                             </execution>
                         </executions>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -224,10 +235,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
