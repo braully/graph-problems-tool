@@ -12,7 +12,7 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 
 public class GraphHullNumberOptm extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
-    static final String description = "Hull Number Brute Optm";
+    static final String description = "Hull Number";
 
     GraphHullNumberHeuristicV1 heuristic = new GraphHullNumberHeuristicV1();
 
