@@ -50,14 +50,16 @@ public class BatchExecuteOperation implements IBatchExecute {
 
     static final IGraphOperation[] operations = new IGraphOperation[]{
         new GraphCaratheodoryNumberBinary(),
-//        new GraphCaratheodoryHeuristicHybrid(),
+        //        new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumberOptm(),
         new GraphHullNumberHeuristicV1(),
         new GraphIterationNumberOptm(),
-//        new GraphCountEdges(),
+        //        new GraphCountEdges(),
         new GraphCycleChordlessDetec(),
         new com.github.braully.graph.operation.CycleHullCheck()
     };
+    private String formatResult;
+    private String formatResultSimples;
 
     @Override
     public String getDefaultInput() {
@@ -380,10 +382,12 @@ public class BatchExecuteOperation implements IBatchExecute {
                     if (graphcount > continueOffset) {
                         ret.setName(graphFileName + "-" + graphcount);
                         String resultProcess = processGraph(operation, ret, dirname, graphcount);
-                        writer.write(resultProcess);
+                        writer.write(formatResultSimples);
+//                        writer.write(resultProcess);
                         writer.flush();
                         if (verbose) {
-                            System.out.println(resultProcess);
+                            System.out.print(formatResult);
+//                            System.out.print(formatResultSimples);
                         }
                     }
                     graphcount++;
@@ -447,29 +451,9 @@ public class BatchExecuteOperation implements IBatchExecute {
         }
 
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
-        String formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
-
-        File resultFile = null;
-        BufferedWriter writer = null;
-        BufferedReader r = null;
-
-        try {
-            writer = new BufferedWriter(new FileWriter(resultFile, true));
-            resultFile = null;//getResultFile(operation, file, dirname);
-            r = new BufferedReader(new InputStreamReader(new FileInputStream(resultFile)));
-        } catch (Exception e) {
-
-        }
-//            if (output == null) {
+        formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
+        formatResultSimples = formatResultSimple(groupName, id, loadGraphAdjMatrix, operation, result);
         System.out.println(formatResult);
-//            } else {
-//                try {
-//                    output.write(formatResult);
-//                    output.flush();
-//                } catch (IOException ex) {
-//                    System.err.println(formatResult);
-//                }
-//            }
         return formatResult;
     }
 
@@ -485,6 +469,18 @@ public class BatchExecuteOperation implements IBatchExecute {
         sb.append(operation.getName());
         sb.append("\t");
         sb.append(printResultMap(result, loadGraphAdjMatrix));
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    public String formatResultSimple(String name, String id, UndirectedSparseGraphTO loadGraphAdjMatrix,
+            IGraphOperation operation, Map result) {
+        StringBuilder sb = new StringBuilder();
+//        sb.append(id);
+//        sb.append("\t");
+        sb.append(loadGraphAdjMatrix.getVertexCount());
+        sb.append("\t");
+        sb.append(result.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT));
         sb.append("\n");
         return sb.toString();
     }
