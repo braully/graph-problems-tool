@@ -6,10 +6,6 @@
 package com.github.braully.graph;
 
 import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
-import com.github.braully.graph.operation.GraphCaratheodoryHeuristicHybrid;
-import com.github.braully.graph.operation.GraphCountEdges;
-import com.github.braully.graph.operation.GraphCycleChordlessDetec;
-import com.github.braully.graph.operation.GraphHullNumber;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
@@ -37,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.cli.*;
+import tmp.ConjectureOperation;
 
 /**
  *
@@ -54,9 +51,10 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphHullNumberOptm(),
         new GraphHullNumberHeuristicV1(),
         new GraphIterationNumberOptm(),
+        new ConjectureOperation()
         //        new GraphCountEdges(),
-        new GraphCycleChordlessDetec(),
-        new com.github.braully.graph.operation.CycleHullCheck()
+//        new GraphCycleChordlessDetec(),
+//        new com.github.braully.graph.operation.CycleHullCheck()
     };
     private String formatResult;
     private String formatResultSimples;
