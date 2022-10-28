@@ -450,7 +450,7 @@ public class BatchExecuteOperation implements IBatchExecute {
 
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
-        formatResultSimples = formatResultSimple(groupName, id, loadGraphAdjMatrix, operation, result);
+        formatResultSimples = formatResultSimple(groupName, ""+graphcount, loadGraphAdjMatrix, operation, result);
         System.out.println(formatResult);
         return formatResult;
     }
@@ -474,8 +474,8 @@ public class BatchExecuteOperation implements IBatchExecute {
     public String formatResultSimple(String name, String id, UndirectedSparseGraphTO loadGraphAdjMatrix,
             IGraphOperation operation, Map result) {
         StringBuilder sb = new StringBuilder();
-//        sb.append(id);
-//        sb.append("\t");
+        sb.append(id);
+        sb.append("\t");
         sb.append(loadGraphAdjMatrix.getVertexCount());
         sb.append("\t");
         sb.append(result.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT));
