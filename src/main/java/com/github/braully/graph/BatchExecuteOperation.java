@@ -9,6 +9,7 @@ import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
+import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import com.github.braully.graph.operation.OperationConvexityGraphResult;
 import java.io.BufferedReader;
@@ -51,8 +52,9 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphHullNumberOptm(),
         new GraphHullNumberHeuristicV1(),
         new GraphIterationNumberOptm(),
+        new GraphTSSCordasco(),
         new ConjectureOperation()
-        //        new GraphCountEdges(),
+    //        new GraphCountEdges(),
 //        new GraphCycleChordlessDetec(),
 //        new com.github.braully.graph.operation.CycleHullCheck()
     };
@@ -450,7 +452,7 @@ public class BatchExecuteOperation implements IBatchExecute {
 
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
-        formatResultSimples = formatResultSimple(groupName, ""+graphcount, loadGraphAdjMatrix, operation, result);
+        formatResultSimples = formatResultSimple(groupName, "" + graphcount, loadGraphAdjMatrix, operation, result);
         System.out.println(formatResult);
         return formatResult;
     }
