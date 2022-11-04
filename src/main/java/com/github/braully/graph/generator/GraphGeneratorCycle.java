@@ -14,12 +14,17 @@ public class GraphGeneratorCycle extends GraphGeneratorPath {
 
     @Override
     public UndirectedSparseGraphTO<Integer, Integer> generateGraph(Map parameters) {
-        UndirectedSparseGraphTO<Integer, Integer> graph = super.generateGraph(parameters);
         Integer nvertices = getIntegerParameter(parameters, N_VERTICES);
 
         if (nvertices == null) {
             nvertices = DEFAULT_NVERTICES;
         }
+        return generateCycleGraph(nvertices);
+    }
+
+    public UndirectedSparseGraphTO<Integer, Integer> generateCycleGraph(Integer nvertices) {
+        UndirectedSparseGraphTO<Integer, Integer> graph = super.generatePathGraph(nvertices);
+
         graph.setName("C" + nvertices);
         graph.addEdge(graph.getEdgeCount(), graph.getVertexCount() - 1, 0);
         return graph;
