@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2022 strike.
+ * Copyright 2022 Braully Rocha da Silva.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package util;
+package run;
 
 import com.github.braully.graph.BatchExecuteOperation;
+
 
 /**
  *

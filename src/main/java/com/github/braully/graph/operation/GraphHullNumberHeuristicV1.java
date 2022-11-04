@@ -28,7 +28,7 @@ public class GraphHullNumberHeuristicV1
         Set<Integer> minHullSet = null;
 
         try {
-            minHullSet = buildOptimizedHullSet(graph);
+            minHullSet = findMinHullSetGraph(graph);
             if (minHullSet != null && !minHullSet.isEmpty()) {
                 hullNumber = minHullSet.size();
             }

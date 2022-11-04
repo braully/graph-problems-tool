@@ -11,19 +11,18 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 
 public class GraphStatistics implements IGraphOperation {
-    
+
     static final String type = "General";
     static final String description = "Statistics";
-    
+
     private static final Logger log = Logger.getLogger(GraphWS.class);
-    
+
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         /* Processar a buscar pelo hullset e hullnumber */
         Map<String, Object> response = new HashMap<>();
         try {
-            DistanceStatistics distanceStatistics = new DistanceStatistics();
-            double diameter = distanceStatistics.diameter(graph);
+            double diameter = diameter(graph);
             response.put("Diameter", diameter);
             try {
                 int girth = girth(graph);
@@ -35,10 +34,10 @@ public class GraphStatistics implements IGraphOperation {
             } catch (Exception e) {
                 log.warn("fail on girth", e);
             }
-            
+
             response.put("n", graph.getVertexCount());
             response.put("m", graph.getEdgeCount());
-            
+
             int Lambda = 0, lambda = Integer.MAX_VALUE;
             for (Integer i : (Collection<Integer>) graph.getVertices()) {
                 lambda = Math.min(lambda, graph.getNeighborCount(i));
@@ -60,15 +59,15 @@ public class GraphStatistics implements IGraphOperation {
      */
     public int girth(UndirectedSparseGraphTO<Integer, Integer> graph) {
         class Node {
-            
+
             public int vertex, depth;
-            
+
             public Node(int vertex, int depth) {
                 this.vertex = vertex;
                 this.depth = depth;
             }
         }
-        
+
         String path = "";
         /* Used for labelling vertices. */
         int[] labels = new int[graph.getVertexCount()];
@@ -135,12 +134,17 @@ public class GraphStatistics implements IGraphOperation {
         /* We don't want any division by zero errors. */
         return best > 0 ? best : 1;
     }
-    
+
     public String getTypeProblem() {
         return type;
     }
-    
+
     public String getName() {
         return description;
+    }
+
+    public double diameter(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        DistanceStatistics distanceStatistics = new DistanceStatistics();
+        return distanceStatistics.diameter(graph);
     }
 }
