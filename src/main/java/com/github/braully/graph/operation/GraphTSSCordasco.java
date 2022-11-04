@@ -40,6 +40,8 @@ public class GraphTSSCordasco implements IGraphOperation {
         try {
             response.put("TSS", "" + s);
             response.put("|TSS|", s.size());
+            response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, s.size());
+
         } catch (Exception ex) {
             log.error(null, ex);
         }
