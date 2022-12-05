@@ -18,9 +18,7 @@ import util.BFSUtil;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV4
-        extends GraphHullNumber implements IGraphOperation {
-
-    public static int K = 2;
+        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV4.class);
 
@@ -149,10 +147,10 @@ public class GraphHullNumberHeuristicV4
                 int contaminado = 0;
                 //Contabilizar quantos vertices foram adicionados
                 for (int j = 0; j < vertexCount; j++) {
-                    if (auxb[j] == K) {
+                    if (auxb[j] >= K) {
                         neighborCount++;
                     }
-                    if (auxb[j] <= K) {
+                    if (auxb[j] < K) {
                         contaminado++;
                     }
                 }
@@ -199,63 +197,6 @@ public class GraphHullNumberHeuristicV4
             hullSet = new HashSet<>(s);
         }
         return hullSet;
-    }
-
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        System.out.println("tentando reduzir");
-
-        for (Integer v : tmp) {
-            if (graphRead.degree(v) < K) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(tmp);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                s = t;
-                if (verbose) {
-                    System.out.println("Reduzido removido: " + v);
-                }
-            }
-        }
-        return s;
-    }
-
-    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
-        Set<Integer> fecho = new HashSet<>();
-        int[] aux = new int[(Integer) graph.maxVertex() + 1];
-        for (int i = 0; i < aux.length; i++) {
-            aux[i] = 0;
-        }
-
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer iv : currentSet) {
-            Integer v = iv;
-            mustBeIncluded.add(v);
-            aux[v] = K;
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
-                if (!vertn.equals(verti) && aux[vertn] < K - 1) {
-                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                    if (aux[vertn] == K) {
-                        mustBeIncluded.add(vertn);
-                    }
-                }
-            }
-            aux[verti] += K;
-        }
-        return fecho.size() == graph.getVertexCount();
     }
 
     public void printPesoAux(int[] auxb) {

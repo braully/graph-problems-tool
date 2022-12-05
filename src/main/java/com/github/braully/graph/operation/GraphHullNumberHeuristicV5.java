@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5
-        extends GraphHullNumber implements IGraphOperation {
+        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     public static int K = 2;
 

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5Tmp
-        extends GraphHullNumber implements IGraphOperation {
+        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     public static int K = 2;
 
@@ -327,43 +327,6 @@ public class GraphHullNumberHeuristicV5Tmp
             }
         }
         return s;
-    }
-
-    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
-        Set<Integer> fecho = new HashSet<>();
-        int[] aux = new int[(Integer) graph.maxVertex() + 1];
-        for (int i = 0; i < aux.length; i++) {
-            aux[i] = 0;
-        }
-
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer iv : currentSet) {
-            Integer v = iv;
-            mustBeIncluded.add(v);
-            aux[v] = K;
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
-                if (!vertn.equals(verti) && aux[vertn] < K - 1) {
-                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                    if (aux[vertn] == K) {
-                        mustBeIncluded.add(vertn);
-                    }
-                }
-            }
-            aux[verti] += K;
-        }
-        return fecho.size() == graph.getVertexCount();
     }
 
     public void printPesoAux(int[] auxb) {

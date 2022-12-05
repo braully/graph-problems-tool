@@ -13,7 +13,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 public class GraphHullNumberHeuristicV2
-        extends GraphHullNumber implements IGraphOperation {
+        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV2.class);
 
@@ -92,7 +92,7 @@ public class GraphHullNumberHeuristicV2
 
             }
             Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, s, aux, sizeHs);
-            tmp = tentarMinimizar(graphRead, tmp);
+            tmp = tryMinimal(graphRead, tmp);
             if (hullSet == null) {
                 hullSet = tmp;
                 vl = v;
@@ -118,7 +118,7 @@ public class GraphHullNumberHeuristicV2
         return hullSet;
     }
 
-    private Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
+    public Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
             Integer v, Set<Integer> sini, int[] auxini, int sizeHsini) {
         Set<Integer> s = new LinkedHashSet<>(sini);
         int vertexCount = graph.getVertexCount();
@@ -183,24 +183,6 @@ public class GraphHullNumberHeuristicV2
             }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
         } while (sizeHs < vertexCount);
-        return s;
-    }
-
-    public Set<Integer> tentarMinimizar(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        for (Integer v : tmp) {
-            if (graphRead.degree(v) < 2) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(tmp);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                s = t;
-                if (verbose) {
-                    System.out.println("Reduzido removido: " + v);
-                }
-            }
-        }
         return s;
     }
 }

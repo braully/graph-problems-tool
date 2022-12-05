@@ -1,19 +1,23 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphHullNumberHeuristicV4.K;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
 
 public class GraphHullNumberHeuristicV1
         extends GraphHullNumber implements IGraphOperation {
+
+    public int K = 2;
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV1.class);
 
@@ -130,7 +134,7 @@ public class GraphHullNumberHeuristicV1
 
             for (int i = 0; i < vertexCount; i++) {
                 //Se vertice já foi adicionado, ignorar
-                if (aux[i] >= INCLUDED) {
+                if (aux[i] >= K) {
                     continue;
                 }
                 int[] auxb = aux.clone();
@@ -140,10 +144,10 @@ public class GraphHullNumberHeuristicV1
                 int contaminado = 0;
                 //Contabilizar quantos vertices foram adicionados
                 for (int j = 0; j < vertexCount; j++) {
-                    if (auxb[j] == INCLUDED) {
+                    if (auxb[j] >= K) {
                         neighborCount++;
                     }
-                    if (auxb[j] == NEIGHBOOR_COUNT_INCLUDED) {
+                    if (auxb[j] > 0 && auxb[j] < K) {
                         contaminado++;
                     }
                 }
@@ -200,6 +204,43 @@ public class GraphHullNumberHeuristicV1
             }
         }
         return s;
+    }
+
+    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
+            Integer... currentSet) {
+        if (currentSet == null || currentSet.length == 0) {
+            return false;
+        }
+        Set<Integer> fecho = new HashSet<>();
+        int[] aux = new int[(Integer) graph.maxVertex() + 1];
+        for (int i = 0; i < aux.length; i++) {
+            aux[i] = 0;
+        }
+
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        for (Integer iv : currentSet) {
+            Integer v = iv;
+            mustBeIncluded.add(v);
+            aux[v] = K;
+        }
+        while (!mustBeIncluded.isEmpty()) {
+            Integer verti = mustBeIncluded.remove();
+            fecho.add(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            for (Integer vertn : neighbors) {
+                if (vertn.equals(verti)) {
+                    continue;
+                }
+                if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
+                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                    if (aux[vertn] == K) {
+                        mustBeIncluded.add(vertn);
+                    }
+                }
+            }
+            aux[verti] += K;
+        }
+        return fecho.size() == graph.getVertexCount();
     }
 
     public Set<Integer> buildOptimizedHullSetTryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead) {

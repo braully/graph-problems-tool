@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 public class GraphHullNumberHeuristicV3
-        extends GraphHullNumber implements IGraphOperation {
+        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV3.class);
 
@@ -93,7 +93,7 @@ public class GraphHullNumberHeuristicV3
 
             for (int i = 0; i < vertexCount; i++) {
                 //Se vertice já foi adicionado, ignorar
-                if (aux[i] >= INCLUDED) {
+                if (aux[i] >= K) {
                     continue;
                 }
                 int[] auxb = aux.clone();
@@ -103,10 +103,10 @@ public class GraphHullNumberHeuristicV3
                 int contaminado = 0;
                 //Contabilizar quantos vertices foram adicionados
                 for (int j = 0; j < vertexCount; j++) {
-                    if (auxb[j] == INCLUDED) {
+                    if (auxb[j] >= K) {
                         neighborCount++;
                     }
-                    if (auxb[j] == NEIGHBOOR_COUNT_INCLUDED) {
+                    if (auxb[j] > 0 && auxb[j] < K) {
                         contaminado++;
                     }
                 }
@@ -143,30 +143,11 @@ public class GraphHullNumberHeuristicV3
             sizeHs = sizeHs + addVertToS(bestVertice, s, graphRead, aux);
         } while (sizeHs < vertexCount);
 
-        s = tentarMinimizar(graphRead, s);
+        s = tryMinimal(graphRead, s);
         if (hullSet == null) {
             hullSet = new HashSet<>(s);
         }
         return hullSet;
     }
 
-    public Set<Integer> tentarMinimizar(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        System.out.println("tentando reduzir");
-
-        for (Integer v : tmp) {
-            if (graphRead.degree(v) < 2) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(tmp);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                s = t;
-                if (verbose) {
-                    System.out.println("Reduzido removido: " + v);
-                }
-            }
-        }
-        return s;
-    }
 }
