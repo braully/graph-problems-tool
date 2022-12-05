@@ -1,7 +1,6 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphHullNumberHeuristicV4.K;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,19 +11,21 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 
-public class GraphHullNumberHeuristicV1
+public class GraphHullNumberHeuristicV3
         extends GraphHullNumber implements IGraphOperation {
 
-    private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV1.class);
+    private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV3.class);
 
-    static final String description = "Hull Number Heuristic";
+    static final String description = "Hull Number Heuristic V3";
+
+    static boolean verbose = true;
 
     @Override
     public String getName() {
         return description;
     }
 
-    public GraphHullNumberHeuristicV1() {
+    public GraphHullNumberHeuristicV3() {
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -58,69 +59,31 @@ public class GraphHullNumberHeuristicV1
         List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
         Set<Integer> hullSet = null;
         Integer vl = null;
-        Set<Integer> s = new HashSet<>();
+        Set<Integer> sini = new LinkedHashSet<>();
 
         int vertexCount = graphRead.getVertexCount();
-        int[] aux = new int[vertexCount];
+        int[] auxini = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
-            aux[i] = 0;
+            auxini[i] = 0;
         }
         int sizeHs = 0;
         for (Integer v : vertices) {
             if (graphRead.degree(v) <= 1) {
-                sizeHs = sizeHs + addVertToS(v, s, graphRead, aux);
+                sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
         }
-
-        int total = graphRead.getVertexCount();
-        int cont = 0;
-
         vertices.sort(Comparator
                 .comparingInt((Integer v) -> -graphRead.degree(v))
                 .thenComparing(v -> -v));
 
-        for (Integer v : vertices) {
-            if (s.contains(v)) {
-                continue;
-            }
-            if (verbose) {
-//                System.out.println("Trying ini vert: " + v);
-//                UtilProccess.printCurrentItme();
+        int total = graphRead.getVertexCount();
+        int cont = 0;
+        Integer v = vertices.get(0);
+//        if(v != null)
+        Set<Integer> s = new LinkedHashSet<>(sini);
+        sizeHs += addVertToS(v, s, graphRead, auxini);
+        int[] aux = auxini;
 
-            }
-            Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, s, aux, sizeHs);
-            tmp = tryMinimal(graphRead, tmp);
-            if (hullSet == null) {
-                hullSet = tmp;
-                vl = v;
-            } else if (tmp.size() < hullSet.size()) {
-                if (verbose) {
-                    System.out.println("Melhorado em: " + (hullSet.size() - tmp.size()));
-                    System.out.println(" em i " + v + " vindo de " + vl);
-                    System.out.println("d(" + v + ")=" + graphRead.degree(v) + " d(" + vl + ")=" + graphRead.degree(vl));
-                    System.out.println(hullSet);
-                    System.out.println(tmp);
-                }
-                hullSet = tmp;
-            }
-            cont++;
-            if (verbose) {
-//                UtilProccess.printCurrentItmeAndEstimated(total - cont);
-//                System.out.println(" s size: " + tmp.size());
-            }
-        }
-        if (hullSet == null) {
-            hullSet = new HashSet<>(s);
-        }
-        return hullSet;
-    }
-
-    protected Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer v, Set<Integer> sini, int[] auxini, int sizeHsini) {
-        Set<Integer> s = new HashSet<>(sini);
-        int vertexCount = graph.getVertexCount();
-        int[] aux = auxini.clone();
-        int sizeHs = addVertToS(v, s, graph, aux) + sizeHsini;
         int bestVertice;
         do {
             bestVertice = -1;
@@ -134,7 +97,7 @@ public class GraphHullNumberHeuristicV1
                     continue;
                 }
                 int[] auxb = aux.clone();
-                int deltaHsi = addVertToS(i, null, graph, auxb);
+                int deltaHsi = addVertToS(i, null, graphRead, auxb);
 
                 int neighborCount = 0;
                 int contaminado = 0;
@@ -177,17 +140,22 @@ public class GraphHullNumberHeuristicV1
             if (bestVertice == -1) {
                 break;
             }
-            sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
+            sizeHs = sizeHs + addVertToS(bestVertice, s, graphRead, aux);
         } while (sizeHs < vertexCount);
-        return s;
+
+        s = tentarMinimizar(graphRead, s);
+        if (hullSet == null) {
+            hullSet = new HashSet<>(s);
+        }
+        return hullSet;
     }
 
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
+    public Set<Integer> tentarMinimizar(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
         Set<Integer> s = tmp;
-//        System.out.println("tentando reduzir");
+        System.out.println("tentando reduzir");
 
         for (Integer v : tmp) {
-            if (graphRead.degree(v) < K) {
+            if (graphRead.degree(v) < 2) {
                 continue;
             }
             Set<Integer> t = new LinkedHashSet<>(tmp);
@@ -200,11 +168,5 @@ public class GraphHullNumberHeuristicV1
             }
         }
         return s;
-    }
-
-    public Set<Integer> buildOptimizedHullSetTryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
-        Set<Integer> optimizedHullSet = this.buildOptimizedHullSet(graphRead);
-        Set<Integer> optimizedMinimalHullSet = tryMinimal(graphRead, optimizedHullSet);
-        return optimizedMinimalHullSet;
     }
 }

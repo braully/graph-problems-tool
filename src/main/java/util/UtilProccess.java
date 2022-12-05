@@ -442,12 +442,69 @@ public class UtilProccess {
             ex.printStackTrace();
         }
     }
+    public static long lastime;
 
     public static void printCurrentItme() {
         try {
-            System.out.printf("time: %s\n", dateFormater.format(new Date()));
+            long current = System.currentTimeMillis();
+            System.out.printf("time: %s\n", dateFormater.format(current));
+            if (lastime > 0) {
+                long delta = current - lastime;
+                System.out.print("Delta: ");
+                printTimeFormated(delta);
+            }
+
+            lastime = current;
         } catch (Exception e) {
         }
+    }
+
+    public static void printStartTime() {
+        try {
+            long current = System.currentTimeMillis();
+            System.out.printf("time: %s\n", dateFormater.format(current));
+            lastime = current;
+        } catch (Exception e) {
+        }
+    }
+
+    public static void printEndTime() {
+        try {
+            long current = System.currentTimeMillis();
+            System.out.printf("time: %s\n", dateFormater.format(current));
+            if (lastime > 0) {
+                long delta = current - lastime;
+                System.out.print("DELTA: ");
+                printTimeFormated(delta);
+            }
+
+            lastime = current;
+        } catch (Exception e) {
+        }
+    }
+
+    public static void printCurrentItmeAndEstimated(long trabalhoRestante) {
+        try {
+            long current = System.currentTimeMillis();
+//            System.out.printf("time: %s\n", dateFormater.format(current));
+            if (lastime > 0) {
+                long delta = current - lastime;
+                System.out.print("Estimated: ");
+                printTimeFormated(delta * trabalhoRestante);
+            }
+
+            lastime = current;
+        } catch (Exception e) {
+        }
+    }
+
+    public static void printTimeFormated(long delta) {
+        long millis = delta % 1000;
+        long second = (delta / 1000) % 60;
+        long minute = (delta / (1000 * 60)) % 60;
+        long hour = (delta / (1000 * 60 * 60)) % 24;
+        String time = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
+        System.out.printf("%s\n", time);
     }
 
     public static List<Integer> strToList(String group) {

@@ -7,22 +7,22 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
-import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import java.util.Set;
 
 /**
  *
  * @author strike
  */
-public class DensityInterationConjecture {
+public class DensityHullConjecture {
 
     public static final int INI_V = 5;
     public static final int MAX_V = 50;
 
     public static void main(String... args) {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
-        GraphIterationNumberOptm operacao = new GraphIterationNumberOptm();
+        GraphHullNumberOptm operacao = new GraphHullNumberOptm();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
+        Set<Integer> minHullSet = null;
 
         System.out.print("Dens:\t");
         for (double density = 0.1; density <= 0.9; density += 0.1) {
@@ -37,8 +37,8 @@ public class DensityInterationConjecture {
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
-                operacao.doOperation(graph);
-                System.out.printf("%2d\t", operacao.lastResult);
+                minHullSet = operacao.findMinHullSetGraph(graph);
+                System.out.printf("%2d\t", minHullSet.size());
 
             }
 

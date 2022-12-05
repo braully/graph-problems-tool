@@ -36,7 +36,7 @@ public class GraphGeneratorPath extends AbstractGraphGenerator {
         return graph;
     }
 
-    public UndirectedSparseGraphTO<Integer, Integer>  generatePathGraph(Integer nvertices) {
+    public UndirectedSparseGraphTO<Integer, Integer> generatePathGraph(Integer nvertices) {
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         List<Integer> vertexElegibles = new ArrayList<>(nvertices);
         Integer[] vertexs = new Integer[nvertices];
@@ -51,6 +51,7 @@ public class GraphGeneratorPath extends AbstractGraphGenerator {
             Integer target = vertexs[i] + 1;
             graph.addEdge(countEdge++, source, target);
         }
+        graph.setName("P" + (nvertices + 1));
         return graph;
     }
 }

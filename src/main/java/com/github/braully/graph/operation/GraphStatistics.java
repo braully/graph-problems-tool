@@ -129,8 +129,8 @@ public class GraphStatistics implements IGraphOperation {
             queue.clear();
             root++;
         }
-        System.out.println("Path: " + path);
-        log.info("Path: " + path);
+//        System.out.println("Path: " + path);
+//        log.info("Path: " + path);
         /* We don't want any division by zero errors. */
         return best > 0 ? best : 1;
     }

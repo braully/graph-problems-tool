@@ -25,6 +25,7 @@ public class GraphTSSCordasco implements IGraphOperation {
     static final String description = "TSS-Cordasco";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
+    public static int K = 2;
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -53,7 +54,7 @@ public class GraphTSSCordasco implements IGraphOperation {
     }
 
     public Set<Integer> tssCordasco(UndirectedSparseGraphTO graph, List<Integer> reqList) {
-        Set<Integer> S = new HashSet<>();
+        Set<Integer> S = new LinkedHashSet<>();
         //(G -> Vertices.begin(), G -> Vertices.end())
         Set<Integer> U = new TreeSet<>(graph.getVertices());
         int n = graph.getVertexCount();
@@ -75,7 +76,7 @@ public class GraphTSSCordasco implements IGraphOperation {
             delta[v] = graph.degree(v);
 //            k[v] = R[v];
 //Se existir a lista de requisitos
-            int req = 2;
+            int req = K;
             if (reqList != null) {
                 req = reqList.get(v);
             }

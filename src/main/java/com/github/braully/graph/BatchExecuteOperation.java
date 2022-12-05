@@ -7,6 +7,11 @@ package com.github.braully.graph;
 
 import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV6;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
@@ -51,6 +56,10 @@ public class BatchExecuteOperation implements IBatchExecute {
         //        new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumberOptm(),
         new GraphHullNumberHeuristicV1(),
+        new GraphHullNumberHeuristicV2(),
+        new GraphHullNumberHeuristicV3(),
+        new GraphHullNumberHeuristicV5(),
+        new GraphHullNumberHeuristicV5Tmp(),
         new GraphIterationNumberOptm(),
         new GraphTSSCordasco(),
         new ConjectureOperation()
@@ -113,6 +122,11 @@ public class BatchExecuteOperation implements IBatchExecute {
             System.out.println(e.getMessage());
             formatter.printHelp("BatchExecuteOperation", options);
             System.exit(1);
+            return;
+        }
+
+        if (args == null || args.length == 0) {
+            formatter.printHelp("BatchExecuteOperation", options);
             return;
         }
 
@@ -453,7 +467,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResultSimples = formatResultSimple(groupName, "" + graphcount, loadGraphAdjMatrix, operation, result);
-        System.out.println(formatResult);
+//        System.out.println(formatResult);
         return formatResult;
     }
 
