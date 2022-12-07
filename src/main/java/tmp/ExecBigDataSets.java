@@ -57,8 +57,8 @@ public class ExecBigDataSets {
             "Livemocha",
             "BlogCatalog",
             "BuzzNet",
-            "YouTube2",
             "Last.fm"
+//            ,"YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -86,7 +86,7 @@ public class ExecBigDataSets {
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 1; k <= 10; k++) {
+        for (int k = 2; k <= 10; k++) {
 
             System.out.println("-------------\n\nK: " + k);
 
