@@ -92,7 +92,7 @@ public class ExecBigDataSets {
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 1; k <= 2; k++) {
+        for (int k = 2; k <= 5; k++) {
             heur1.K = heur2.K = heur3.K = heur4.K = heur5.K = heur5t.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
 
@@ -128,7 +128,7 @@ public class ExecBigDataSets {
                         delta[i] = 0;
                         boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
                         if (!checkIfHullSet) {
-                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
+                            System.out.println("CORDASSO IS NOT HULL SET");
                         }
                     } else {
                         delta[i] = result[0] - result[i];
