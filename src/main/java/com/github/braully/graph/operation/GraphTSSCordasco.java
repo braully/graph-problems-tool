@@ -3,7 +3,6 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class GraphTSSCordasco implements IGraphOperation {
     static final String description = "TSS-Cordasco";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
-    public static int K = 2;
+    public int K = 2;
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -40,6 +39,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 
         try {
             response.put("TSS", "" + s);
+            response.put(IGraphOperation.DEFAULT_PARAM_NAME_SET, s);
             response.put("|TSS|", s.size());
             response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, s.size());
 

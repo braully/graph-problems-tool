@@ -25,6 +25,7 @@ package tmp;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV4;
@@ -32,9 +33,11 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
+import static com.github.braully.graph.operation.IGraphOperation.DEFAULT_PARAM_NAME_SET;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 import util.UtilProccess;
@@ -45,7 +48,7 @@ import util.UtilProccess;
  */
 public class ExecBigDataSets {
 
-    public static void main(String... args) throws FileNotFoundException, IOException {
+    public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
             "ca-GrQc", "ca-HepTh",
             "ca-CondMat", "ca-HepPh",
@@ -56,9 +59,8 @@ public class ExecBigDataSets {
             "BlogCatalog2",
             "Livemocha",
             "BlogCatalog",
-            "BuzzNet",
-            "Last.fm"
-//            ,"YouTube2"
+            "BuzzNet", //            "Last.fm"
+        //            ,"YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -68,6 +70,9 @@ public class ExecBigDataSets {
         heur3.setVerbose(false);
         GraphHullNumberHeuristicV2 heur2 = new GraphHullNumberHeuristicV2();
         heur2.setVerbose(false);
+        GraphHullNumberHeuristicV1 heur1 = new GraphHullNumberHeuristicV1();
+//        heur1.fatorLimite = 2;
+        heur1.setVerbose(true);
         GraphHullNumberHeuristicV5 heur5 = new GraphHullNumberHeuristicV5();
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp heur5t = new GraphHullNumberHeuristicV5Tmp();
@@ -77,8 +82,9 @@ public class ExecBigDataSets {
 
         IGraphOperation[] operations = new IGraphOperation[]{
             tss,
+            //            heur1,
             //            heur2, 
-            heur3, heur4,
+            //            heur3, heur4,
             heur5,
             heur5t
         };
@@ -86,8 +92,8 @@ public class ExecBigDataSets {
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 2; k <= 10; k++) {
-
+        for (int k = 1; k <= 2; k++) {
+            heur1.K = heur2.K = heur3.K = heur4.K = heur5.K = heur5t.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
 
             for (String s : dataSets) {
@@ -107,6 +113,8 @@ public class ExecBigDataSets {
                 System.out.println("Loaded Graph: " + s + " " + graphES.getVertexCount() + " " + graphES.getEdgeCount());
 
                 for (int i = 0; i < operations.length; i++) {
+//                    BeanUtils.setProperty(operations[i], "K", k);
+//                    PropertyUtils.setSimpleProperty(operations[i], "K", k);
                     System.out.println("*************");
                     System.out.print(" - EXEC: " + operations[i].getName() + " k: " + k + " g:" + s);
                     System.out.print("  - ");
@@ -118,6 +126,10 @@ public class ExecBigDataSets {
                     System.out.print(" - Result: " + result[i]);
                     if (i == 0) {
                         delta[i] = 0;
+                        boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
+                        if (!checkIfHullSet) {
+                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
+                        }
                     } else {
                         delta[i] = result[0] - result[i];
 

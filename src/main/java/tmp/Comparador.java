@@ -18,8 +18,8 @@ public class Comparador {
     public static void main(String... args) throws FileNotFoundException, IOException {
         String[] strFiles = new String[]{
 //                        "resultado-TSS-Cordasco.hog-graphs-ge20-le50-ordered.txt",
-                        "resultado-Hull_Number_Heuristic.hog-graphs-ge20-le50-ordered.txt", //            "resultado-Hull_Number_Heuristic_V6.hog-graphs-ge20-le50-ordered.txt"
-//            "resultado-Hull_Number_Heuristic_V5.hog-graphs-ge20-le50-ordered.txt",
+//                        "resultado-Hull_Number_Heuristic.hog-graphs-ge20-le50-ordered.txt", //            "resultado-Hull_Number_Heuristic_V6.hog-graphs-ge20-le50-ordered.txt"
+            "resultado-Hull_Number_Heuristic_V5.hog-graphs-ge20-le50-ordered.txt",
             "resultado-Hull_Number_Heuristic_V5-tmp.hog-graphs-ge20-le50-ordered.txt"
         };
         BufferedReader[] files = new BufferedReader[strFiles.length];

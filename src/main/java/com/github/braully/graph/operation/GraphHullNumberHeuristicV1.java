@@ -22,6 +22,7 @@ public class GraphHullNumberHeuristicV1
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV1.class);
 
     static final String description = "Hull Number Heuristic";
+    public Integer fatorLimite;
 
     @Override
     public String getName() {
@@ -82,13 +83,18 @@ public class GraphHullNumberHeuristicV1
         vertices.sort(Comparator
                 .comparingInt((Integer v) -> -graphRead.degree(v))
                 .thenComparing(v -> -v));
+        int limite = vertexCount;
+        if (fatorLimite != null) {
+            limite = vertexCount / fatorLimite;
+        }
 
-        for (Integer v : vertices) {
+        for (int idx = 0; idx < limite; idx++) {
+            Integer v = vertices.get(idx);
             if (s.contains(v)) {
                 continue;
             }
             if (verbose) {
-//                System.out.println("Trying ini vert: " + v);
+                System.out.println("Trying ini vert: " + v);
 //                UtilProccess.printCurrentItme();
 
             }
@@ -97,6 +103,9 @@ public class GraphHullNumberHeuristicV1
             if (hullSet == null) {
                 hullSet = tmp;
                 vl = v;
+                if (verbose) {
+                    System.out.println("Primeiro resultado v:" + v + " em: " + hullSet.size());
+                }
             } else if (tmp.size() < hullSet.size()) {
                 if (verbose) {
                     System.out.println("Melhorado em: " + (hullSet.size() - tmp.size()));
