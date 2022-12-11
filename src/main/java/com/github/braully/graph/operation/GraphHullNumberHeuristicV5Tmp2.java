@@ -130,13 +130,15 @@ public class GraphHullNumberHeuristicV5Tmp2
 
         int[] aux = auxini.clone();
         BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
-        bdl.labelDistances(graph, s);
+//        bdl.labelDistances(graph, s);
 
         int bestVertice;
         boolean esgotado = false;
         int ranking[] = new int[vertexCount];
 
         do {
+            bdl.labelDistances(graph, s);
+
             bestVertice = -1;
             int maiorGrau = 0;
             int maiorDeltaHs = 0;
@@ -166,7 +168,7 @@ public class GraphHullNumberHeuristicV5Tmp2
                 }
             }
 
-            while (menorRest > 0) {
+            while (menorRest > 0 && sizeHs < vertexCount) {
                 int bestNeighbor = -1;
 
                 for (Integer i : graph.getNeighborsUnprotected(bestVertice)) {
@@ -281,7 +283,6 @@ public class GraphHullNumberHeuristicV5Tmp2
 //
 //            }
 //            sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
-            bdl.labelDistances(graph, s);
         } while (sizeHs < vertexCount);
         s = tryMinimal(graph, s);
 

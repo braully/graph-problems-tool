@@ -96,7 +96,7 @@ public class ExecBigDataSets {
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 5; k <= 6; k++) {
+        for (int k = 3; k <= 6; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
