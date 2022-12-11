@@ -7,7 +7,8 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -27,7 +28,8 @@ public class DensityHeuristicCompare {
         GraphIterationNumberOptm operacao = new GraphIterationNumberOptm();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 
-        GraphHullNumberHeuristicV5 heur5 = new GraphHullNumberHeuristicV5();
+        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
+//        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
         heur.setVerbose(false);
@@ -37,12 +39,19 @@ public class DensityHeuristicCompare {
             tss, heur, heur5
         };
 
+        int contMelhor[] = new int[operations.length];
+        int contIgual[] = new int[operations.length];
+        int contPior[] = new int[operations.length];
+        int[] cont = new int[9];
+        int idx = 0;
         System.out.print("Dens:\t");
         for (double density = 0.1; density <= 0.9; density += 0.1) {
             System.out.printf("%.1f \t", density);
+            cont[idx++] = 0;
 
         }
         for (int i = 0; i < operations.length; i++) {
+            contPior[i] = contIgual[i] = contMelhor[i] = 0;
             System.out.printf("T(%s) \t", operations[i].getName());
         }
         for (int i = 1; i < operations.length; i++) {
@@ -53,13 +62,18 @@ public class DensityHeuristicCompare {
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
+
+        for (int i = 0; i < operations.length; i++) {
+            totalTime[i] = 0;
+        }
+
+        int ngraphs = 10;
+        int windows = 10;
+
         for (int nv = INI_V; nv <= MAX_V; nv++) {
+            tss.K = heur.K = heur5.K = 10;
 
-            for (int i = 0; i < operations.length; i++) {
-                totalTime[i] = 0;
-            }
-
-            System.out.printf("%3d: \t", nv);
+            System.out.printf("%3d-%d: \t", nv, (nv + windows));
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
@@ -72,15 +86,19 @@ public class DensityHeuristicCompare {
 //                    currentTimeMillis = currentTimeMillis / 1000;
                     totalTime[i] += currentTimeMillis;
                     result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
+                    cont[(int) (density * 10) - 1]++;
                     if (i == 0) {
-                        System.out.printf("%d", result[i]);
+//                        System.out.printf("%d", result[i]);
                     } else {
                         if (result[i].equals(result[0])) {
-                            System.out.print("'");
+                            contIgual[i]++;
+//                            System.out.print("'");
                         } else if (result[i] < result[0]) {
-                            System.out.print("-");
+//                            System.out.print("-");
+                            contMelhor[i]++;
                         } else {
-                            System.out.print("+");
+//                            System.out.print("+");
+                            contPior[i]++;
                         }
                     }
                     if (i > 0) {
@@ -99,6 +117,13 @@ public class DensityHeuristicCompare {
                 System.out.printf("%d \t", delta[i]);
             }
             System.out.println();
+        }
+
+        System.out.println();
+        for (int i = 0; i < operations.length; i++) {
+            System.out.printf("%s: \n - igual: %d melhor: %d pior: %d tempo: %d \n",
+                    operations[i].getName(), contIgual[i], contMelhor[i],
+                    contPior[i], totalTime[i]);
         }
     }
 }

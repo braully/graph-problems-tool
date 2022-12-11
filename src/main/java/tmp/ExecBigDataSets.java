@@ -31,6 +31,7 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV4;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import static com.github.braully.graph.operation.IGraphOperation.DEFAULT_PARAM_NAME_SET;
@@ -77,6 +78,8 @@ public class ExecBigDataSets {
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp heur5t = new GraphHullNumberHeuristicV5Tmp();
         heur5t.setVerbose(false);
+        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
+        heur5t2.setVerbose(false);
 
         GraphTSSCordasco tss = new GraphTSSCordasco();
 
@@ -85,15 +88,17 @@ public class ExecBigDataSets {
             //            heur1,
             //            heur2, 
             //            heur3, heur4,
-            heur5,
-            heur5t
+            //            heur5,
+            //            heur5t,
+            heur5t2
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 2; k <= 5; k++) {
-            heur1.K = heur2.K = heur3.K = heur4.K = heur5.K = heur5t.K = tss.K = k;
+        for (int k = 5; k <= 6; k++) {
+            heur1.K = heur2.K = heur3.K
+                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
 
             for (String s : dataSets) {

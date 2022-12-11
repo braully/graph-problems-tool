@@ -1,14 +1,12 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.PROCESSED;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +182,10 @@ public class GraphHullNumberHeuristicV5Tmp
                     continue;
                 }
             }
+            if (maiorDeltaHs == 1 && verbose) {
+                System.out.println("ALERTA: Adicionando vertice sem aumento de entropia " + bestVertice);
+                System.out.println("O vértice v: " + bestVertice + " precisa de " + (K - aux[bestVertice]) + " vizinhos para ser contaminado ");
+            }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
             bdl.labelDistances(graph, s);
         } while (sizeHs < vertexCount);
@@ -305,6 +307,10 @@ public class GraphHullNumberHeuristicV5Tmp
 //                UtilProccess.printCurrentItmeAndEstimated(total - cont);
 //                System.out.println(" s size: " + tmp.size());
             }
+        }
+        if (hullSet == null) {
+            hullSet = sini;
+
         }
         return hullSet;
     }
