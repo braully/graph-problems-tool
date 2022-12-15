@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class DensityHeuristicCompare {
 
-    public static final int INI_V = 5;
+    public static final int INI_V = 1;
     public static final int MAX_V = 50;
 
     public static void main(String... args) {
@@ -32,11 +32,14 @@ public class DensityHeuristicCompare {
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
-        heur.setVerbose(false);
+//        heur.setVerbose(false);
+        heur.setVerbose(true);
         GraphTSSCordasco tss = new GraphTSSCordasco();
 
         IGraphOperation[] operations = new IGraphOperation[]{
-            tss, heur, heur5
+            tss,
+            heur
+//            , heur5
         };
 
         int contMelhor[] = new int[operations.length];
@@ -73,11 +76,12 @@ public class DensityHeuristicCompare {
         for (int nv = INI_V; nv <= MAX_V; nv++) {
             tss.K = heur.K = heur5.K = 10;
 
-            System.out.printf("%3d-%d: \t", nv, (nv + windows));
+            System.out.printf("%3d: \t", nv, (nv + windows));
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
-
+                int mindelta = Integer.MAX_VALUE;
+                int maxdelta = Integer.MIN_VALUE;
                 for (int i = 0; i < operations.length; i++) {
                     long currentTimeMillis = System.currentTimeMillis();
 //                    System.out.println("Do: " + operations[i].getName());
@@ -103,9 +107,17 @@ public class DensityHeuristicCompare {
                     }
                     if (i > 0) {
                         delta[i] = result[0] - result[i];
+                        if (delta[i] > maxdelta) {
+                            maxdelta = delta[i];
+                        }
+                        if (delta[i] < mindelta) {
+                            mindelta = delta[i];
+                        }
+                        System.out.printf("%d", delta[i]);
                     }
-
                 }
+
+//                System.out.printf("[%d,%d]", mindelta, maxdelta);
                 System.out.printf("\t");
 
             }

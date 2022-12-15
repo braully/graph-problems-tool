@@ -61,6 +61,19 @@ public class GraphHullNumberHeuristicV5Tmp2
 
     }
 
+    protected boolean isGreaterSimple(int... compare) {
+        boolean ret = false;
+        int i = 0;
+        while (i < compare.length - 1
+                && compare[i] == compare[i + 1]) {
+            i += 2;
+        }
+        if (i <= compare.length - 2 && compare[i] > compare[i + 1]) {
+            ret = true;
+        }
+        return ret;
+    }
+
     public Boolean isGreater(int... compare) {
         Boolean ret = false;
         int i = 0;
@@ -135,16 +148,23 @@ public class GraphHullNumberHeuristicV5Tmp2
         int bestVertice;
         boolean esgotado = false;
         int ranking[] = new int[vertexCount];
-
+        int maiorGrau = 0;
+        int maiorDeltaHs = 0;
+        int maiorContaminado = 0;
+        int maiorProfundidade = 0;
+        int menorRest = 0;
+        int maiorAux = 0;
         do {
             bdl.labelDistances(graph, s);
 
             bestVertice = -1;
-            int maiorGrau = 0;
-            int maiorDeltaHs = 0;
-            int maiorContaminado = 0;
-            int maiorProfundidade = 0;
-            int menorRest = 0;
+            maiorGrau = 0;
+            maiorDeltaHs = 0;
+            maiorContaminado = 0;
+            maiorProfundidade = 0;
+            maiorAux = 0;
+            menorRest = 0;
+
             List<Integer> melhores = new ArrayList<Integer>();
             for (int i = 0; i < vertexCount; i++) {
                 if (aux[i] >= K) {
@@ -157,19 +177,36 @@ public class GraphHullNumberHeuristicV5Tmp2
                     menorRest = rest;
                     melhores.add(i);
                     bestVertice = i;
-
+                    maiorGrau = graph.degree(i);
+                    maiorProfundidade = bdl.getDistance(graph, i);
                 } else if (menorRest == rest) {
                     melhores.add(i);
+                    int di = graph.degree(i);
+                    int prof = bdl.getDistance(graph, i);
+                    if (isGreaterSimple(di, maiorGrau,
+                            prof, maiorProfundidade)) {
+                        bestVertice = i;
+                        maiorGrau = di;
+                        maiorProfundidade = prof;
+                        maiorAux = aux[i];
+                    }
                 } else if (rest < menorRest) {
                     melhores.clear();
                     menorRest = rest;
                     melhores.add(i);
                     bestVertice = i;
+                    maiorGrau = graph.degree(i);
+                    maiorProfundidade = bdl.getDistance(graph, i);
                 }
             }
 
             while (menorRest > 0 && sizeHs < vertexCount) {
                 int bestNeighbor = -1;
+                maiorGrau = 0;
+                maiorDeltaHs = 0;
+                maiorContaminado = 0;
+                maiorProfundidade = 0;
+                maiorAux = 0;
 
                 for (Integer i : graph.getNeighborsUnprotected(bestVertice)) {
                     if (aux[i] >= K) {
@@ -190,26 +227,46 @@ public class GraphHullNumberHeuristicV5Tmp2
                         }
                     }
 
+                    int di = graph.degree(i);
+                    int deltadei = di - aux[i];
+//                    int deltadei = aux[i];
+                    int iprof = bdl.getDistance(graph, i);
                     if (bestNeighbor == -1) {
                         maiorDeltaHs = deltaHsi;
-                        maiorGrau = neighborCount;
-                        maiorContaminado = contaminado;
+//                        maiorGrau = neighborCount;
+//                        maiorContaminado = contaminado;
+                        maiorGrau = di;
+                        maiorContaminado = deltadei;
                         bestNeighbor = i;
-                        maiorProfundidade = bdl.getDistance(graph, i);
-                    } else if (isGreater(deltaHsi, maiorDeltaHs,
-                            neighborCount, maiorGrau,
-                            bdl.getDistance(graph, i), maiorProfundidade,
-                            contaminado, maiorContaminado)) {
+                        maiorProfundidade = iprof;
+                        maiorAux = aux[i];
+
+                    } else if (isGreaterSimple(
+                            //                            deltaHsi, maiorDeltaHs,
+                            //                            di, maiorGrau,
+                            //                            iprof, maiorProfundidade,
+                            //                            deltadei, maiorContaminado,
+                            deltaHsi, maiorDeltaHs
+                            //                                                        -maiorAux, -aux[i],
+//                            ,-maiorAux, -aux[i]
+//                            ,-deltadei, -maiorContaminado
+                              , di, maiorGrau
+                            //                            -di, -maiorGrau,
+                            , iprof, maiorProfundidade
+                    )) {
                         maiorDeltaHs = deltaHsi;
-                        maiorGrau = neighborCount;
-                        maiorContaminado = contaminado;
+//                        maiorGrau = neighborCount;
+//                        maiorContaminado = contaminado;
+                        maiorGrau = di;
+                        maiorContaminado = deltadei;
                         bestNeighbor = i;
+                        maiorAux = aux[i];
                         maiorProfundidade = bdl.getDistance(graph, i);
                     }
 
                 }
                 sizeHs = sizeHs + addVertToS(bestNeighbor, s, graph, aux);
-
+//                bdl.labelDistances(graph, s);
                 menorRest--;
             }
 

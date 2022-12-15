@@ -11,7 +11,7 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV6;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
@@ -60,6 +60,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphHullNumberHeuristicV3(),
         new GraphHullNumberHeuristicV5(),
         new GraphHullNumberHeuristicV5Tmp(),
+        new GraphHullNumberHeuristicV5Tmp2(),
         new GraphIterationNumberOptm(),
         new GraphTSSCordasco(),
         new ConjectureOperation()
