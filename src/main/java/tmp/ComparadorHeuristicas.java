@@ -8,6 +8,7 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import java.io.BufferedReader;
@@ -26,7 +27,9 @@ public class ComparadorHeuristicas {
     public static void main(String... args) throws FileNotFoundException, IOException {
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
+        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
+
+//        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
@@ -37,8 +40,8 @@ public class ComparadorHeuristicas {
         int k = 2;
 
         IGraphOperation[] operations = new IGraphOperation[]{
-            //            heur,
-            tss,
+                        heur,
+//            tss,
             heur5
         };
 
@@ -52,6 +55,7 @@ public class ComparadorHeuristicas {
         int contdiff = 0;
         int primeiraFalha = -1;
         Integer resultarr[] = new Integer[operations.length];
+        Set resultSetArr[] = new Set[operations.length];
         while (null != (line = files.readLine())) {
             int ml = -1;
             int pr = -1;
@@ -61,6 +65,7 @@ public class ComparadorHeuristicas {
                 Integer result = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
                 Set<Integer> resultSet = (Set<Integer>) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_SET);
                 resultarr[i] = result;
+                resultSetArr[i] = resultSet;
                 if (ml == -1) {
                     ml = result;
                 } else if (result < ml) {
@@ -72,22 +77,28 @@ public class ComparadorHeuristicas {
                     pr = result;
                 }
             }
+            int r1 = resultarr[0];
+            int r2 = resultarr[1];
+            if (r1 == r2) {
+                igual++;
+            } else {
+                if (r1 < r2) {
+                    pior++;
+                    for (int i = 0; i < operations.length; i++) {
+                        System.out.printf("%s ", resultSetArr[i]);
+                    }
+                    System.out.println();
+                    System.out.println(line);
+                } else {
+                    melhor++;
+                }
+            }
+
             if (pr != ml) {
                 if (primeiraFalha == -1) {
                     primeiraFalha = idx;
-                    igual++;
                 }
-                int r1 = resultarr[0];
-                int r2 = resultarr[1];
-                if (r1 == r2) {
-                    igual++;
-                } else {
-                    if (r1 < r2) {
-                        pior++;
-                    } else {
-                        melhor++;
-                    }
-                }
+
                 contdiff++;
                 System.out.printf("%d: ", idx);
                 for (int i = 0; i < operations.length; i++) {
@@ -106,6 +117,6 @@ public class ComparadorHeuristicas {
         System.out.println("total: " + idx);
         System.out.println("Melhor: " + melhor);
         System.out.println("Pior: " + pior);
-        System.out.println("Pior: " + (pior * 100 / idx));
+        System.out.println("Pior: " + (pior * 100 / idx) + "pct");
     }
 }

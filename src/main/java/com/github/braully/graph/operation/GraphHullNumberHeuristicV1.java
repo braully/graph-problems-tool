@@ -4,14 +4,17 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 
 public class GraphHullNumberHeuristicV1
@@ -195,6 +198,41 @@ public class GraphHullNumberHeuristicV1
         return s;
     }
 
+    public Set<Integer> findHullSubSetBruteForce(
+            UndirectedSparseGraphTO<Integer, Integer> graph,
+            int currentSetSize, Integer... subset) {
+        Set<Integer> hullSet = null;
+        if (graph == null || graph.getVertexCount() <= 0) {
+            return hullSet;
+        }
+        Set<Integer> verticeset = new HashSet<>(graph.getVertices());
+        if (subset != null) {
+            for (Integer v : subset) {
+                verticeset.remove(v);
+            }
+        }
+        List<Integer> vertices = new ArrayList<>(verticeset);
+        Collections.sort(vertices);
+
+        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(vertices.size(), currentSetSize - subset.length);
+        while (combinationsIterator.hasNext()) {
+            int[] currentSet = combinationsIterator.next();
+            if (checkIfHullSubSet(graph, vertices, currentSet, subset)) {
+                hullSet = new LinkedHashSet<>();
+                if (subset != null) {
+                    for (Integer v : subset) {
+                        hullSet.add(v);
+                    }
+                }
+                for (int i : currentSet) {
+                    hullSet.add(vertices.get(i));
+                }
+                break;
+            }
+        }
+        return hullSet;
+    }
+
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
         Set<Integer> s = tmp;
 //        System.out.println("tentando reduzir");
@@ -256,5 +294,46 @@ public class GraphHullNumberHeuristicV1
         Set<Integer> optimizedHullSet = this.buildOptimizedHullSet(graphRead);
         Set<Integer> optimizedMinimalHullSet = tryMinimal(graphRead, optimizedHullSet);
         return optimizedMinimalHullSet;
+    }
+
+    public boolean checkIfHullSubSet(UndirectedSparseGraphTO<Integer, Integer> graph, List<Integer> vertices, int[] currentSet, Integer[] subset) {
+        if (currentSet == null || currentSet.length == 0) {
+            return false;
+        }
+        Set<Integer> fecho = new HashSet<>();
+        int[] aux = new int[(Integer) graph.maxVertex() + 1];
+        for (int i = 0; i < aux.length; i++) {
+            aux[i] = 0;
+        }
+
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        for (Integer iv : currentSet) {
+            Integer v = vertices.get(iv);
+            mustBeIncluded.add(v);
+            aux[v] = K;
+        }
+        for (Integer iv : subset) {
+            Integer v = iv;
+            mustBeIncluded.add(v);
+            aux[v] = K;
+        }
+        while (!mustBeIncluded.isEmpty()) {
+            Integer verti = mustBeIncluded.remove();
+            fecho.add(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            for (Integer vertn : neighbors) {
+                if (vertn.equals(verti)) {
+                    continue;
+                }
+                if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
+                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                    if (aux[vertn] == K) {
+                        mustBeIncluded.add(vertn);
+                    }
+                }
+            }
+            aux[verti] += K;
+        }
+        return fecho.size() == graph.getVertexCount();
     }
 }

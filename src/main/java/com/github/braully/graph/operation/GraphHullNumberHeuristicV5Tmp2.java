@@ -1,13 +1,16 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -179,11 +182,14 @@ public class GraphHullNumberHeuristicV5Tmp2
                     bestVertice = i;
                     maiorGrau = graph.degree(i);
                     maiorProfundidade = bdl.getDistance(graph, i);
+                    maiorAux = aux[i];
+
                 } else if (menorRest == rest) {
                     melhores.add(i);
                     int di = graph.degree(i);
                     int prof = bdl.getDistance(graph, i);
-                    if (isGreaterSimple(di, maiorGrau,
+                    if (isGreaterSimple(
+                            di, maiorGrau,
                             prof, maiorProfundidade)) {
                         bestVertice = i;
                         maiorGrau = di;
@@ -200,6 +206,15 @@ public class GraphHullNumberHeuristicV5Tmp2
                 }
             }
 
+            if (melhores.size() > 1) {
+                System.out.println(s.size() + ": " + melhores.size());
+                if (melhores.size() < vertexCount) {
+                    System.out.println(melhores);
+                }
+                System.out.println(" - " + bestVertice);
+            }
+
+            esgotado = false;
             while (menorRest > 0 && sizeHs < vertexCount) {
                 int bestNeighbor = -1;
                 maiorGrau = 0;
@@ -208,6 +223,15 @@ public class GraphHullNumberHeuristicV5Tmp2
                 maiorProfundidade = 0;
                 maiorAux = 0;
 
+//                Set<Integer> diff = new HashSet<>(graph.getNeighborsUnprotected(bestVertice));
+//                diff.removeAll(melhores);
+//                diff.removeAll(s);
+//                Collection<Integer> it = diff;
+//                if (it.isEmpty() || esgotado) {
+//                    it = (Collection<Integer>) graph.getNeighborsUnprotected(bestVertice);
+//                }
+//
+//                for (Integer i : it) {
                 for (Integer i : graph.getNeighborsUnprotected(bestVertice)) {
                     if (aux[i] >= K) {
                         continue;
@@ -246,13 +270,14 @@ public class GraphHullNumberHeuristicV5Tmp2
                             //                            di, maiorGrau,
                             //                            iprof, maiorProfundidade,
                             //                            deltadei, maiorContaminado,
-                            deltaHsi, maiorDeltaHs
-                            //                                                        -maiorAux, -aux[i],
-//                            ,-maiorAux, -aux[i]
-//                            ,-deltadei, -maiorContaminado
-                              , di, maiorGrau
-                            //                            -di, -maiorGrau,
-                            , iprof, maiorProfundidade
+                            deltaHsi, maiorDeltaHs //                                                        -maiorAux, -aux[i],
+                            //                                                        ,-maiorAux, -aux[i]
+                            ,
+//                             maiorAux, aux[i] //                            ,-deltadei, -maiorContaminado
+//                            ,
+                             di, maiorGrau //                                                        -di, -maiorGrau
+                            ,
+                             iprof, maiorProfundidade
                     )) {
                         maiorDeltaHs = deltaHsi;
 //                        maiorGrau = neighborCount;
@@ -264,6 +289,14 @@ public class GraphHullNumberHeuristicV5Tmp2
                         maiorProfundidade = bdl.getDistance(graph, i);
                     }
 
+                }
+                if (melhores.contains(bestNeighbor)) {
+                    System.out.println("Alerta: " + bestNeighbor + " in melhores");
+//                    System.out.println("Diff: " + diff);
+                }
+                if (bestNeighbor == -1) {
+                    esgotado = true;
+                    continue;
                 }
                 sizeHs = sizeHs + addVertToS(bestNeighbor, s, graph, aux);
 //                bdl.labelDistances(graph, s);
@@ -379,13 +412,24 @@ public class GraphHullNumberHeuristicV5Tmp2
         UtilProccess.printArray(auxb);
     }
 
-    public static void main(String... args) {
-
+    public static void main(String... args) throws IOException {
+        GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
+        opref.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp2 op = new GraphHullNumberHeuristicV5Tmp2();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
+//        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
+        graph = UtilGraph.loadGraphG6("S`?GOGA?O?_C_AOAC?__GAC?C_GC@gAEO");
+        System.out.println(graph);
+
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         System.out.println("S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+
+        Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
+        System.out.println("REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
+
+        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 17);
+        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
+
         if (true) {
             return;
         }
@@ -405,7 +449,7 @@ public class GraphHullNumberHeuristicV5Tmp2
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
-                Set<Integer> findMinHullSetGraph = op.findMinHullSetGraph(graph);
+                findMinHullSetGraph = op.findMinHullSetGraph(graph);
                 System.out.printf("%d", findMinHullSetGraph.size());
 
                 System.out.printf("\t");

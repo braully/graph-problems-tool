@@ -32,6 +32,7 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV4;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import static com.github.braully.graph.operation.IGraphOperation.DEFAULT_PARAM_NAME_SET;
@@ -78,7 +79,9 @@ public class ExecBigDataSets {
         heur5.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp heur5t = new GraphHullNumberHeuristicV5Tmp();
         heur5t.setVerbose(false);
-        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
+//        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
+        GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
+
         heur5t2.setVerbose(false);
 
         GraphTSSCordasco tss = new GraphTSSCordasco();
@@ -96,7 +99,7 @@ public class ExecBigDataSets {
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
 
-        for (int k = 3; k <= 6; k++) {
+        for (int k = 2; k <= 6; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
@@ -121,19 +124,19 @@ public class ExecBigDataSets {
 //                    BeanUtils.setProperty(operations[i], "K", k);
 //                    PropertyUtils.setSimpleProperty(operations[i], "K", k);
                     System.out.println("*************");
-                    System.out.print(" - EXEC: " + operations[i].getName() + " k: " + k + " g:" + s);
-                    System.out.print("  - ");
+                    System.out.print(" - EXEC: " + operations[i].getName() + "-k: " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
                     UtilProccess.printStartTime();
                     Map<String, Object> doOperation = operations[i].doOperation(graphES);
-                    System.out.print("  - ");
-                    totalTime[i] += UtilProccess.printEndTime();
                     result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
                     System.out.print(" - Result: " + result[i]);
+                    totalTime[i] += UtilProccess.printEndTime();
+
                     if (i == 0) {
                         delta[i] = 0;
                         boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
                         if (!checkIfHullSet) {
                             System.out.println("CORDASSO IS NOT HULL SET");
+                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
                         }
                     } else {
                         delta[i] = result[0] - result[i];
