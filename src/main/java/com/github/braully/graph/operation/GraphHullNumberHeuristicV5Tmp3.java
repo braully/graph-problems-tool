@@ -4,6 +4,7 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -386,7 +387,6 @@ public class GraphHullNumberHeuristicV5Tmp3
     }
 
     public static void main(String... args) throws IOException {
-
         GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
         opref.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
@@ -411,8 +411,12 @@ public class GraphHullNumberHeuristicV5Tmp3
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
-        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
-        System.out.println(graph);
+//        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
+
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        GraphStatistics statistics = new GraphStatistics();
+
+        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
 
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         System.out.println("S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);

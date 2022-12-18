@@ -2,12 +2,18 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import edu.uci.ics.jung.algorithms.shortestpath.DistanceStatistics;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 public class GraphStatistics implements IGraphOperation {
@@ -45,6 +51,7 @@ public class GraphStatistics implements IGraphOperation {
             }
             response.put("δ", lambda);
             response.put("Δ", Lambda);
+            response.put("ω", numConnectedComponents(graph));
         } catch (Exception ex) {
             log.error(null, ex);
         }
@@ -140,11 +147,32 @@ public class GraphStatistics implements IGraphOperation {
     }
 
     public String getName() {
+
         return description;
     }
 
     public double diameter(UndirectedSparseGraphTO<Integer, Integer> graph) {
         DistanceStatistics distanceStatistics = new DistanceStatistics();
         return distanceStatistics.diameter(graph);
+    }
+
+    public int numConnectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        int ret = 0;
+        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
+        if (graph != null && graph.getVertexCount() > 0) {
+            Collection<Integer> vertices = graph.getVertices();
+            TreeSet<Integer> verts = new TreeSet<>(vertices);
+            while (!verts.isEmpty()) {
+                Integer first = verts.first();
+                bdl.labelDistances(graph, first);
+                for (Integer v : vertices) {
+                    if (bdl.getDistance(graph, v) >= 0) {
+                        verts.remove(v);
+                    }
+                }
+                ret++;
+            }
+        }
+        return ret;
     }
 }
