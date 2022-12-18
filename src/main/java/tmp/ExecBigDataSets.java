@@ -40,6 +40,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import util.UtilProccess;
@@ -49,6 +51,12 @@ import util.UtilProccess;
  * @author strike
  */
 public class ExecBigDataSets {
+
+    public static final Map<String, int[]> resultadoArquivado = new HashMap<>();
+
+    static {
+        resultadoArquivado.put("TSS-Cordasco-k2-Delicious", new int[]{});
+    }
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
@@ -93,13 +101,15 @@ public class ExecBigDataSets {
             //            heur3, heur4,
             //            heur5,
             //            heur5t,
-            heur5t2
+//            heur5t2
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
+        
+        Arrays.sort(dataSets);
 
-        for (int k = 2; k <= 6; k++) {
+        for (int k = 1; k <= 6; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
@@ -121,17 +131,26 @@ public class ExecBigDataSets {
                 System.out.println("Loaded Graph: " + s + " " + graphES.getVertexCount() + " " + graphES.getEdgeCount());
 
                 for (int i = 0; i < operations.length; i++) {
+                    String arquivadoStr = operations[i].getName() + "k" + k + "-" + s;
+                    Map<String, Object> doOperation = null;
 //                    BeanUtils.setProperty(operations[i], "K", k);
 //                    PropertyUtils.setSimpleProperty(operations[i], "K", k);
                     System.out.println("*************");
                     System.out.print(" - EXEC: " + operations[i].getName() + "-k: " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
-                    UtilProccess.printStartTime();
-                    Map<String, Object> doOperation = operations[i].doOperation(graphES);
-                    result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
-                    System.out.print(" - Result: " + result[i]);
-                    totalTime[i] += UtilProccess.printEndTime();
+                    int[] get = resultadoArquivado.get(arquivadoStr);
+                    if (get != null) {
+                        result[i] = get[0];
+                        totalTime[i] = get[1];
+                    } else {
+                        UtilProccess.printStartTime();
+                        doOperation = operations[i].doOperation(graphES);
+                        result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
+                        totalTime[i] += UtilProccess.printEndTime();
+                        System.out.println(" - arquivar: " + arquivadoStr + ", new int[]{" + result[i] + ", " + totalTime[i] + "}");
+                    }
+                    System.out.println(" - Result: " + result[i]);
 
-                    if (i == 0) {
+                    if (i == 0 && get != null) {
                         delta[i] = 0;
                         boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
                         if (!checkIfHullSet) {
