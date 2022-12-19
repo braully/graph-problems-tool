@@ -391,7 +391,7 @@ public class GraphHullNumberHeuristicV5Tmp2
             if (graphRead.degree(v) < K) {
                 continue;
             }
-            Set<Integer> t = new LinkedHashSet<>(tmp);
+            Set<Integer> t = new LinkedHashSet<>(s);
             t.remove(v);
             if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
                 s = t;

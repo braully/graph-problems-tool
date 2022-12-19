@@ -18,7 +18,7 @@ import util.UtilProccess;
 public class GraphHullNumberHeuristicV5Tmp
         extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
-    public static int K = 2;
+    public int K = 2;
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp.class);
 

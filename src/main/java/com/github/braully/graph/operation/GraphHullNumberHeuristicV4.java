@@ -1,7 +1,6 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp.K;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;

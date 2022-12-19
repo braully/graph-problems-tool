@@ -9,6 +9,7 @@ import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import java.io.BufferedReader;
@@ -27,7 +28,8 @@ public class ComparadorHeuristicas {
     public static void main(String... args) throws FileNotFoundException, IOException {
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
+//        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
+        GraphHullNumberHeuristicV5Tmp3Bkp heur5 = new GraphHullNumberHeuristicV5Tmp3Bkp();
 
 //        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
@@ -40,12 +42,13 @@ public class ComparadorHeuristicas {
         int k = 2;
 
         IGraphOperation[] operations = new IGraphOperation[]{
-                        heur,
-//            tss,
+            //            heur,
+            tss,
             heur5
         };
 
         heur.K = tss.K = heur5.K = k;
+//        heur5.startVertice = true;
         int igual = 0;
         int melhor = 0;
         int pior = 0;

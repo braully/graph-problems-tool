@@ -120,10 +120,10 @@ public class ExecBigDataSets {
         String[] dataSets = new String[]{
             "ca-GrQc", "ca-HepTh",
             "ca-CondMat", "ca-HepPh",
-            "BlogCatalog3",
             "ca-AstroPh",
             "Douban",
             "Delicious",
+            "BlogCatalog3",
             "BlogCatalog2",
             "Livemocha",
             "BlogCatalog",
@@ -154,11 +154,11 @@ public class ExecBigDataSets {
 
         IGraphOperation[] operations = new IGraphOperation[]{
             tss, //            heur1,
-        //            heur2, 
-        //            heur3, heur4,
-        //            heur5,
-        //            heur5t,
-        //            heur5t2
+            //            heur2, 
+            //            heur3, heur4,
+            //            heur5,
+            //            heur5t,
+            heur5t2
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
@@ -166,7 +166,7 @@ public class ExecBigDataSets {
 
         Arrays.sort(dataSets);
 
-        for (int k = 2; k <= 6; k++) {
+        for (int k = 2; k <= 10; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
@@ -211,13 +211,17 @@ public class ExecBigDataSets {
                             + "\t" + k + "\t" + s + "\t" + graphES.getVertexCount()
                             + "\t" + result[i] + "\t" + totalTime[i]);
 
-                    if (i == 0 && get == null) {
-                        delta[i] = 0;
+                    if (doOperation != null) {
                         boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
                         if (!checkIfHullSet) {
-                            System.out.println("CORDASSO IS NOT HULL SET");
-                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
+                            System.out.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
+                            System.err.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
+//                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
                         }
+                    }
+                    if (i == 0 && get == null) {
+                        delta[i] = 0;
+
                     } else {
                         delta[i] = result[0] - result[i];
 

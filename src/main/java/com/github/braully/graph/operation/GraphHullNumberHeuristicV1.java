@@ -235,13 +235,15 @@ public class GraphHullNumberHeuristicV1
 
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
         Set<Integer> s = tmp;
-//        System.out.println("tentando reduzir");
+        if (verbose) {
+            System.out.println("tentando reduzir: " + s.size());
+        }
 
         for (Integer v : tmp) {
             if (graphRead.degree(v) < K) {
                 continue;
             }
-            Set<Integer> t = new LinkedHashSet<>(tmp);
+            Set<Integer> t = new LinkedHashSet<>(s);
             t.remove(v);
             if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
                 s = t;
