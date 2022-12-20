@@ -28,12 +28,14 @@ public class ComparadorHeuristicas {
     public static void main(String... args) throws FileNotFoundException, IOException {
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-//        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
-        GraphHullNumberHeuristicV5Tmp3Bkp heur5 = new GraphHullNumberHeuristicV5Tmp3Bkp();
+        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
+        GraphHullNumberHeuristicV5Tmp3Bkp heur5b = new GraphHullNumberHeuristicV5Tmp3Bkp();
 
 //        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
+        heur5b.setVerbose(false);
+
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
 //        heur.setVerbose(false);
         heur.setVerbose(false);
@@ -43,11 +45,12 @@ public class ComparadorHeuristicas {
 
         IGraphOperation[] operations = new IGraphOperation[]{
             //            heur,
-            tss,
-            heur5
+            //            tss,
+            heur5,
+            heur5b
         };
 
-        heur.K = tss.K = heur5.K = k;
+        heur.K = tss.K = heur5.K = heur5b.K = k;
 //        heur5.startVertice = true;
         int igual = 0;
         int melhor = 0;
@@ -62,8 +65,9 @@ public class ComparadorHeuristicas {
         while (null != (line = files.readLine())) {
             int ml = -1;
             int pr = -1;
+            graph = UtilGraph.loadGraphG6(line);
+
             for (int i = 0; i < operations.length; i++) {
-                graph = UtilGraph.loadGraphG6(line);
                 Map<String, Object> doOperation = operations[i].doOperation(graph);
                 Integer result = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
                 Set<Integer> resultSet = (Set<Integer>) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_SET);

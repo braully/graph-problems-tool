@@ -21,6 +21,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import static tmp.DensityHeuristicCompare.INI_V;
 import static tmp.DensityHeuristicCompare.MAX_V;
+import util.BFSUtil;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5Tmp3Bkp
@@ -30,7 +31,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp3.class);
 
-    static final String description = "Hull Number Heuristic V5-tmp3";
+    static final String description = "Hull Number Heuristic V5-tmp3-bkp";
     int etapaVerbose = -1;
 
     @Override
@@ -74,14 +75,26 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
         int vertexCount = graph.getVertexCount();
         int[] aux = auxini.clone();
-        int sizeHs = addVertToS(v, s, graph, aux) + sizeHsini;
-        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
-        bdl.labelDistances(graph, s);
+        int sizeHs = sizeHsini;
+        if (v != null) {
+            if (verbose) {
+                System.out.println("Start vertice: " + v);
+            }
+            sizeHs += addVertToS(v, s, graph, aux);
+        }
+//        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
+//        bdl.labelDistances(graph, s);
 
-        int bestVertice;
+        BFSUtil bdl = BFSUtil.newBfsUtilSimple(vertexCount);
+        bdl.labelDistances(graph, s);
+        int bestVertice = -1;
         boolean esgotado = false;
         List<Integer> melhores = new ArrayList<Integer>();
         while (sizeHs < vertexCount) {
+            if (bestVertice != -1) {
+                bdl.revisitVertex(graph, bestVertice);
+                bdl.incBfs(graph, bestVertice);
+            }
             bestVertice = -1;
             int maiorGrau = 0;
             int maiorGrauContaminacao = 0;
@@ -120,7 +133,9 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
                 int di = graph.degree(i);
                 int deltadei = di - aux[i];
-                int prof = bdl.getDistance(graph, i);
+//                int prof = bdl.getDistance(graph, i);
+
+                int prof = bdl.getDistanceSafe(graph, i);
                 if (etapaVerbose == s.size()) {
                     System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
                             i, deltaHsi, grauContaminacao,
@@ -215,7 +230,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
                 System.out.println(" - " + melhores);
             }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
-            bdl.labelDistances(graph, s);
+//            bdl.labelDistances(graph, s);
         }
 
         s = tryMinimal(graph, s);
@@ -332,7 +347,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
             }
             Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs);
-            tmp = tryMinimal(graphRead, tmp);
+//            tmp = tryMinimal(graphRead, tmp);
             if (hullSet == null) {
                 hullSet = tmp;
                 vl = v;
@@ -362,7 +377,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
         Set<Integer> s = tmp;
 //        System.out.println("tentando reduzir");
-
+        int cont = 0;
         for (Integer v : tmp) {
             if (graphRead.degree(v) < K) {
                 continue;
@@ -373,8 +388,11 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
                 s = t;
                 if (verbose) {
                     System.out.println("Reduzido removido: " + v);
+                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+
                 }
             }
+            cont++;
         }
         return s;
     }
@@ -392,7 +410,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
         GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
         opref.setVerbose(false);
-        GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
+        GraphHullNumberHeuristicV5Tmp3Bkp op = new GraphHullNumberHeuristicV5Tmp3Bkp();
 
         System.out.println("Teste greater: ");
         Boolean greater = op.isGreater(1, 1, 2, 2, 3, 3);
@@ -410,13 +428,13 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
             throw new IllegalStateException("fail on greater");
         }
 
-//        op.etapaVerbose = 3;
+        op.etapaVerbose = 1;
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
-
-        op.K = 3;
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
+//        op.K = 3;
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 
 //        System.out.println(graph);
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
@@ -425,9 +443,8 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
         Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
         System.out.println("REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
 
-        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);
-        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
-
+//        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);
+//        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
         if (true) {
             return;
         }

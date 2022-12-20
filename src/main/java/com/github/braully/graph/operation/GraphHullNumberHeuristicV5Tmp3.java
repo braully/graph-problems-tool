@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import static tmp.DensityHeuristicCompare.INI_V;
 import static tmp.DensityHeuristicCompare.MAX_V;
+import util.BFSUtil;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5Tmp3
@@ -88,21 +89,25 @@ public class GraphHullNumberHeuristicV5Tmp3
                 sizeHs += addVertToS(vi, s, graph, aux);
             }
         }
-        BFSDistanceLabeler<Integer, Integer> bdls = new BFSDistanceLabeler<>();
-        BFSDistanceLabeler<Integer, Integer> bdlhs = new BFSDistanceLabeler<>();
+//        BFSDistanceLabeler<Integer, Integer> bdls = new BFSDistanceLabeler<>();
+//        BFSDistanceLabeler<Integer, Integer> bdlhs = new BFSDistanceLabeler<>();
+        BFSUtil bdls = BFSUtil.newBfsUtilSimple(vertexCount);
+        bdls.labelDistances(graph, s);
 
-        int bestVertice;
+        int bestVertice = -1;
         boolean esgotado = false;
         List<Integer> melhores = new ArrayList<Integer>();
         while (sizeHs < vertexCount) {
-            bdls.labelDistances(graph, s);
+            if (bestVertice != -1) {
+                bdls.incBfs(graph, bestVertice);
+            }
+
 //            for (Integer i : vertices) {
 //                if (aux[i] >= K) {
 //                    hs.add(i);
 //                }
 //            }
 //            bdlhs.labelDistances(graph, hs);
-
             bestVertice = -1;
             int maiorGrau = 0;
             int maiorGrauContaminacao = 0;
@@ -142,7 +147,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 
                 int di = graph.degree(i);
                 int deltadei = di - aux[i];
-                int profundidadeS = bdls.getDistance(graph, i);
+                int profundidadeS = bdls.getDistanceSafe(graph, i);
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
 
                 if (etapaVerbose == s.size()) {
@@ -241,6 +246,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 System.out.println(" - " + melhores);
             }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
+
 //            if (sizeHs < vertexCount) {
 //                bdl.labelDistances(graph, s);
 //            }
@@ -283,29 +289,30 @@ public class GraphHullNumberHeuristicV5Tmp3
             UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] aux) {
         int countIncluded = 0;
-        if (verti == null || aux[verti] >= K || s == null) {
+        if (verti == null || aux[verti] >= K) {
             return countIncluded;
         }
 
         aux[verti] = aux[verti] + K;
-        if (s != null && s.add(verti)) {
-
-            Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-            mustBeIncluded.add(verti);
-            while (!mustBeIncluded.isEmpty()) {
-                verti = mustBeIncluded.remove();
-                Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-                for (Integer vertn : neighbors) {
-                    if (vertn.equals(verti)) {
-                        continue;
-                    }
-                    if (!vertn.equals(verti) && (++aux[vertn]) == K) {
-                        mustBeIncluded.add(vertn);
-                    }
-                }
-                countIncluded++;
-            }
+        if (s != null) {
+            s.add(verti);
         }
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        mustBeIncluded.add(verti);
+        while (!mustBeIncluded.isEmpty()) {
+            verti = mustBeIncluded.remove();
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            for (Integer vertn : neighbors) {
+                if (vertn.equals(verti)) {
+                    continue;
+                }
+                if (!vertn.equals(verti) && (++aux[vertn]) == K) {
+                    mustBeIncluded.add(vertn);
+                }
+            }
+            countIncluded++;
+        }
+
         return countIncluded;
     }
 
@@ -386,7 +393,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         }
         Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs,
                 verticeStart);
-        tmp = tryMinimal(graphRead, tmp);
+//        tmp = tryMinimal(graphRead, tmp);
         if (hullSet == null) {
             hullSet = tmp;
 //                vl = v;
@@ -508,21 +515,20 @@ public class GraphHullNumberHeuristicV5Tmp3
             throw new IllegalStateException("fail on greater");
         }
 
-        op.etapaVerbose = 3;
-
+        op.etapaVerbose = 1;
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
+        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
 
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-
 //        GraphStatistics statistics = new GraphStatistics();
 //        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
-        op.startVertice = false;
-//        op.K = 4;
+//        op.startVertice = false;
+//        op.K = 3;
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printStartTime();
@@ -531,9 +537,8 @@ public class GraphHullNumberHeuristicV5Tmp3
         Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
         System.out.println("REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
 
-        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);
-        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
-
+//        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);
+//        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
         if (true) {
             return;
         }

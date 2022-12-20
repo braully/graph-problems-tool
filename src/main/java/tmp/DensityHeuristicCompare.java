@@ -10,6 +10,7 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -28,8 +29,8 @@ public class DensityHeuristicCompare {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
         GraphIterationNumberOptm operacao = new GraphIterationNumberOptm();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-
-        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
+        GraphHullNumberHeuristicV5Tmp3Bkp heur5 = new GraphHullNumberHeuristicV5Tmp3Bkp();
+//        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
 //        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
@@ -41,8 +42,7 @@ public class DensityHeuristicCompare {
         IGraphOperation[] operations = new IGraphOperation[]{
             tss,
             //            heur, 
-            heur5,
-        };
+            heur5,};
 
         heur.setVerbose(false);
 
