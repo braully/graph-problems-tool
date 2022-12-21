@@ -36,8 +36,11 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
 import static com.github.braully.graph.operation.IGraphOperation.DEFAULT_PARAM_NAME_SET;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -114,6 +117,61 @@ public class ExecBigDataSets {
         resultadoArquivado.put("TSS-Cordasco-k6-Delicious", new int[]{93376, 2657732});
         resultadoArquivado.put("TSS-Cordasco-k6-Douban", new int[]{140694, 2949447});
         resultadoArquivado.put("TSS-Cordasco-k6-Livemocha", new int[]{29079, 2959369});
+        resultadoArquivado.put("TSS-Cordasco-k6-ca-AstroPh", new int[]{7247, 735});
+        resultadoArquivado.put("TSS-Cordasco-k6-ca-CondMat", new int[]{13750, 2391});
+        resultadoArquivado.put("TSS-Cordasco-k6-ca-GrQc", new int[]{4021, 2488});
+        resultadoArquivado.put("TSS-Cordasco-k6-ca-HepPh", new int[]{6669, 2839});
+        resultadoArquivado.put("TSS-Cordasco-k6-ca-HepTh", new int[]{7218, 3152});
+
+        resultadoArquivado.put("TSS-Cordasco-k6-Livemocha", new int[]{29079, 2959369});
+        resultadoArquivado.put("TSS-Cordasco-k7-ca-AstroPh", new int[]{8018, 3729});
+        resultadoArquivado.put("TSS-Cordasco-k7-ca-CondMat", new int[]{15085, 5336});
+        resultadoArquivado.put("TSS-Cordasco-k7-ca-GrQc", new int[]{4231, 5439});
+        resultadoArquivado.put("TSS-Cordasco-k7-ca-HepPh", new int[]{7197, 5839});
+        resultadoArquivado.put("TSS-Cordasco-k7-ca-HepTh", new int[]{7641, 6196});
+        resultadoArquivado.put("TSS-Cordasco-k8-ca-AstroPh", new int[]{8701, 6852});
+        resultadoArquivado.put("TSS-Cordasco-k8-ca-CondMat", new int[]{16193, 8738});
+        resultadoArquivado.put("TSS-Cordasco-k8-ca-GrQc", new int[]{4375, 8848});
+        resultadoArquivado.put("TSS-Cordasco-k8-ca-HepPh", new int[]{7594, 9286});
+        resultadoArquivado.put("TSS-Cordasco-k8-ca-HepTh", new int[]{8000, 9681});
+        resultadoArquivado.put("TSS-Cordasco-k9-ca-AstroPh", new int[]{9296, 10405});
+        resultadoArquivado.put("TSS-Cordasco-k9-ca-CondMat", new int[]{17079, 12842});
+        resultadoArquivado.put("TSS-Cordasco-k9-ca-GrQc", new int[]{4505, 12959});
+        resultadoArquivado.put("TSS-Cordasco-k9-ca-HepPh", new int[]{7953, 13432});
+        resultadoArquivado.put("TSS-Cordasco-k9-ca-HepTh", new int[]{8277, 13863});
+        resultadoArquivado.put("TSS-Cordasco-k10-ca-AstroPh", new int[]{9817, 14648});
+        resultadoArquivado.put("TSS-Cordasco-k10-ca-CondMat", new int[]{17820, 17332});
+        resultadoArquivado.put("TSS-Cordasco-k10-ca-GrQc", new int[]{4596, 17453});
+        resultadoArquivado.put("TSS-Cordasco-k10-ca-HepPh", new int[]{8243, 17973});
+        resultadoArquivado.put("TSS-Cordasco-k10-ca-HepTh", new int[]{8528, 18416});
+        resultadoArquivado.put("TSS-Cordasco-k7-BlogCatalog", new int[]{48923, 3009869});
+        resultadoArquivado.put("TSS-Cordasco-k7-BlogCatalog2", new int[]{61589, 3091358});
+        resultadoArquivado.put("TSS-Cordasco-k7-BlogCatalog3", new int[]{2090, 3091785});
+        resultadoArquivado.put("TSS-Cordasco-k7-BuzzNet", new int[]{34503, 3114635});
+        resultadoArquivado.put("TSS-Cordasco-k7-Delicious", new int[]{94696, 3263998});
+        resultadoArquivado.put("TSS-Cordasco-k7-Douban", new int[]{142373, 3442783});
+        resultadoArquivado.put("TSS-Cordasco-k7-Livemocha", new int[]{33179, 3449285});
+        resultadoArquivado.put("TSS-Cordasco-k8-BlogCatalog", new int[]{51331, 3505541});
+        resultadoArquivado.put("TSS-Cordasco-k8-BlogCatalog2", new int[]{64126, 3593685});
+        resultadoArquivado.put("TSS-Cordasco-k8-BlogCatalog3", new int[]{2376, 3594171});
+        resultadoArquivado.put("TSS-Cordasco-k8-BuzzNet", new int[]{37815, 3604022});
+        resultadoArquivado.put("TSS-Cordasco-k8-Delicious", new int[]{95758, 3765559});
+        resultadoArquivado.put("TSS-Cordasco-k8-Douban", new int[]{143514, 3892198});
+        resultadoArquivado.put("TSS-Cordasco-k8-Livemocha", new int[]{36928, 3918922});
+        resultadoArquivado.put("TSS-Cordasco-k9-BlogCatalog", new int[]{53353, 3978657});
+        resultadoArquivado.put("TSS-Cordasco-k9-BlogCatalog2", new int[]{66462, 4045435});
+        resultadoArquivado.put("TSS-Cordasco-k9-BlogCatalog3", new int[]{2701, 4045874});
+        resultadoArquivado.put("TSS-Cordasco-k9-BuzzNet", new int[]{40725, 4077845});
+        resultadoArquivado.put("TSS-Cordasco-k9-Delicious", new int[]{96609, 4235578});
+        resultadoArquivado.put("TSS-Cordasco-k9-Douban", new int[]{144334, 4639522});
+        resultadoArquivado.put("TSS-Cordasco-k9-Livemocha", new int[]{40275, 4662990});
+        resultadoArquivado.put("TSS-Cordasco-k10-BlogCatalog", new int[]{55086, 4732063});
+        resultadoArquivado.put("TSS-Cordasco-k10-BlogCatalog2", new int[]{68320, 4837964});
+        resultadoArquivado.put("TSS-Cordasco-k10-BlogCatalog3", new int[]{3008, 4838540});
+        resultadoArquivado.put("TSS-Cordasco-k10-BuzzNet", new int[]{43122, 4852435});
+        resultadoArquivado.put("TSS-Cordasco-k10-Delicious", new int[]{97297, 5030005});
+        resultadoArquivado.put("TSS-Cordasco-k10-Douban", new int[]{144961, 5279579});
+        resultadoArquivado.put("TSS-Cordasco-k10-Livemocha", new int[]{43439, 5312075});
     }
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -166,6 +224,10 @@ public class ExecBigDataSets {
 
         Arrays.sort(dataSets);
 
+        String strResultFile = "resultado-" + ExecBigDataSets.class.getSimpleName() + ".txt";
+        File resultFile = new File(strResultFile);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
+
         for (int k = 2; k <= 10; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
@@ -207,9 +269,16 @@ public class ExecBigDataSets {
                     }
                     System.out.println(" - Result: " + result[i]);
 
-                    System.out.println("xls: " + operations[i].getName()
-                            + "\t" + k + "\t" + s + "\t" + graphES.getVertexCount()
-                            + "\t" + result[i] + "\t" + totalTime[i]);
+                    String out = "Big\t" + s + "\t" + graphES.getVertexCount() + "\t"
+                            + graphES.getEdgeCount()
+                            + "\t" + k + "\t" + operations[i].getName()
+                            + "\t" + result[i] + "\t" + totalTime[i];
+
+                    System.out.println("xls: " + out);
+
+                    writer.write(out);
+//                        writer.write(resultProcess);
+                    writer.flush();
 
                     if (doOperation != null) {
                         boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
@@ -247,5 +316,7 @@ public class ExecBigDataSets {
                 }
             }
         }
+        writer.flush();
+        writer.close();
     }
 }
