@@ -327,7 +327,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
             } else {
                 int degreeVi = graphRead.degree(vi);
-                if (degreeVi > v) {
+                if (degreeVi > degreev) {
                     v = vi;
                     degreev = graphRead.degree(vi);
                 } else if (degreeVi == degreev && vi > v) {
@@ -371,8 +371,8 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
             } else if (tmp.size() < hullSet.size()) {
                 if (verbose) {
                     System.out.println("Melhorado em: " + (hullSet.size() - tmp.size()));
-                    System.out.println(" em i " + v + " vindo de " + vl);
-                    System.out.println("d(" + v + ")=" + graphRead.degree(vs) + " d(" + vl + ")=" + graphRead.degree(vl));
+                    System.out.println(" em i " + vs + " vindo de " + vl);
+                    System.out.println("d(" + vs + ")=" + graphRead.degree(vs) + " d(" + vl + ")=" + graphRead.degree(vl));
                     System.out.println(hullSet);
                     System.out.println(tmp);
                 }
