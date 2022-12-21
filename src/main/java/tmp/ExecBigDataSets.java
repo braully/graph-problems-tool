@@ -272,9 +272,9 @@ public class ExecBigDataSets {
                     String out = "Big\t" + s + "\t" + graphES.getVertexCount() + "\t"
                             + graphES.getEdgeCount()
                             + "\t" + k + "\t" + operations[i].getName()
-                            + "\t" + result[i] + "\t" + totalTime[i];
+                            + "\t" + result[i] + "\t" + totalTime[i] + "\n";
 
-                    System.out.println("xls: " + out);
+                    System.out.print("xls: " + out);
 
                     writer.write(out);
 //                        writer.write(resultProcess);

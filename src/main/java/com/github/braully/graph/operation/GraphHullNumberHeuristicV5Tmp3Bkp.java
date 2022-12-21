@@ -31,7 +31,7 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp3.class);
 
-    static final String description = "Hull Number Heuristic V5-tmp3-bkp";
+    static final String description = "HHn-v2-bkp";
     int etapaVerbose = -1;
 
     @Override

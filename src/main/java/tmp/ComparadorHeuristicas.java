@@ -51,7 +51,7 @@ public class ComparadorHeuristicas {
         };
 
         heur.K = tss.K = heur5.K = heur5b.K = k;
-//        heur5.startVertice = true;
+        heur5.startVertice = true;
         int igual = 0;
         int melhor = 0;
         int pior = 0;

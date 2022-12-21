@@ -279,6 +279,11 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
             for (Pair<V> par : pairs) {
                 sb.append(par.getFirst()).append("-").append(par.getSecond()).append(",");
             }
+            for (Integer v : (Collection<Integer>) this.getVertices()) {
+                if (degree(v) == 0) {
+                    sb.append(v).append(",");
+                }
+            }
         } catch (Exception e) {
 
         }

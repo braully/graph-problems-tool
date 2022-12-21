@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import static tmp.DensityHeuristicCompare.INI_V;
 import static tmp.DensityHeuristicCompare.MAX_V;
 import util.BFSUtil;
+import util.MapCountOpt;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5Tmp3
@@ -97,6 +98,8 @@ public class GraphHullNumberHeuristicV5Tmp3
         int bestVertice = -1;
         boolean esgotado = false;
         List<Integer> melhores = new ArrayList<Integer>();
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        MapCountOpt mapCount = new MapCountOpt(vertexCount);
         while (sizeHs < vertexCount) {
             if (bestVertice != -1) {
                 bdls.incBfs(graph, bestVertice);
@@ -130,24 +133,52 @@ public class GraphHullNumberHeuristicV5Tmp3
                 if (aux[i] >= K) {
                     continue;
                 }
-                int[] auxb = aux.clone();
-                int deltaHsi = addVertToS(i, null, graph, auxb);
+                int profundidadeS = bdls.getDistanceSafe(graph, i);
+                if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
+                    continue;
+                }
 
+//                int[] auxb = aux.clone();
+//                int deltaHsi = addVertToS(i, null, graph, auxb);
                 int grauContaminacao = 0;
                 int contaminadoParcialmente = 0;
-                //Contabilizar quantos vertices foram adicionados
-                for (int j = 0; j < vertexCount; j++) {
-                    if (auxb[j] >= K) {
-                        grauContaminacao++;
-                    }
-                    if (auxb[j] > 0 && auxb[j] < K) {
-                        contaminadoParcialmente++;
+
+                mustBeIncluded.clear();
+                mapCount.clear();
+                mustBeIncluded.add(i);
+                mapCount.setVal(i, K);
+                while (!mustBeIncluded.isEmpty()) {
+                    Integer verti = mustBeIncluded.remove();
+                    Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+                    for (Integer vertn : neighbors) {
+                        if (vertn.equals(verti)
+                                || vertn.equals(i)
+                                || (aux[vertn] + mapCount.getCount(vertn)) >= K) {
+                            continue;
+                        }
+                        Integer inc = mapCount.inc(vertn);
+                        if (inc + aux[vertn] == K) {
+                            mustBeIncluded.add(vertn);
+                            grauContaminacao++;
+                        } else {
+                            contaminadoParcialmente++;
+                        }
                     }
                 }
 
+                int deltaHsi = grauContaminacao;
+
+                //Contabilizar quantos vertices foram adicionados
+//                for (int j = 0; j < vertexCount; j++) {
+//                    if (auxb[j] >= K) {
+//                        grauContaminacao++;
+//                    }
+//                    if (auxb[j] > 0 && auxb[j] < K) {
+//                        contaminadoParcialmente++;
+//                    }
+//                }
                 int di = graph.degree(i);
                 int deltadei = di - aux[i];
-                int profundidadeS = bdls.getDistanceSafe(graph, i);
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
 
                 if (etapaVerbose == s.size()) {
@@ -167,23 +198,23 @@ public class GraphHullNumberHeuristicV5Tmp3
                     maiorAux = aux[i];
                     maiorGrau = di;
 //                    maiorProfundidadeHS = profundidadeHS;
-                    if (etapaVerbose == s.size()) {
-                        System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-                                i, deltaHsi, grauContaminacao,
-                                contaminadoParcialmente, profundidadeS, aux[i], di);
-//                        System.out.print("  * ");
-                        for (int j = 0; j < vertexCount; j++) {
-                            if (j != i) {
-                                if (aux[j] < K && auxb[j] >= K) {
-                                    System.out.print(" +" + j);
-                                } else if (aux[j] == 0 && auxb[j] > 0) {
-                                    System.out.print(" +/-" + j);
-                                }
-                            }
-                        }
-                        System.out.println();
-
-                    }
+//                    if (etapaVerbose == s.size()) {
+//                        System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
+//                                i, deltaHsi, grauContaminacao,
+//                                contaminadoParcialmente, profundidadeS, aux[i], di);
+////                        System.out.print("  * ");
+//                        for (int j = 0; j < vertexCount; j++) {
+//                            if (j != i) {
+//                                if (aux[j] < K && auxb[j] >= K) {
+//                                    System.out.print(" +" + j);
+//                                } else if (aux[j] == 0 && auxb[j] > 0) {
+//                                    System.out.print(" +/-" + j);
+//                                }
+//                            }
+//                        }
+//                        System.out.println();
+//
+//                    }
                 } else {
                     Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
                             grauContaminacao, maiorGrauContaminacao,
@@ -200,15 +231,15 @@ public class GraphHullNumberHeuristicV5Tmp3
                                     contaminadoParcialmente, profundidadeS, aux[i], di);
 
                             System.out.print("  * ");
-                            for (int j = 0; j < vertexCount; j++) {
-                                if (j != i) {
-                                    if (aux[j] < K && auxb[j] >= K) {
-                                        System.out.print(" +" + j);
-                                    } else if (aux[j] == 0 && auxb[j] > 0) {
-                                        System.out.print(" +/-" + j);
-                                    }
-                                }
-                            }
+//                            for (int j = 0; j < vertexCount; j++) {
+//                                if (j != i) {
+//                                    if (aux[j] < K && auxb[j] >= K) {
+//                                        System.out.print(" +" + j);
+//                                    } else if (aux[j] == 0 && auxb[j] > 0) {
+//                                        System.out.print(" +/-" + j);
+//                                    }
+//                                }
+//                            }
                             System.out.println();
                         }
                     } else if (greater) {
@@ -226,17 +257,17 @@ public class GraphHullNumberHeuristicV5Tmp3
                                     i, deltaHsi, grauContaminacao,
                                     contaminadoParcialmente, profundidadeS, aux[i], di);
 
-                            System.out.print("  * ");
-                            for (int j = 0; j < vertexCount; j++) {
-                                if (j != i) {
-                                    if (aux[j] < K && auxb[j] >= K) {
-                                        System.out.print(" +" + j);
-                                    } else if (aux[j] == 0 && auxb[j] > 0) {
-                                        System.out.print(" +/-" + j);
-                                    }
-                                }
-                            }
-                            System.out.println();
+//                            System.out.print("  * ");
+//                            for (int j = 0; j < vertexCount; j++) {
+//                                if (j != i) {
+//                                    if (aux[j] < K && auxb[j] >= K) {
+//                                        System.out.print(" +" + j);
+//                                    } else if (aux[j] == 0 && auxb[j] > 0) {
+//                                        System.out.print(" +/-" + j);
+//                                    }
+//                                }
+//                            }
+//                            System.out.println();
                         }
                     }
                 }
@@ -245,8 +276,12 @@ public class GraphHullNumberHeuristicV5Tmp3
                 System.out.println(" - " + bestVertice);
                 System.out.println(" - " + melhores);
             }
+            if (bestVertice == -1) {
+                esgotado = true;
+                continue;
+            }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
-
+            esgotado = false;
 //            if (sizeHs < vertexCount) {
 //                bdl.labelDistances(graph, s);
 //            }
@@ -519,9 +554,9 @@ public class GraphHullNumberHeuristicV5Tmp3
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
-        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
+//        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
 
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
