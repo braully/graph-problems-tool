@@ -28,7 +28,7 @@ import java.util.Map;
 public class DensityHeuristicCompare {
 
     public static final int INI_V = 1;
-    public static final int MAX_V = 1000;
+    public static final int MAX_V = 500;
 
     public static void main(String... args) throws IOException {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
@@ -44,11 +44,11 @@ public class DensityHeuristicCompare {
         heur.setVerbose(false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
 
-        String strResultFile = "resultado-" + ExecBigDataSets.class.getSimpleName() + ".txt";
+        String strResultFile = "resultado-" + DensityHeuristicCompare.class.getSimpleName() + ".txt";
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        String strResultFileGraphs = "resultado-" + ExecBigDataSets.class.getSimpleName() + ".txt";
+        String strResultFileGraphs = "grafos-rand-" + DensityHeuristicCompare.class.getSimpleName() + ".txt";
         File resultFileGraphs = new File(strResultFileGraphs);
         BufferedWriter writerGraphs = new BufferedWriter(new FileWriter(resultFile, true));
 
@@ -140,6 +140,16 @@ public class DensityHeuristicCompare {
                             }
                             System.out.printf("%d", delta[i]);
                         }
+                        String out = "Big\t" + graph.getName() + "\t" + graph.getVertexCount() + "\t"
+                                + graph.getEdgeCount()
+                                + "\t" + k + "\t" + operations[i].getName()
+                                + "\t" + result[i] + "\t" + totalTime[i] + "\n";
+
+                        System.out.print("xls: " + out);
+
+                        writer.write(out);
+//                        writer.write(resultProcess);
+                        writer.flush();
                     }
 
 //                System.out.printf("[%d,%d]", mindelta, maxdelta);
