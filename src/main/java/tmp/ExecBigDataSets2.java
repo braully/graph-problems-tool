@@ -206,6 +206,7 @@ public class ExecBigDataSets2 {
         heur5t.setVerbose(false);
 //        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
         GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
+        heur5t2.startVertice = false;
 
         heur5t2.setVerbose(false);
 
@@ -229,7 +230,7 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 2; k <= 10; k++) {
+        for (int k = 4; k <= 10; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
