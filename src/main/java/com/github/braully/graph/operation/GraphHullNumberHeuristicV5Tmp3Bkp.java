@@ -315,30 +315,47 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
         }
-        vertices.sort(Comparator
-                .comparingInt((Integer v) -> -graphRead.degree(v))
-                .thenComparing(v -> -v));
+//        vertices.sort(Comparator
+//                .comparingInt((Integer v) -> -graphRead.degree(v))
+//                .thenComparing(v -> -v));
+        Integer v = null;
+        int degreev = -1;
+        for (Integer vi : vertices) {
+            if (v == null) {
+                v = vi;
+                degreev = graphRead.degree(vi);
+
+            } else {
+                int degreeVi = graphRead.degree(vi);
+                if (degreeVi > v) {
+                    v = vi;
+                    degreev = graphRead.degree(vi);
+                } else if (degreeVi == degreev && v > vi) {
+                    v = vi;
+                    degreev = graphRead.degree(vi);
+                }
+            }
+        }
 
         int total = graphRead.getVertexCount();
         int cont = 0;
 //        int ret = total & cont;
-        Integer vi = vertices.get(0);
         List<Integer> verticeStart = new ArrayList<>();
-        Integer bestN = null;
-        for (Integer v : graphRead.getNeighborsUnprotected(vi)) {
-            if (bestN == null) {
-                bestN = v;
-            } else if (graphRead.degree(v) > graphRead.degree(bestN)
-                    || (graphRead.degree(bestN) == graphRead.degree(v)
-                    && bestN > v)) {
-                bestN = v;
-            }
-        }
-        verticeStart.add(vi);
+//        Integer bestN = null;
+//        for (Integer va  : graphRead.getNeighborsUnprotected(v)) {
+//            if (bestN == null) {
+//                bestN = va;
+//            } else if (graphRead.degree(va) > graphRead.degree(bestN)
+//                    || (graphRead.degree(bestN) == graphRead.degree(va)
+//                    && bestN > va)) {
+//                bestN = va;
+//            }
+//        }
+        verticeStart.add(v);
 //        verticeStart.add(bestN);
 
-        for (Integer v : verticeStart) {
-            if (sini.contains(v)) {
+        for (Integer vs : verticeStart) {
+            if (sini.contains(vs)) {
                 continue;
             }
             if (verbose) {
@@ -346,16 +363,16 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
 //                UtilProccess.printCurrentItme();
 
             }
-            Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs);
+            Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, vs, sini, auxini, sizeHs);
 //            tmp = tryMinimal(graphRead, tmp);
             if (hullSet == null) {
                 hullSet = tmp;
-                vl = v;
+                vl = vs;
             } else if (tmp.size() < hullSet.size()) {
                 if (verbose) {
                     System.out.println("Melhorado em: " + (hullSet.size() - tmp.size()));
                     System.out.println(" em i " + v + " vindo de " + vl);
-                    System.out.println("d(" + v + ")=" + graphRead.degree(v) + " d(" + vl + ")=" + graphRead.degree(vl));
+                    System.out.println("d(" + v + ")=" + graphRead.degree(vs) + " d(" + vl + ")=" + graphRead.degree(vl));
                     System.out.println(hullSet);
                     System.out.println(tmp);
                 }

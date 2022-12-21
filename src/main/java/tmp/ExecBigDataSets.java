@@ -207,6 +207,7 @@ public class ExecBigDataSets {
         GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
 
         heur5t2.setVerbose(false);
+//        heur5t2.startVertice = false;
 
         GraphTSSCordasco tss = new GraphTSSCordasco();
 

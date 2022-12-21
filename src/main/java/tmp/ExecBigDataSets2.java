@@ -206,7 +206,7 @@ public class ExecBigDataSets2 {
         heur5t.setVerbose(false);
 //        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
         GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
-        heur5t2.startVertice = false;
+//        heur5t2.startVertice = false;
 
         heur5t2.setVerbose(false);
 

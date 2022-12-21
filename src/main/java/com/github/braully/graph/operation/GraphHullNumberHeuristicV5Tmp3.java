@@ -419,12 +419,28 @@ public class GraphHullNumberHeuristicV5Tmp3
 //
 //            }
         Integer v = null;
-
+        int degreev = -1;
         if (startVertice) {
-            vertices.sort(Comparator
-                    .comparingInt((Integer vi) -> -graphRead.degree(vi))
-                    .thenComparing(vi -> -vi));
-            v = vertices.get(0);
+//            vertices.sort(Comparator
+//                    .comparingInt((Integer vi) -> -graphRead.degree(vi))
+//                    .thenComparing(vi -> -vi));
+//            v = vertices.get(0);
+            for (Integer vi : vertices) {
+                if (v == null) {
+                    v = vi;
+                    degreev = graphRead.degree(vi);
+
+                } else {
+                    int degreeVi = graphRead.degree(vi);
+                    if (degreeVi > v) {
+                        v = vi;
+                        degreev = graphRead.degree(vi);
+                    } else if (degreeVi == degreev && v > vi) {
+                        v = vi;
+                        degreev = graphRead.degree(vi);
+                    }
+                }
+            }
         }
         Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs,
                 verticeStart);
