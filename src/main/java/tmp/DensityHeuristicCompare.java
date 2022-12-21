@@ -50,11 +50,11 @@ public class DensityHeuristicCompare {
 
         String strResultFileGraphs = "grafos-rand-" + DensityHeuristicCompare.class.getSimpleName() + ".txt";
         File resultFileGraphs = new File(strResultFileGraphs);
-        BufferedWriter writerGraphs = new BufferedWriter(new FileWriter(resultFile, true));
+        BufferedWriter writerGraphs = new BufferedWriter(new FileWriter(resultFileGraphs, true));
 
         IGraphOperation[] operations = new IGraphOperation[]{
+            heur,
             tss,
-            //            heur,
             heur5,};
 
         heur.setVerbose(false);
