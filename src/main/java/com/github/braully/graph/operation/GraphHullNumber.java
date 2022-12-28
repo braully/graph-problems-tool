@@ -3,6 +3,7 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.PROCESSED;
+import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 
@@ -269,6 +272,31 @@ public class GraphHullNumber implements IGraphOperation {
 
     public String getName() {
         return description;
+    }
+
+    public Map<Integer, Integer> numConnectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        int ret = 0;
+        Map<Integer, Integer> map = new TreeMap<>();
+        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
+        if (graph != null && graph.getVertexCount() > 0) {
+            Collection<Integer> vertices = graph.getVertices();
+            TreeSet<Integer> verts = new TreeSet<>(vertices);
+            while (!verts.isEmpty()) {
+                Integer first = verts.first();
+                bdl.labelDistances(graph, first);
+                int contn = 1;
+                for (Integer v : vertices) {
+                    if (bdl.getDistance(graph, v) >= 0) {
+                        verts.remove(v);
+                        contn++;
+                    }
+                }
+                ret++;
+
+                map.put(ret, contn);
+            }
+        }
+        return map;
     }
 
 }

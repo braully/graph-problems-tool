@@ -53,9 +53,10 @@ public class DensityHeuristicCompare {
         BufferedWriter writerGraphs = new BufferedWriter(new FileWriter(resultFileGraphs, true));
 
         IGraphOperation[] operations = new IGraphOperation[]{
-            heur,
+//            heur,
             tss,
-            heur5,};
+            heur5,
+        };
 
         heur.setVerbose(false);
 

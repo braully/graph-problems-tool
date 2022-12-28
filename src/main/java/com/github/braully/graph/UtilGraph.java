@@ -229,6 +229,45 @@ public class UtilGraph {
         writer.write("\n");
     }
 
+    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDatasetRaw(InputStream edgesStream) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        if (edgesStream != null) {
+            Map<Integer, Integer> vCount = new HashMap<>();
+            TreeSet<Integer> mnodes = new TreeSet<>();
+            List<Pair<Integer>> sedges = new ArrayList<>();
+
+            int count = 0;
+            String readLine = null;
+            try {
+                ret = new UndirectedSparseGraphTO<Integer, Integer>();
+
+                BufferedReader redges = new BufferedReader(new InputStreamReader(edgesStream));
+                readLine = null;
+                while ((readLine = redges.readLine()) != null
+                        && !(readLine = readLine.trim()).isEmpty()) {
+                    if (readLine.startsWith("#")) {
+                        continue;
+                    }
+                    String[] split = readLine.split("\t");
+                    if (split.length >= 2) {
+                        Integer v = Integer.parseInt(split[0].trim());
+                        Integer t = Integer.parseInt(split[1].trim());
+                        ret.addVertex(v);
+                        ret.addVertex(t);
+                        ret.addEdge(v, t);
+                    } else {
+                        System.err.println("Line not parsed: " + readLine);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(readLine);
+            }
+
+        }
+        return ret;
+    }
+
     public static UndirectedSparseGraphTO<Integer, Integer> loadBigDataset(InputStream edgesStream) throws IOException {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
         if (edgesStream != null) {
@@ -255,6 +294,8 @@ public class UtilGraph {
                         mnodes.add(t);
                         mnodes.add(v);
                         sedges.add(new Pair<Integer>(v, t));
+                    } else {
+                        System.err.println("Line not parsed: " + readLine);
                     }
                 }
                 for (Integer v : mnodes) {
@@ -311,7 +352,11 @@ public class UtilGraph {
                         Integer t = vCount.get(Integer.parseInt(split[1].trim()));
                         if (v != null && t != null) {
                             ret.addEdge(v, t);
+                        } else {
+                            System.err.println("Fail on edge v e t null: " + readLine);
                         }
+                    } else {
+                        System.err.println("Fail on edge: " + readLine);
                     }
                 }
             } catch (Exception e) {

@@ -373,4 +373,8 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
     private void clearCachedVertices() {
         cacheVertices = null;
     }
+
+    public String toResumedString() {
+        return name + " n=" + getVertexCount() + " m=" + getEdgeCount();
+    }
 }

@@ -329,10 +329,10 @@ public class GraphHullNumberHeuristicV5Tmp3Bkp
                 int degreeVi = graphRead.degree(vi);
                 if (degreeVi > degreev) {
                     v = vi;
-                    degreev = graphRead.degree(vi);
+                    degreev = degreeVi;
                 } else if (degreeVi == degreev && vi > v) {
                     v = vi;
-                    degreev = graphRead.degree(vi);
+                    degreev = degreeVi;
                 }
             }
         }

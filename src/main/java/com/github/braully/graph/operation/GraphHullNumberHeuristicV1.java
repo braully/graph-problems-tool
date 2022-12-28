@@ -1,6 +1,9 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import com.github.braully.graph.UtilGraph;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +28,7 @@ public class GraphHullNumberHeuristicV1
     private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV1.class);
 
     static final String description = "Hull Number Heuristic";
-    public Integer fatorLimite;
+    public Integer fatorLimite = null;
 
     @Override
     public String getName() {
@@ -198,6 +201,37 @@ public class GraphHullNumberHeuristicV1
         return s;
     }
 
+    public int addVertToS(Integer verti, Set<Integer> s,
+            UndirectedSparseGraphTO<Integer, Integer> graph,
+            int[] aux) {
+        int countIncluded = 0;
+        if (verti == null || aux[verti] >= K) {
+            return countIncluded;
+        }
+
+        aux[verti] = aux[verti] + K;
+        if (s != null) {
+            s.add(verti);
+        }
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        mustBeIncluded.add(verti);
+        while (!mustBeIncluded.isEmpty()) {
+            verti = mustBeIncluded.remove();
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            for (Integer vertn : neighbors) {
+                if (vertn.equals(verti)) {
+                    continue;
+                }
+                if (!vertn.equals(verti) && (++aux[vertn]) == K) {
+                    mustBeIncluded.add(vertn);
+                }
+            }
+            countIncluded++;
+        }
+
+        return countIncluded;
+    }
+
     public Set<Integer> findHullSubSetBruteForce(
             UndirectedSparseGraphTO<Integer, Integer> graph,
             int currentSetSize, Integer... subset) {
@@ -337,5 +371,41 @@ public class GraphHullNumberHeuristicV1
             aux[verti] += K;
         }
         return fecho.size() == graph.getVertexCount();
+    }
+
+    public static void main(String... args) throws IOException {
+        GraphHullNumberHeuristicV1 op = new GraphHullNumberHeuristicV1();
+        GraphHullNumberOptm op2 = new GraphHullNumberOptm();
+        UndirectedSparseGraphTO<Integer, Integer> graph = null;
+//        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
+//        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
+//        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
+//        graph = UtilGraph.loadBigDatasetRaw(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
+
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
+//     
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
+
+        System.out.println(graph.getName());
+        System.out.println(graph.toResumedString());
+        System.out.println(op.numConnectedComponents(graph));
+//        op.fatorLimite = 5;
+//        op2.K = 3;
+//        op2.verbose = true;
+//        Set<Integer> findMinHullSetGraph = op2.findMinHullSetGraph(graph);
+//        op.K = 3;
+        op.K = 2;
+        Set<Integer> findMinHullSetGraph = op.findMinHullSetGraph(graph);
+        System.out.println("REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
     }
 }

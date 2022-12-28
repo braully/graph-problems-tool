@@ -46,8 +46,8 @@ public class ComparadorHeuristicas {
         IGraphOperation[] operations = new IGraphOperation[]{
                         heur,
 //                        tss,
-//            heur5,
-            heur5b
+            heur5,
+//            heur5b
         };
 
         heur.K = tss.K = heur5.K = heur5b.K = k;
