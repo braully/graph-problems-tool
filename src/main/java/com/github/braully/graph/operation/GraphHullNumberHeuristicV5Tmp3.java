@@ -313,7 +313,8 @@ public class GraphHullNumberHeuristicV5Tmp3
 //            }
         }
 
-        s = tryMinimal(graph, s);
+//        s = tryMinimal(graph, s);
+        s = tryMinimal2(graph, s);
         return s;
     }
 
@@ -571,17 +572,22 @@ public class GraphHullNumberHeuristicV5Tmp3
     public Set<Integer> tryMinimal2(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp) {
         Set<Integer> s = tmp;
+        List<Integer> ltmp = new ArrayList<>(tmp);
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
         }
         Collection<Integer> vertices = graphRead.getVertices();
         int cont = 0;
-        for (Integer x : tmp) {
-            if (graphRead.degree(x) < K) {
+        for_p:
+        for (int h = 0; h < ltmp.size(); h++) {
+            Integer x = ltmp.get(h);
+            if (graphRead.degree(x) < K || !s.contains(x)) {
                 continue;
             }
-            for (Integer y : tmp) {
-                if (graphRead.degree(y) < K || y.equals(x)) {
+            for (int j = h + 1; j < ltmp.size(); j++) {
+                Integer y = ltmp.get(j);
+                if (graphRead.degree(y) < K || y.equals(x)
+                        || !s.contains(y)) {
                     continue;
                 }
                 Set<Integer> t = new LinkedHashSet<>(s);
@@ -646,11 +652,16 @@ public class GraphHullNumberHeuristicV5Tmp3
                     }
 
                     if (contz == vertices.size()) {
-                        s = t;
                         if (verbose) {
-                            System.out.println("Reduzido removido: " + x + " " + y);
+                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
                             System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
                         }
+                        t.add(z);
+                        s = t;
+                        ltmp = new ArrayList<>(s);
+//                        h--;
+                        h = 0;
+                        continue for_p;
                     }
                 }
 
@@ -682,22 +693,21 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 
         //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
-        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
+//        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
 //        graph = UtilGraph.loadBigDatasetRaw(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
-
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 //        GraphStatistics statistics = new GraphStatistics();
 //        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
-        System.out.println(graph.getName());
+//        System.out.println(graph.getName());
         System.out.println(graph.toResumedString());
         System.out.println(op.numConnectedComponents(graph));
         //        op.startVertice = false;
