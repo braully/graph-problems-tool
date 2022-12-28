@@ -38,6 +38,7 @@ public class UtilGraph {
 
     private static String inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/converter";
     private static String outputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/convertidos";
+    private static boolean verbose = false;
 
     public static void main(String... args) throws Exception {
         processDirectory(null, null);
@@ -353,10 +354,14 @@ public class UtilGraph {
                         if (v != null && t != null) {
                             ret.addEdge(v, t);
                         } else {
-                            System.err.println("Fail on edge v e t null: " + readLine);
+                            if (verbose) {
+                                System.err.println("Fail on edge v e t null: " + readLine);
+                            }
                         }
                     } else {
-                        System.err.println("Fail on edge: " + readLine);
+                        if (verbose) {
+                            System.err.println("Fail on edge: " + readLine);
+                        }
                     }
                 }
             } catch (Exception e) {
