@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import static tmp.DensityHeuristicCompare.INI_V;
 import static tmp.DensityHeuristicCompare.MAX_V;
@@ -313,7 +311,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 //            }
         }
 
-//        s = tryMinimal(graph, s);
+        s = tryMinimal(graph, s);
         s = tryMinimal2(graph, s);
         return s;
     }
