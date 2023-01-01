@@ -25,6 +25,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
     public int K = 2;
+    public Integer marjority;
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -79,7 +80,10 @@ public class GraphTSSCordasco implements IGraphOperation {
             int req = K;
             if (reqList != null) {
                 req = reqList.get(v);
+            } else if (marjority != null) {
+                req = graph.degree(v) / marjority;
             }
+
             k[v] = req;
             N[v] = new TreeSet<>(graph.getNeighborsUnprotected(v));
 
