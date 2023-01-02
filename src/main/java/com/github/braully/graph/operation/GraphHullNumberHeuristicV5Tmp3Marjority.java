@@ -182,7 +182,6 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 }
 
 //                System.out.println("avaliado");
-
                 for (Integer x : mapCount.keySet()) {
                     if (mapCount.getCount(x) + aux[x] < K[x]) {
                         contaminadoParcialmente++;
@@ -536,9 +535,15 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
             return false;
         }
         Set<Integer> fecho = new HashSet<>();
+
+        int vertexCount = graph.getVertexCount();
+        if (K == null || K.length < vertexCount) {
+            K = new int[vertexCount];
+        }
         int[] aux = new int[(Integer) graph.maxVertex() + 1];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
+            K[i] = graph.degree(i) / marjority;
         }
 
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
@@ -555,7 +560,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if (!vertn.equals(verti) && aux[vertn] <= K[vertn] - 1) {
+                if (aux[vertn] <= K[vertn] - 1) {
                     aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
                     if (aux[vertn] == K[vertn]) {
                         mustBeIncluded.add(vertn);
