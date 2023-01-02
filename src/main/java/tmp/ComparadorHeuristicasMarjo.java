@@ -25,7 +25,7 @@ import java.util.Set;
  * @author strike
  */
 public class ComparadorHeuristicasMarjo {
-    
+
     public static void main(String... args) throws FileNotFoundException, IOException {
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
@@ -38,20 +38,20 @@ public class ComparadorHeuristicasMarjo {
         heur5.setVerbose(false);
         heur5b.setVerbose(false);
         heur5m.setVerbose(false);
-        
+
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
 //        heur.setVerbose(false);
         heur.setVerbose(false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
-        
+
         int k = 2;
-        
+
         IGraphOperation[] operations = new IGraphOperation[]{
             //                        heur,
             tss,
             heur5m, //            heur5b
         };
-        
+
         tss.marjority = heur5m.marjority = k;
         heur5.startVertice = true;
         int igual = 0;
@@ -68,11 +68,13 @@ public class ComparadorHeuristicasMarjo {
             int ml = -1;
             int pr = -1;
             graph = UtilGraph.loadGraphG6(line);
-            
+
             for (int i = 0; i < operations.length; i++) {
+                System.out.print("Start-" + idx + ": " + operations[i].getName());
                 Map<String, Object> doOperation = operations[i].doOperation(graph);
                 Integer result = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
                 Set<Integer> resultSet = (Set<Integer>) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_SET);
+                System.out.println(".. fim");
                 resultarr[i] = result;
                 resultSetArr[i] = resultSet;
                 if (ml == -1) {
@@ -102,21 +104,23 @@ public class ComparadorHeuristicasMarjo {
                     melhor++;
                 }
             }
-            
+
             if (pr != ml) {
                 if (primeiraFalha == -1) {
                     primeiraFalha = idx;
                 }
-                
+
                 contdiff++;
                 System.out.printf("%d: ", idx);
                 for (int i = 0; i < operations.length; i++) {
                     System.out.printf("%d ", resultarr[i]);
-                    
+
                 }
                 System.out.println();
             }
+            System.out.println("Total: " + idx + " melhor: " + melhor + " pior: " + pior + " igula: " + igual);
             idx++;
+
         }
         if (primeiraFalha != -1) {
             System.out.println("Primeira falha em: " + primeiraFalha);

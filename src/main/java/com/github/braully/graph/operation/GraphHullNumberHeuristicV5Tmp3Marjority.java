@@ -163,6 +163,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 mapCount.clear();
                 mustBeIncluded.add(i);
                 mapCount.setVal(i, K[i]);
+//                System.out.println(s.size() + "-avaliando: " + i);
                 while (!mustBeIncluded.isEmpty()) {
                     Integer verti = mustBeIncluded.remove();
                     Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -179,6 +180,8 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                     }
                     grauContaminacao++;
                 }
+
+//                System.out.println("avaliado");
 
                 for (Integer x : mapCount.keySet()) {
                     if (mapCount.getCount(x) + aux[x] < K[x]) {
@@ -382,13 +385,12 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if (!vertn.equals(verti) && (++aux[vertn]) == K[vertn]) {
+                if ((++aux[vertn]) == K[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
             countIncluded++;
         }
-
         return countIncluded;
     }
 
@@ -410,6 +412,10 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         for (Integer v : vertices) {
             if (graphRead.degree(v) <= K[v] - 1) {
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
+            }
+            if (K[v] == 0) {
+                sini.add(v);
+                sizeHs++;
             }
         }
 //        vertices.sort(Comparator
@@ -711,7 +717,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 
         //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
-        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
+        graph = UtilGraph.loadGraphG6("S?????????????????w@oK?B??GW@OE?g");
 //        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
 //        graph = UtilGraph.loadBigDatasetRaw(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
@@ -734,6 +740,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
 //        op.etapaVerbose = 1;
 //        op.startVertice = false;
 
+        op.setVerbose(true);
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printStartTime();
