@@ -100,7 +100,7 @@ public class ExecBigDataSetsMarj {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 2; k <= 2; k++) {
+        for (int k = 2; k <= 5; k++) {
             heur5t2.marjority = tss.marjority = k;
             System.out.println("-------------\n\nK-Marjority: " + k);
 
