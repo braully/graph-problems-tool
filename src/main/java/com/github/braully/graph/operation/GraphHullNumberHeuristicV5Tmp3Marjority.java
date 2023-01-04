@@ -2,9 +2,7 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
-import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -18,8 +16,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import static tmp.DensityHeuristicCompare.INI_V;
-import static tmp.DensityHeuristicCompare.MAX_V;
 import util.BFSUtil;
 import util.MapCountOpt;
 import util.UtilProccess;
@@ -367,7 +363,10 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
             UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] aux) {
         int countIncluded = 0;
-        if (verti == null || aux[verti] >= K[verti]) {
+        if (verti == null) {
+            return countIncluded;
+        }
+        if (K[verti] > 0 && aux[verti] >= K[verti]) {
             return countIncluded;
         }
 
@@ -413,8 +412,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
             if (K[v] == 0) {
-                sini.add(v);
-                sizeHs++;
+                sizeHs = sizeHs + addVertToS(v, null, graphRead, auxini);
             }
         }
 //        vertices.sort(Comparator
@@ -531,9 +529,11 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
 
     public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
             Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
+//        if (currentSet == null || currentSet.length == 0) {
+//            return false;
+//        }
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+
         Set<Integer> fecho = new HashSet<>();
 
         int vertexCount = graph.getVertexCount();
@@ -544,9 +544,11 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
             K[i] = graph.degree(i) / marjority;
+            if (K[i] == 0) {
+                mustBeIncluded.add(i);
+            }
         }
 
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         for (Integer iv : currentSet) {
             Integer v = iv;
             mustBeIncluded.add(v);
@@ -554,19 +556,16 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         }
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
             for (Integer vertn : neighbors) {
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if (aux[vertn] <= K[vertn] - 1) {
-                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                    if (aux[vertn] == K[vertn]) {
-                        mustBeIncluded.add(vertn);
-                    }
+                if ((++aux[vertn]) == K[vertn]) {
+                    mustBeIncluded.add(vertn);
                 }
             }
+            fecho.add(verti);
             aux[verti] += K[verti];
         }
         return fecho.size() == graph.getVertexCount();

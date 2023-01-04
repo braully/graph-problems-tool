@@ -85,7 +85,7 @@ public class GraphTSSCordasco implements IGraphOperation {
             }
 
             k[v] = req;
-            N[v] = new TreeSet<>(graph.getNeighborsUnprotected(v));
+            N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
 
             mapa[v] = v;
             if (k[v] == 0) {
