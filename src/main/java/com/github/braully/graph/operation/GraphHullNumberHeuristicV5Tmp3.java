@@ -29,6 +29,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 
     public int K = 2;
     public boolean startVertice = true;
+    public boolean marjorado = false;
 
     public boolean checkbfs = false;
     public boolean checkstartv = false;
@@ -82,6 +83,11 @@ public class GraphHullNumberHeuristicV5Tmp3
         int vertexCount = graph.getVertexCount();
         int[] aux = auxini.clone();
         int sizeHs = sizeHsini;
+        if (verbose) {
+            System.out.println("Sini-SIZE: " + sizeHsini);
+//            System.out.println("Sini: " + sini);
+
+        }
         if (v != null) {
             if (verbose) {
                 System.out.println("Start vertice: " + v);
@@ -133,6 +139,7 @@ public class GraphHullNumberHeuristicV5Tmp3
             int maiorProfundidadeS = 0;
             int maiorProfundidadeHS = 0;
             int maiorAux = 0;
+            double maiorDouble = 0;
             melhores.clear();
             if (etapaVerbose == s.size()) {
                 System.out.println("- Verbose etapa: " + etapaVerbose);
@@ -142,7 +149,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 System.out.println(" * n: " + vertexCount);
                 System.out.printf("- vert: del conta pconta prof aux grau\n");
             }
-            for (int i = 0; i < vertexCount; i++) {
+            for (Integer i : vertices) {
                 //Se vertice já foi adicionado, ignorar
                 if (aux[i] >= K) {
                     continue;
@@ -154,6 +161,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 
                 int grauContaminacao = 0;
                 int contaminadoParcialmente = 0;
+                double ddouble = 0;
 
                 mustBeIncluded.clear();
                 mapCount.clear();
@@ -202,13 +210,15 @@ public class GraphHullNumberHeuristicV5Tmp3
 //                }
                 int di = graph.degree(i);
                 int deltadei = di - aux[i];
+
+                ddouble = contaminadoParcialmente / graph.degree(i);
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
 
-                if (etapaVerbose == s.size()) {
-                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-                            i, deltaHsi, grauContaminacao,
-                            contaminadoParcialmente, profundidadeS, aux[i], di);
-                }
+//                if (etapaVerbose == s.size()) {
+//                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
+//                            i, deltaHsi, grauContaminacao,
+//                            contaminadoParcialmente, profundidadeS, aux[i], di);
+//                }
 //                System.out.printf("- vert: del conta pconta prof aux grau");
 //                System.out.printf(" %d: ");
                 if (bestVertice == -1) {
@@ -218,6 +228,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                     bestVertice = i;
                     maiorProfundidadeS = profundidadeS;
 //                    maiorProfundidade = bdl.getDistance(graph, i);
+                    maiorDouble = ddouble;
                     maiorAux = aux[i];
                     maiorGrau = di;
 //                    maiorProfundidadeHS = profundidadeHS;
@@ -245,6 +256,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                             profundidadeS, maiorProfundidadeS,
                             //                            profundidadeHS, maiorProfundidadeHS,
                             contaminadoParcialmente, maiorContaminadoParcialmente,
+                            //                            (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
                             -aux[i], -maiorAux
                     );
                     if (greater == null) {
@@ -274,6 +286,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                         bestVertice = i;
                         maiorProfundidadeS = profundidadeS;
                         maiorGrau = di;
+                        maiorDouble = ddouble;
 //                        maiorProfundidadeHS = profundidadeHS;
 //                        System.out.printf("- vert: del conta pconta prof aux grau");
                         if (etapaVerbose == s.size()) {
@@ -281,17 +294,24 @@ public class GraphHullNumberHeuristicV5Tmp3
                                     i, deltaHsi, grauContaminacao,
                                     contaminadoParcialmente, profundidadeS, aux[i], di);
 
-//                            System.out.print("  * ");
-//                            for (int j = 0; j < vertexCount; j++) {
-//                                if (j != i) {
-//                                    if (aux[j] < K && auxb[j] >= K) {
-//                                        System.out.print(" +" + j);
-//                                    } else if (aux[j] == 0 && auxb[j] > 0) {
-//                                        System.out.print(" +/-" + j);
-//                                    }
-//                                }
-//                            }
-//                            System.out.println();
+                            System.out.print("  * ");
+                            for (Integer x : mapCount.keySet()) {
+                                if (x.equals(i)) {
+                                    continue;
+                                }
+                                if (aux[x] < K && mapCount.getCount(x) + aux[x] >= K) {
+                                    System.out.print(" +" + x);
+                                }
+                            }
+                            for (Integer x : mapCount.keySet()) {
+                                if (x.equals(i)) {
+                                    continue;
+                                }
+                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < K) {
+                                    System.out.print(" +/-" + x);
+                                }
+                            }
+                            System.out.println();
                         }
                     }
                 }
@@ -383,7 +403,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         Integer vl = null;
         Set<Integer> sini = new LinkedHashSet<>();
 
-        int vertexCount = graphRead.getVertexCount();
+        int vertexCount = (Integer) graphRead.maxVertex() + 1;
         int[] auxini = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
@@ -547,6 +567,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         Set<Integer> s = tmp;
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
+            System.out.println("s: " + s);
         }
         int cont = 0;
         for (Integer v : tmp) {
@@ -573,6 +594,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         List<Integer> ltmp = new ArrayList<>(tmp);
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
+            System.out.println("s: " + s);
         }
         Collection<Integer> vertices = graphRead.getVertices();
         int cont = 0;
@@ -686,30 +708,35 @@ public class GraphHullNumberHeuristicV5Tmp3
 
         System.out.println("Teste greater: ");
 
-        op.etapaVerbose = 1;
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
 //        graph = new UndirectedSparseGraphTO("0-1,0-3,1-2,3-4,3-5,4-5,");
 
         //        graph = UtilGraph.loadGraphG6("S??OOc_OAP?G@_?KQ?C????[?EPWgF??W");
+//        graph = UtilGraph.loadGraphG6("S?????????????????w@oK?B??GW@OE?g");
 //        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
-//        graph = UtilGraph.loadBigDatasetRaw(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+
 //        GraphStatistics statistics = new GraphStatistics();
 //        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
 //        System.out.println(graph.getName());
         System.out.println(graph.toResumedString());
-        System.out.println(op.numConnectedComponents(graph));
+//        System.out.println(op.numConnectedComponents(graph));
         //        op.startVertice = false;
-        //        op.K = 3;
+        op.K = 2;
+//        op.etapaVerbose = 1;
+//        op.startVertice = false;
+
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printStartTime();
@@ -718,19 +745,27 @@ public class GraphHullNumberHeuristicV5Tmp3
         Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
         System.out.println("REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
 
-        if (true) {
-            return;
-        }
-
         Integer[] optHuull = buildOptimizedHullSet.toArray(new Integer[0]);
+
         for (int i = 1; i < buildOptimizedHullSet.size(); i++) {
+            System.out.println("tentador constuir um conjunto " + i + " menor: " + findMinHullSetGraph.size());
+            System.out.print("S: ");
             Integer[] arr = new Integer[i];
             for (int j = 0; j < i; j++) {
                 arr[j] = optHuull[j];
+                System.out.print(arr[j] + ", ");
             }
-            System.out.println("tentador constuir um conjunto " + i + " menor");
-            Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, buildOptimizedHullSet.size() - i, arr);
+            System.out.println();
+            Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), arr);
+            if (findHullSubSetBruteForce == null) {
+                System.out.println(" Falhou ");
+                break;
+            }
+
             System.out.println("Encontrado-[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
+        }
+        if (true) {
+            return;
         }
 
 //        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);

@@ -186,8 +186,7 @@ public class ExecBigDataSets {
             "Livemocha",
             "BlogCatalog",
             "BuzzNet",
-            "Last.fm",
-//             "YouTube2"
+            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -230,7 +229,7 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 3; k <= 5; k++) {
+        for (int k = 6; k <= 10; k++) {
             heur1.K = heur2.K = heur3.K
                     = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = k;
             System.out.println("-------------\n\nK: " + k);
