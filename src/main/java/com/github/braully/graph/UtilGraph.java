@@ -225,6 +225,37 @@ public class UtilGraph {
         writer.write("\n");
     }
 
+    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDataset(InputStream streamNodes, InputStream edgesStream) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        if (streamNodes != null && edgesStream != null) {
+            try {
+                ret = new UndirectedSparseGraphTO<Integer, Integer>();
+                BufferedReader rnodes = new BufferedReader(new InputStreamReader(streamNodes));
+                String readLine = null;
+                while ((readLine = rnodes.readLine()) != null
+                        && !(readLine = readLine.trim()).startsWith("#")) {
+                    Integer v = Integer.parseInt(readLine);
+                    ret.addVertex(v - 1);
+                }
+                BufferedReader redges = new BufferedReader(new InputStreamReader(edgesStream));
+                readLine = null;
+                while ((readLine = redges.readLine()) != null
+                        && !(readLine = readLine.trim()).isEmpty()
+                        && !readLine.startsWith("#")) {
+                    String[] split = readLine.split(",");
+                    if (split.length >= 2) {
+                        Integer v = Integer.parseInt(split[0].trim()) - 1;
+                        Integer t = Integer.parseInt(split[1].trim()) - 1;
+                        ret.addEdge(v, t);
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        return ret;
+    }
+
     static UndirectedSparseGraphTO<Integer, Integer> loadGraphCsr(InputStream uploadedInputStream) throws IOException {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
         try {

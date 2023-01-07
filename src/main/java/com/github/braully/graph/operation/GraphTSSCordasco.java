@@ -106,7 +106,9 @@ public class GraphTSSCordasco implements IGraphOperation {
                 }
 
                 for (Integer u : N[v]) {
-                    N[u].remove(v);
+                    if (!u.equals(v)) {
+                        N[u].remove(v);
+                    }
 
                     delta[u] = delta[u] - 1;
                     if (k[u] > 0) {
