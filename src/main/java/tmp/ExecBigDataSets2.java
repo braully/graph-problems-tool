@@ -213,7 +213,7 @@ public class ExecBigDataSets2 {
         GraphTSSCordasco tss = new GraphTSSCordasco();
 
         IGraphOperation[] operations = new IGraphOperation[]{
-            tss, //            heur1,
+//            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,

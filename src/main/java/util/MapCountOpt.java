@@ -22,6 +22,14 @@ public class MapCountOpt extends ArrayList<Integer> {
         return inc[i];
     }
 
+    public Integer dec(Integer i) {
+        inc[i]--;
+        if (inc[i] == 0) {
+            super.remove(i);
+        }
+        return inc[i];
+    }
+
     public Integer setVal(Integer i, int val) {
         if (inc[i] == 0) {
             super.add(i);

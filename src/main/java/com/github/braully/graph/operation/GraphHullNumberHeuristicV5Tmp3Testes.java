@@ -25,7 +25,7 @@ import util.BFSUtil;
 import util.MapCountOpt;
 import util.UtilProccess;
 
-public class GraphHullNumberHeuristicV5Tmp3
+public class GraphHullNumberHeuristicV5Tmp3Testes
         extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     public int K = 2;
@@ -36,7 +36,7 @@ public class GraphHullNumberHeuristicV5Tmp3
     public boolean checkstartv = false;
     public boolean checkDeltaHsi = false;
 
-    private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp3.class);
+    private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp3Testes.class);
 
     static final String description = "HHn-v2";
     int etapaVerbose = -1;
@@ -48,7 +48,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         return description;
     }
 
-    public GraphHullNumberHeuristicV5Tmp3() {
+    public GraphHullNumberHeuristicV5Tmp3Testes() {
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -90,7 +90,7 @@ public class GraphHullNumberHeuristicV5Tmp3
     protected Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
             Integer v, Set<Integer> sini, int[] auxini, int sizeHsini, List<Integer> verticeStart) {
 //        Set<Integer> s = new HashSet<>(sini);
-//        List<Integer> verticesInteresse = new ArrayList<>();
+        List<Integer> verticesInteresse = new ArrayList<>();
         Set<Integer> s = new LinkedHashSet<>(sini);
         Set<Integer> hs = new LinkedHashSet<>();
         Collection<Integer> vertices = graph.getVertices();
@@ -124,14 +124,14 @@ public class GraphHullNumberHeuristicV5Tmp3
         List<Integer> melhores = new ArrayList<Integer>();
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         MapCountOpt mapCount = new MapCountOpt(maxVertex + 1);
-//        MapCountOpt mapCountS = new MapCountOpt(maxVertex + 1);
+        MapCountOpt mapCountS = new MapCountOpt(maxVertex + 1);
 
-//        for (Integer vt : sini) {
-//            Collection<Integer> ns = graph.getNeighborsUnprotected(vt);
-//            for (Integer vnn : ns) {
-//                mapCountS.inc(vnn);
-//            }
-//        }
+        for (Integer vt : sini) {
+            Collection<Integer> ns = graph.getNeighborsUnprotected(vt);
+            for (Integer vnn : ns) {
+                mapCountS.inc(vnn);
+            }
+        }
         while (sizeHs < vertexCount) {
             if (bestVertice != -1) {
                 bdls.incBfs(graph, bestVertice);
@@ -383,88 +383,88 @@ public class GraphHullNumberHeuristicV5Tmp3
                 esgotado = true;
                 continue;
             }
-//            if (checkaddirmao) {
-//                Collection<Integer> neighborsUnprotected = graph.getNeighborsUnprotected(bestVertice);
-//                for (Integer nv : neighborsUnprotected) {
-//                    if (s.contains(nv)) {
-//                        if (verbose) {
-//                            System.out.println("add v to s: " + bestVertice + " nv from: " + nv + " posicao: " + s.size());
-//                        }
-//                        Integer inc = mapCountS.inc(nv);
-//                        if (inc >= K) {
-//                            if (verbose) {
-//                                System.out.println("" + nv + " maior que k: será removido de s");
-//                            }
+            if (checkaddirmao) {
+                Collection<Integer> neighborsUnprotected = graph.getNeighborsUnprotected(bestVertice);
+                for (Integer nv : neighborsUnprotected) {
+                    if (s.contains(nv)) {
+                        if (verbose) {
+                            System.out.println("add v to s: " + bestVertice + " nv from: " + nv + " posicao: " + s.size());
+                        }
+                        Integer inc = mapCountS.inc(nv);
+                        if (inc >= K) {
+                            if (verbose) {
+                                System.out.println("" + nv + " maior que k: será removido de s");
+                            }
+                            s.remove(nv);
+//                            bdls.labelDistances(graph, s);
+                        } else if (inc == K - 1) {
+                            if (verbose) {
+                                System.out.println("  - " + nv + " possivel vertice de corte, reavaliar um de seus vizinhos");
+                            }
 //                            s.remove(nv);
-////                            bdls.labelDistances(graph, s);
-//                        } else if (inc == K - 1) {
-//                            if (verbose) {
-//                                System.out.println("  - " + nv + " possivel vertice de corte, reavaliar um de seus vizinhos");
-//                            }
-////                            s.remove(nv);
-////                            aux[nv] -= K;
-////                            sizeHs--;
-//                            boolean comecou = false;
-////                            System.out.print("  - remover: ");
-//                            Set<Integer> remover = new LinkedHashSet<>();
-//                            for (Integer vs : s) {
-//                                if (vs.equals(nv)) {
-//                                    comecou = true;
-//                                }
-//                                if (comecou) {
-////                                    System.out.print(vs + ", ");
-//                                    remover.add(vs);
-//                                }
-//                            }
-//                            if (verbose) {
-//                                System.out.println();
-//                            }
-//                            if (rollbackEnable && (s.size() - remover.size()) > commit) {
-//                                if (verbose) {
-//                                    System.out.println("  --Será removido: " + remover);
-//                                }
-//                                s.removeAll(remover);
-//                                aux = auxini.clone();
-//                                commit = s.size();
-//                                sizeHs = sizeHsini;
-//                                mapCountS.clear();
-//
-//                                for (Integer vi : s) {
-//                                    sizeHs += addVertToS(vi, null, graph, aux);
-//                                    Collection<Integer> ns = graph.getNeighborsUnprotected(vi);
-//                                    for (Integer vnn : ns) {
-//                                        if (s.contains(vnn)) {
-//                                            mapCountS.inc(vnn);
-//                                        }
-//                                    }
-//                                }
-//
-//                                bdls.labelDistances(graph, s);
-//                            } else {
-//                                if (rollbackEnable && verbose) {
-//                                    System.out.println("Não será removido, bloco comitado");
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+//                            aux[nv] -= K;
+//                            sizeHs--;
+                            boolean comecou = false;
+//                            System.out.print("  - remover: ");
+                            Set<Integer> remover = new LinkedHashSet<>();
+                            for (Integer vs : s) {
+                                if (vs.equals(nv)) {
+                                    comecou = true;
+                                }
+                                if (comecou) {
+//                                    System.out.print(vs + ", ");
+                                    remover.add(vs);
+                                }
+                            }
+                            if (verbose) {
+                                System.out.println();
+                            }
+                            if (rollbackEnable && (s.size() - remover.size()) > commit) {
+                                if (verbose) {
+                                    System.out.println("  --Será removido: " + remover);
+                                }
+                                s.removeAll(remover);
+                                aux = auxini.clone();
+                                commit = s.size();
+                                sizeHs = sizeHsini;
+                                mapCountS.clear();
+
+                                for (Integer vi : s) {
+                                    sizeHs += addVertToS(vi, null, graph, aux);
+                                    Collection<Integer> ns = graph.getNeighborsUnprotected(vi);
+                                    for (Integer vnn : ns) {
+                                        if (s.contains(vnn)) {
+                                            mapCountS.inc(vnn);
+                                        }
+                                    }
+                                }
+
+                                bdls.labelDistances(graph, s);
+                            } else {
+                                if (rollbackEnable && verbose) {
+                                    System.out.println("Não será removido, bloco comitado");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             esgotado = false;
 
             if (maiorDeltaHs == 1) {
-//                verticesInteresse.add(bestVertice);
+                verticesInteresse.add(bestVertice);
                 Integer distance = bdls.getDistance(graph, bestVertice);
                 if (distance == null || distance < 0) {
                     continue;
                 }
-//                System.out.println("Novo vertice de interesse: " + bestVertice + " posicao: " + (s.size() - 1) + " " + sizeHs + "/" + vertexCount);
+                System.out.println("Novo vertice de interesse: " + bestVertice + " posicao: " + (s.size() - 1) + " " + sizeHs + "/" + vertexCount);
                 int contfront = 0;
                 for (Integer vt : vertices) {
                     if (aux[vt] > 0 && aux[vt] < K) {
                         contfront++;
                     }
                 }
-//                System.out.println("Tamanho fronteira: " + contfront + " degree: " + graph.degree(bestVertice));
+                System.out.println("Tamanho fronteira: " + contfront + " degree: " + graph.degree(bestVertice));
 
             }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
@@ -473,7 +473,8 @@ public class GraphHullNumberHeuristicV5Tmp3
 //            }
         }
 
-//        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
+        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
+
         s = tryMinimal(graph, s);
 //        s = tryMinimal2(graph, s);
         return s;
@@ -971,7 +972,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         GraphSubgraph opsubgraph = new GraphSubgraph();
         GraphSubgraphNeighborHood opsubgraphn = new GraphSubgraphNeighborHood();
         opref.setVerbose(false);
-        GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
+        GraphHullNumberHeuristicV5Tmp3Testes op = new GraphHullNumberHeuristicV5Tmp3Testes();
 
         System.out.println("Teste greater: ");
 
@@ -999,14 +1000,14 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadGraph(new File("tmp.es"));
         System.out.println(graph.toResumedString());
 //        op.K = 3;
-        op.verbose = false;
+        op.verbose = true;
 ////        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraph.subGraphInduced(graph, Set.of(388, 1129, 1185, 1654, 3584, 3997));
 //        System.out.println(subGraph.getEdgeString());
 //        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
 //        System.out.println(subGraph.getEdgeString());
-        op.K = opref.K = 2;
+        op.K = opref.K = 6;
         op.startVertice = false;
 
         if (false) {

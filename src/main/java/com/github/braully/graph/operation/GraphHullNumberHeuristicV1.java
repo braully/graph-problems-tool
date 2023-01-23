@@ -72,8 +72,9 @@ public class GraphHullNumberHeuristicV1
         Set<Integer> s = new HashSet<>();
 
         int vertexCount = graphRead.getVertexCount();
-        int[] aux = new int[vertexCount];
-        for (int i = 0; i < vertexCount; i++) {
+        Integer maxVertex = graphRead.maxVertex();
+        int[] aux = new int[maxVertex + 1];
+        for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
         }
         int sizeHs = 0;
@@ -138,6 +139,7 @@ public class GraphHullNumberHeuristicV1
             Integer v, Set<Integer> sini, int[] auxini, int sizeHsini) {
         Set<Integer> s = new HashSet<>(sini);
         int vertexCount = graph.getVertexCount();
+        Collection<Integer> vertices = graph.getVertices();
         int[] aux = auxini.clone();
         int sizeHs = addVertToS(v, s, graph, aux) + sizeHsini;
         int bestVertice;
@@ -147,7 +149,7 @@ public class GraphHullNumberHeuristicV1
             int maiorDeltaHs = 0;
             int maiorContaminado = 0;
 
-            for (int i = 0; i < vertexCount; i++) {
+            for (Integer i : vertices) {
                 //Se vertice já foi adicionado, ignorar
                 if (aux[i] >= K) {
                     continue;
