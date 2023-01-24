@@ -452,19 +452,19 @@ public class GraphHullNumberHeuristicV5Tmp3
             esgotado = false;
 
             if (maiorDeltaHs == 1) {
-//                verticesInteresse.add(bestVertice);
-                Integer distance = bdls.getDistance(graph, bestVertice);
-                if (distance == null || distance < 0) {
-                    continue;
-                }
-//                System.out.println("Novo vertice de interesse: " + bestVertice + " posicao: " + (s.size() - 1) + " " + sizeHs + "/" + vertexCount);
-                int contfront = 0;
-                for (Integer vt : vertices) {
-                    if (aux[vt] > 0 && aux[vt] < K) {
-                        contfront++;
-                    }
-                }
-//                System.out.println("Tamanho fronteira: " + contfront + " degree: " + graph.degree(bestVertice));
+////                verticesInteresse.add(bestVertice);
+//                Integer distance = bdls.getDistance(graph, bestVertice);
+//                if (distance == null || distance < 0) {
+//                    continue;
+//                }
+////                System.out.println("Novo vertice de interesse: " + bestVertice + " posicao: " + (s.size() - 1) + " " + sizeHs + "/" + vertexCount);
+//                int contfront = 0;
+//                for (Integer vt : vertices) {
+//                    if (aux[vt] > 0 && aux[vt] < K) {
+//                        contfront++;
+//                    }
+//                }
+////                System.out.println("Tamanho fronteira: " + contfront + " degree: " + graph.degree(bestVertice));
 
             }
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);

@@ -255,7 +255,9 @@ public class UtilGraph {
                         Integer t = Integer.parseInt(split[1].trim());
                         ret.addVertex(v);
                         ret.addVertex(t);
-                        ret.addEdge(v, t);
+                        if (v != null && t != null && !v.equals(t)) {
+                            ret.addEdge(v, t);
+                        }
                     } else {
                         System.err.println("Line not parsed: " + readLine);
                     }
@@ -308,7 +310,7 @@ public class UtilGraph {
                 for (Pair<Integer> p : sedges) {
                     Integer v = vCount.get(p.getFirst());
                     Integer t = vCount.get(p.getSecond());
-                    if (v != null && t != null) {
+                    if (v != null && t != null && !v.equals(t)) {
                         ret.addEdge(v, t);
                     }
                 }
@@ -351,7 +353,7 @@ public class UtilGraph {
 //                        Integer t = Integer.parseInt(split[1].trim()) - 1;
                         Integer v = vCount.get(Integer.parseInt(split[0].trim()));
                         Integer t = vCount.get(Integer.parseInt(split[1].trim()));
-                        if (v != null && t != null) {
+                        if (v != null && t != null && !t.equals(v)) {
                             ret.addEdge(v, t);
                         } else {
                             if (verbose) {
