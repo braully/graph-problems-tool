@@ -29,6 +29,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
     public int K = 2;
+    public int[] kr;
     public boolean startVertice = true;
     public boolean marjorado = false;
 
@@ -174,7 +175,7 @@ public class GraphHullNumberHeuristicV5Tmp3
             }
             for (Integer i : vertices) {
                 //Se vertice já foi adicionado, ignorar
-                if (aux[i] >= K) {
+                if (aux[i] >= kr[i]) {
                     continue;
                 }
                 int profundidadeS = bdls.getDistanceSafe(graph, i);
@@ -189,18 +190,19 @@ public class GraphHullNumberHeuristicV5Tmp3
                 mustBeIncluded.clear();
                 mapCount.clear();
                 mustBeIncluded.add(i);
-                mapCount.setVal(i, K);
+                mapCount.setVal(i, kr[i]);
+//                System.out.println(s.size() + "-avaliando: " + i);
                 while (!mustBeIncluded.isEmpty()) {
                     Integer verti = mustBeIncluded.remove();
                     Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
                     for (Integer vertn : neighbors) {
                         if (vertn.equals(verti)
                                 || vertn.equals(i)
-                                || (aux[vertn] + mapCount.getCount(vertn)) >= K) {
+                                || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
                             continue;
                         }
                         Integer inc = mapCount.inc(vertn);
-                        if ((inc + aux[vertn]) == K) {
+                        if ((inc + aux[vertn]) == kr[vertn]) {
                             mustBeIncluded.add(vertn);
                         }
                     }
@@ -208,7 +210,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 }
 
                 for (Integer x : mapCount.keySet()) {
-                    if (mapCount.getCount(x) + aux[x] < K) {
+                    if (mapCount.getCount(x) + aux[x] < kr[x]) {
                         contaminadoParcialmente++;
                     }
                 }
@@ -354,7 +356,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                                 if (x.equals(i)) {
                                     continue;
                                 }
-                                if (aux[x] < K && mapCount.getCount(x) + aux[x] >= K) {
+                                if (aux[x] < kr[x] && mapCount.getCount(x) + aux[x] >= kr[x]) {
                                     System.out.print(" +" + x);
                                 }
                             }
@@ -362,7 +364,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                                 if (x.equals(i)) {
                                     continue;
                                 }
-                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < K) {
+                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < kr[x]) {
                                     System.out.print(" +/-" + x);
                                 }
                             }
@@ -449,9 +451,8 @@ public class GraphHullNumberHeuristicV5Tmp3
 //                    }
 //                }
 //            }
-            esgotado = false;
 
-            if (maiorDeltaHs == 1) {
+            if (maiorDeltaHs == 1 && esgotado) {
 ////                verticesInteresse.add(bestVertice);
 //                Integer distance = bdls.getDistance(graph, bestVertice);
 //                if (distance == null || distance < 0) {
@@ -467,6 +468,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 ////                System.out.println("Tamanho fronteira: " + contfront + " degree: " + graph.degree(bestVertice));
 
             }
+            esgotado = false;
             sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
 //            if (sizeHs < vertexCount) {
 //                bdl.labelDistances(graph, s);
@@ -520,11 +522,14 @@ public class GraphHullNumberHeuristicV5Tmp3
             UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] aux) {
         int countIncluded = 0;
-        if (verti == null || aux[verti] >= K) {
+        if (verti == null) {
+            return countIncluded;
+        }
+        if (kr[verti] > 0 && aux[verti] >= kr[verti]) {
             return countIncluded;
         }
 
-        aux[verti] = aux[verti] + K;
+        aux[verti] = aux[verti] + kr[verti];
         if (s != null) {
             s.add(verti);
         }
@@ -537,7 +542,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if ((++aux[vertn]) == K) {
+                if ((++aux[vertn]) == kr[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
@@ -556,13 +561,18 @@ public class GraphHullNumberHeuristicV5Tmp3
 
         int vertexCount = (Integer) graphRead.maxVertex() + 1;
         int[] auxini = new int[vertexCount];
+        kr = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
+            kr[i] = Math.min(K, graphRead.degree(i));
         }
         int sizeHs = 0;
         for (Integer v : vertices) {
-            if (graphRead.degree(v) <= K - 1) {
+            if (graphRead.degree(v) <= kr[v] - 1) {
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
+            }
+            if (kr[v] == 0) {
+                sizeHs = sizeHs + addVertToS(v, null, graphRead, auxini);
             }
         }
 //        vertices.sort(Comparator
@@ -679,37 +689,47 @@ public class GraphHullNumberHeuristicV5Tmp3
 
     public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
             Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
+//        if (currentSet == null || currentSet.length == 0) {
+//            return false;
+//        }
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+
         Set<Integer> fecho = new HashSet<>();
+
+        int vertexCount = graph.getVertexCount();
+        if (kr == null || kr.length < vertexCount) {
+            kr = new int[vertexCount];
+        }
         int[] aux = new int[(Integer) graph.maxVertex() + 1];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
+            if (marjorado) {
+                throw new IllegalStateException("implementar");
+            }
+            kr[i] = Math.min(K, graph.degree(i));
+            if (kr[i] == 0) {
+                mustBeIncluded.add(i);
+            }
         }
 
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         for (Integer iv : currentSet) {
             Integer v = iv;
             mustBeIncluded.add(v);
-            aux[v] = K;
+            aux[v] = kr[v];
         }
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
             for (Integer vertn : neighbors) {
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
-                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                    if (aux[vertn] == K) {
-                        mustBeIncluded.add(vertn);
-                    }
+                if ((++aux[vertn]) == kr[vertn]) {
+                    mustBeIncluded.add(vertn);
                 }
             }
-            aux[verti] += K;
+            fecho.add(verti);
+            aux[verti] += kr[verti];
         }
         return fecho.size() == graph.getVertexCount();
     }
@@ -753,17 +773,16 @@ public class GraphHullNumberHeuristicV5Tmp3
             System.out.println("s: " + s);
         }
         Collection<Integer> vertices = graphRead.getVertices();
-        int cont = -1;
+        int cont = 0;
         for_p:
         for (int h = 0; h < ltmp.size(); h++) {
-            cont++;
             Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < K || !s.contains(x)) {
+            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
                 continue;
             }
             for (int j = h + 1; j < ltmp.size(); j++) {
                 Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < K || y.equals(x)
+                if (graphRead.degree(y) < kr[y] || y.equals(x)
                         || !s.contains(y)) {
                     continue;
                 }
@@ -782,7 +801,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 for (Integer iv : t) {
                     Integer v = iv;
                     mustBeIncluded.add(v);
-                    aux[v] = K;
+                    aux[v] = kr[v];
                 }
                 while (!mustBeIncluded.isEmpty()) {
                     Integer verti = mustBeIncluded.remove();
@@ -792,26 +811,24 @@ public class GraphHullNumberHeuristicV5Tmp3
                         if (vertn.equals(verti)) {
                             continue;
                         }
-                        if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
+                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
                             aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                            if (aux[vertn] == K) {
+                            if (aux[vertn] == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
                             }
                         }
                     }
-                    aux[verti] += K;
+                    aux[verti] += kr[verti];
                 }
 
                 for (Integer z : vertices) {
-                    if (aux[z] >= K
-                            || z.equals(x)
-                            || z.equals(y)) {
+                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
                     int contz = contadd;
                     int[] auxb = (int[]) aux.clone();
                     mustBeIncluded.add(z);
-                    auxb[z] = K;
+                    auxb[z] = kr[z];
                     while (!mustBeIncluded.isEmpty()) {
                         Integer verti = mustBeIncluded.remove();
                         contz++;
@@ -820,14 +837,14 @@ public class GraphHullNumberHeuristicV5Tmp3
                             if (vertn.equals(verti)) {
                                 continue;
                             }
-                            if (!vertn.equals(verti) && auxb[vertn] <= K - 1) {
+                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
                                 auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                                if (auxb[vertn] == K) {
+                                if (auxb[vertn] == kr[vertn]) {
                                     mustBeIncluded.add(vertn);
                                 }
                             }
                         }
-                        auxb[verti] += K;
+                        auxb[verti] += kr[verti];
                     }
 
                     if (contz == vertices.size()) {
@@ -845,10 +862,12 @@ public class GraphHullNumberHeuristicV5Tmp3
                 }
 
             }
-
+            cont++;
+            
         }
         return s;
     }
+    
 
     public Set<Integer> tryMinimal2KeepSize(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int sizeKeep) {
@@ -967,11 +986,11 @@ public class GraphHullNumberHeuristicV5Tmp3
 
     public static void main(String... args) throws IOException {
         GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
-        GraphTSSCordasco optss = new GraphTSSCordasco();
         GraphSubgraph opsubgraph = new GraphSubgraph();
         GraphSubgraphNeighborHood opsubgraphn = new GraphSubgraphNeighborHood();
         opref.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
+        GraphTSSCordasco optss = new GraphTSSCordasco();
 
         System.out.println("Teste greater: ");
 
@@ -983,6 +1002,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
         graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
