@@ -6,15 +6,11 @@ import com.github.braully.graph.UtilGraph;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apache.log4j.Logger;
@@ -27,7 +23,7 @@ import util.UtilProccess;
  * https://github.com/rodrigomafort/TSSGenetico/blob/master/TSSCordasco.cpp
  * https://github.com/rodrigomafort/TSSGenetico
  */
-public class GraphTSSCordasco implements IGraphOperation {
+public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperation {
 
     static final String type = "P3-Convexity";
     static final String description = "TSS-Cordasco";
@@ -65,6 +61,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 
     public Set<Integer> tssCordasco(UndirectedSparseGraphTO graph, List<Integer> reqList) {
         Set<Integer> S = new LinkedHashSet<>();
+        initKr(graph);
         //(G -> Vertices.begin(), G -> Vertices.end())
         Set<Integer> U = new TreeSet<>(graph.getVertices());
         int n = graph.getVertexCount();
@@ -84,16 +81,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 
         for (Integer v : U) {
             delta[v] = graph.degree(v);
-//            k[v] = R[v];
-//Se existir a lista de requisitos
-            int req = Math.min(K, delta[v]);
-            if (reqList != null) {
-                req = reqList.get(v);
-            } else if (marjority != null) {
-                req = graph.degree(v) / marjority;
-            }
-
-            k[v] = req;
+            k[v] = kr[v];
             N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
 
             mapa[v] = v;
@@ -194,63 +182,6 @@ public class GraphTSSCordasco implements IGraphOperation {
         return S;
     }
 
-    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
-        Set<Integer> fecho = new HashSet<>();
-        int[] aux = new int[(Integer) graph.maxVertex() + 1];
-        for (int i = 0; i < aux.length; i++) {
-            aux[i] = 0;
-        }
-
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer iv : currentSet) {
-            Integer v = iv;
-            mustBeIncluded.add(v);
-            aux[v] = K;
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
-                if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
-                    aux[vertn] = aux[vertn] + 1;
-                    if (aux[vertn] == K) {
-                        mustBeIncluded.add(vertn);
-                    }
-                }
-            }
-            aux[verti] += K;
-        }
-        return fecho.size() == graph.getVertexCount();
-    }
-
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        int cont = 0;
-        for (Integer v : tmp) {
-
-            cont++;
-            if (graphRead.degree(v) < K) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(s);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                System.out.println("Reduzido removido: " + v);
-                System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                s = t;
-            }
-        }
-        return s;
-    }
-
     double calcularAvaliacao(double k, double delta) {
         return k / (delta * (delta + 1));
     }
@@ -274,7 +205,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 //        graph = UtilGraph.loadGraphG6("S?????????????????w@oK?B??GW@OE?g");
 //        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
@@ -291,7 +222,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        GraphStatistics statistics = new GraphStatistics();
 //        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
 //        System.out.println(graph.getName());
@@ -306,7 +237,7 @@ public class GraphTSSCordasco implements IGraphOperation {
 //        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
 //        System.out.println(subGraph.getEdgeString());
-        optss.K = 2;
+        optss.setR(2);
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = optss.tssCordasco(graph);
 
@@ -314,5 +245,9 @@ public class GraphTSSCordasco implements IGraphOperation {
 
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+
+        if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
+            throw new IllegalStateException("NOT HULL SET");
+        }
     }
 }

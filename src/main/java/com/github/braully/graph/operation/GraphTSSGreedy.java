@@ -2,6 +2,10 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.GraphWS;
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import com.github.braully.graph.UtilGraph;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,13 +17,14 @@ import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import util.UtilParse;
+import util.UtilProccess;
 
 /**
  *
  * Reference: Discovering Small Target Sets in Social Networks: A Fast and
  * Effective Algorithm
  */
-public class GraphTSSGreedy implements IGraphOperation {
+public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation {
 
     static final String type = "P3-Convexity";
     static final String description = "TSS-Greedy";
@@ -51,63 +56,6 @@ public class GraphTSSGreedy implements IGraphOperation {
         return response;
     }
 
-    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer... currentSet) {
-        if (currentSet == null || currentSet.length == 0) {
-            return false;
-        }
-        Set<Integer> fecho = new HashSet<>();
-        int[] aux = new int[(Integer) graph.maxVertex() + 1];
-        for (int i = 0; i < aux.length; i++) {
-            aux[i] = 0;
-        }
-
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer iv : currentSet) {
-            Integer v = iv;
-            mustBeIncluded.add(v);
-            aux[v] = K;
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            fecho.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
-                if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
-                    aux[vertn] = aux[vertn] + 1;
-                    if (aux[vertn] == K) {
-                        mustBeIncluded.add(vertn);
-                    }
-                }
-            }
-            aux[verti] += K;
-        }
-        return fecho.size() == graph.getVertexCount();
-    }
-
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        int cont = 0;
-        for (Integer v : tmp) {
-
-            cont++;
-            if (graphRead.degree(v) < K) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(s);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                System.out.println("Reduzido removido: " + v);
-                System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                s = t;
-            }
-        }
-        return s;
-    }
-
     public Set<Integer> tssGreedy(UndirectedSparseGraphTO graph) {
         return tssGreedy(graph, null);
     }
@@ -115,6 +63,7 @@ public class GraphTSSGreedy implements IGraphOperation {
     public Set<Integer> tssGreedy(UndirectedSparseGraphTO graph, List<Integer> reqList) {
         Set<Integer> S = new LinkedHashSet<>();
         Set<Integer> U = new LinkedHashSet<>(graph.getVertices());
+        initKr(graph);
         int n = graph.getVertexCount();
 
         int[] delta = new int[n];
@@ -124,16 +73,7 @@ public class GraphTSSGreedy implements IGraphOperation {
 
         for (Integer v : U) {
             delta[v] = graph.degree(v);
-//            k[v] = R[v];
-//Se existir a lista de requisitos
-            int req = Math.min(K, delta[v]);
-            if (reqList != null) {
-                req = reqList.get(v);
-            } else if (marjority != null) {
-                req = graph.degree(v) / marjority;
-            }
-
-            k[v] = req;
+            k[v] = kr[v];
             N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
         }
 
@@ -182,4 +122,27 @@ public class GraphTSSGreedy implements IGraphOperation {
     public String getName() {
         return description;
     }
+
+    public static void main(String... args) throws FileNotFoundException, IOException {
+        GraphTSSGreedy optss = new GraphTSSGreedy();
+
+        System.out.println("Teste greater: ");
+
+        UndirectedSparseGraphTO<Integer, Integer> graph = null;
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        System.out.println(graph.toResumedString());
+        optss.setR(2);
+        UtilProccess.printStartTime();
+        Set<Integer> buildOptimizedHullSet = optss.tssGreedy(graph);
+
+        UtilProccess.printStartTime();
+
+        System.out.println(
+                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+
+        if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
+            throw new IllegalStateException("NOT HULL SET");
+        }
+    }
+
 }

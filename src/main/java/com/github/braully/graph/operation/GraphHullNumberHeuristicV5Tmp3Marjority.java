@@ -23,7 +23,8 @@ import util.UtilProccess;
 public class GraphHullNumberHeuristicV5Tmp3Marjority
         extends GraphHullNumberHeuristicV1 implements IGraphOperation {
 
-    public int[] K;
+    public int K = 2;
+    public int[] kr;
     public int marjority = 2;
     public boolean startVertice = true;
     public boolean marjorado = false;
@@ -143,7 +144,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
             }
             for (int i = 0; i < vertexCount; i++) {
                 //Se vertice já foi adicionado, ignorar
-                if (aux[i] >= K[i]) {
+                if (aux[i] >= kr[i]) {
                     continue;
                 }
                 int profundidadeS = bdls.getDistanceSafe(graph, i);
@@ -158,7 +159,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 mustBeIncluded.clear();
                 mapCount.clear();
                 mustBeIncluded.add(i);
-                mapCount.setVal(i, K[i]);
+                mapCount.setVal(i, kr[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
                 while (!mustBeIncluded.isEmpty()) {
                     Integer verti = mustBeIncluded.remove();
@@ -166,11 +167,11 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                     for (Integer vertn : neighbors) {
                         if (vertn.equals(verti)
                                 || vertn.equals(i)
-                                || (aux[vertn] + mapCount.getCount(vertn)) >= K[vertn]) {
+                                || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
                             continue;
                         }
                         Integer inc = mapCount.inc(vertn);
-                        if ((inc + aux[vertn]) == K[vertn]) {
+                        if ((inc + aux[vertn]) == kr[vertn]) {
                             mustBeIncluded.add(vertn);
                         }
                     }
@@ -179,7 +180,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
 
 //                System.out.println("avaliado");
                 for (Integer x : mapCount.keySet()) {
-                    if (mapCount.getCount(x) + aux[x] < K[x]) {
+                    if (mapCount.getCount(x) + aux[x] < kr[x]) {
                         contaminadoParcialmente++;
                     }
                 }
@@ -293,7 +294,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                                 if (x.equals(i)) {
                                     continue;
                                 }
-                                if (aux[x] < K[x] && mapCount.getCount(x) + aux[x] >= K[x]) {
+                                if (aux[x] < kr[x] && mapCount.getCount(x) + aux[x] >= kr[x]) {
                                     System.out.print(" +" + x);
                                 }
                             }
@@ -301,7 +302,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                                 if (x.equals(i)) {
                                     continue;
                                 }
-                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < K[x]) {
+                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < kr[x]) {
                                     System.out.print(" +/-" + x);
                                 }
                             }
@@ -366,11 +367,11 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         if (verti == null) {
             return countIncluded;
         }
-        if (K[verti] > 0 && aux[verti] >= K[verti]) {
+        if (kr[verti] > 0 && aux[verti] >= kr[verti]) {
             return countIncluded;
         }
 
-        aux[verti] = aux[verti] + K[verti];
+        aux[verti] = aux[verti] + kr[verti];
         if (s != null) {
             s.add(verti);
         }
@@ -383,7 +384,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if ((++aux[vertn]) == K[vertn]) {
+                if ((++aux[vertn]) == kr[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
@@ -401,17 +402,17 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
 
         int vertexCount = graphRead.getVertexCount();
         int[] auxini = new int[vertexCount];
-        K = new int[vertexCount];
+        kr = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
-            K[i] = graphRead.degree(i) / marjority;
+            kr[i] = graphRead.degree(i) / marjority;
         }
         int sizeHs = 0;
         for (Integer v : vertices) {
-            if (graphRead.degree(v) <= K[v] - 1) {
+            if (graphRead.degree(v) <= kr[v] - 1) {
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
-            if (K[v] == 0) {
+            if (kr[v] == 0) {
                 sizeHs = sizeHs + addVertToS(v, null, graphRead, auxini);
             }
         }
@@ -537,14 +538,14 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         Set<Integer> fecho = new HashSet<>();
 
         int vertexCount = graph.getVertexCount();
-        if (K == null || K.length < vertexCount) {
-            K = new int[vertexCount];
+        if (kr == null || kr.length < vertexCount) {
+            kr = new int[vertexCount];
         }
         int[] aux = new int[(Integer) graph.maxVertex() + 1];
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
-            K[i] = graph.degree(i) / marjority;
-            if (K[i] == 0) {
+            kr[i] = graph.degree(i) / marjority;
+            if (kr[i] == 0) {
                 mustBeIncluded.add(i);
             }
         }
@@ -552,7 +553,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         for (Integer iv : currentSet) {
             Integer v = iv;
             mustBeIncluded.add(v);
-            aux[v] = K[v];
+            aux[v] = kr[v];
         }
         while (!mustBeIncluded.isEmpty()) {
             Integer verti = mustBeIncluded.remove();
@@ -561,12 +562,12 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 if (vertn.equals(verti)) {
                     continue;
                 }
-                if ((++aux[vertn]) == K[vertn]) {
+                if ((++aux[vertn]) == kr[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
             fecho.add(verti);
-            aux[verti] += K[verti];
+            aux[verti] += kr[verti];
         }
         return fecho.size() == graph.getVertexCount();
     }
@@ -580,7 +581,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         }
         int cont = 0;
         for (Integer v : tmp) {
-            if (graphRead.degree(v) < K[v]) {
+            if (graphRead.degree(v) < kr[v]) {
                 continue;
             }
             Set<Integer> t = new LinkedHashSet<>(s);
@@ -609,12 +610,12 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
         for_p:
         for (int h = 0; h < ltmp.size(); h++) {
             Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < K[x] || !s.contains(x)) {
+            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
                 continue;
             }
             for (int j = h + 1; j < ltmp.size(); j++) {
                 Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < K[y] || y.equals(x)
+                if (graphRead.degree(y) < kr[y] || y.equals(x)
                         || !s.contains(y)) {
                     continue;
                 }
@@ -633,7 +634,7 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                 for (Integer iv : t) {
                     Integer v = iv;
                     mustBeIncluded.add(v);
-                    aux[v] = K[v];
+                    aux[v] = kr[v];
                 }
                 while (!mustBeIncluded.isEmpty()) {
                     Integer verti = mustBeIncluded.remove();
@@ -643,24 +644,24 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                         if (vertn.equals(verti)) {
                             continue;
                         }
-                        if (!vertn.equals(verti) && aux[vertn] <= K[vertn] - 1) {
+                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
                             aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                            if (aux[vertn] == K[vertn]) {
+                            if (aux[vertn] == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
                             }
                         }
                     }
-                    aux[verti] += K[verti];
+                    aux[verti] += kr[verti];
                 }
 
                 for (Integer z : vertices) {
-                    if (aux[z] >= K[z] || z.equals(x) || z.equals(y)) {
+                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
                     int contz = contadd;
                     int[] auxb = (int[]) aux.clone();
                     mustBeIncluded.add(z);
-                    auxb[z] = K[z];
+                    auxb[z] = kr[z];
                     while (!mustBeIncluded.isEmpty()) {
                         Integer verti = mustBeIncluded.remove();
                         contz++;
@@ -669,14 +670,14 @@ public class GraphHullNumberHeuristicV5Tmp3Marjority
                             if (vertn.equals(verti)) {
                                 continue;
                             }
-                            if (!vertn.equals(verti) && auxb[vertn] <= K[vertn] - 1) {
+                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
                                 auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                                if (auxb[vertn] == K[vertn]) {
+                                if (auxb[vertn] == kr[vertn]) {
                                     mustBeIncluded.add(vertn);
                                 }
                             }
                         }
-                        auxb[verti] += K[verti];
+                        auxb[verti] += kr[verti];
                     }
 
                     if (contz == vertices.size()) {

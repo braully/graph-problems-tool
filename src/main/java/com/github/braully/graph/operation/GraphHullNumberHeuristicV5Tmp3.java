@@ -3,6 +3,9 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
+import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.NEIGHBOOR_COUNT_INCLUDED;
+import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
+import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +18,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -26,10 +28,8 @@ import util.MapCountOpt;
 import util.UtilProccess;
 
 public class GraphHullNumberHeuristicV5Tmp3
-        extends GraphHullNumberHeuristicV1 implements IGraphOperation {
+        extends AbstractHeuristic implements IGraphOperation {
 
-    public int K = 2;
-    public int[] kr;
     public boolean startVertice = true;
     public boolean marjorado = false;
 
@@ -93,7 +93,6 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        Set<Integer> s = new HashSet<>(sini);
 //        List<Integer> verticesInteresse = new ArrayList<>();
         Set<Integer> s = new LinkedHashSet<>(sini);
-        Set<Integer> hs = new LinkedHashSet<>();
         Collection<Integer> vertices = graph.getVertices();
         int vertexCount = graph.getVertexCount();
         Integer maxVertex = graph.maxVertex();
@@ -137,17 +136,17 @@ public class GraphHullNumberHeuristicV5Tmp3
             if (bestVertice != -1) {
                 bdls.incBfs(graph, bestVertice);
             }
-            if (checkbfs) {
-                bdlhs.labelDistances(graph, s);
-
-                for (Integer c : vertices) {
-                    Integer distanceSafe = bdls.getDistanceSafe(graph, c);
-                    Integer distance = bdlhs.getDistance(graph, c);
-                    if (!distance.equals(distanceSafe)) {
-                        System.err.println("Fail BFS: vertice " + c + " d1 " + distance + " d2 " + distanceSafe);
-                    }
-                }
-            }
+//            if (checkbfs) {
+//                bdlhs.labelDistances(graph, s);
+//
+//                for (Integer c : vertices) {
+//                    Integer distanceSafe = bdls.getDistanceSafe(graph, c);
+//                    Integer distance = bdlhs.getDistance(graph, c);
+//                    if (!distance.equals(distanceSafe)) {
+//                        System.err.println("Fail BFS: vertice " + c + " d1 " + distance + " d2 " + distanceSafe);
+//                    }
+//                }
+//            }
 
 //            for (Integer i : vertices) {
 //                if (aux[i] >= K) {
@@ -561,11 +560,10 @@ public class GraphHullNumberHeuristicV5Tmp3
 
         int vertexCount = (Integer) graphRead.maxVertex() + 1;
         int[] auxini = new int[vertexCount];
-        kr = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
-            kr[i] = Math.min(K, graphRead.degree(i));
         }
+        initKr(graphRead);
         int sizeHs = 0;
         for (Integer v : vertices) {
             if (graphRead.degree(v) <= kr[v] - 1) {
@@ -681,298 +679,10 @@ public class GraphHullNumberHeuristicV5Tmp3
             hullSet = sini;
 
         }
-        if (!checkIfHullSet(graphRead, hullSet.toArray(new Integer[0]))) {
+        if (!checkIfHullSet(graphRead, hullSet)) {
             throw new IllegalStateException("NOT HULL SET");
         }
         return hullSet;
-    }
-
-    public boolean checkIfHullSet(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer... currentSet) {
-//        if (currentSet == null || currentSet.length == 0) {
-//            return false;
-//        }
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-
-        Set<Integer> fecho = new HashSet<>();
-
-        int vertexCount = graph.getVertexCount();
-        if (kr == null || kr.length < vertexCount) {
-            kr = new int[vertexCount];
-        }
-        int[] aux = new int[(Integer) graph.maxVertex() + 1];
-        for (int i = 0; i < aux.length; i++) {
-            aux[i] = 0;
-            if (marjorado) {
-                throw new IllegalStateException("implementar");
-            }
-            kr[i] = Math.min(K, graph.degree(i));
-            if (kr[i] == 0) {
-                mustBeIncluded.add(i);
-            }
-        }
-
-        for (Integer iv : currentSet) {
-            Integer v = iv;
-            mustBeIncluded.add(v);
-            aux[v] = kr[v];
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
-                if ((++aux[vertn]) == kr[vertn]) {
-                    mustBeIncluded.add(vertn);
-                }
-            }
-            fecho.add(verti);
-            aux[verti] += kr[verti];
-        }
-        return fecho.size() == graph.getVertexCount();
-    }
-
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        if (verbose) {
-            System.out.println("tentando reduzir: " + s.size());
-            System.out.println("s: " + s);
-        }
-        int cont = 0;
-        for (Integer v : tmp) {
-
-//        LinkedList<Integer> tmp2 = new LinkedList<>(tmp);
-//        Iterator<Integer> descendingIterator = tmp2.descendingIterator();
-//        while (descendingIterator.hasNext()) {
-//            Integer v = descendingIterator.next();
-            cont++;
-            if (graphRead.degree(v) < K) {
-                continue;
-            }
-            Set<Integer> t = new LinkedHashSet<>(s);
-            t.remove(v);
-            if (checkIfHullSet(graphRead, t.toArray(new Integer[0]))) {
-                s = t;
-                if (verbose) {
-                    System.out.println("Reduzido removido: " + v);
-                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                }
-            }
-        }
-        return s;
-    }
-
-    public Set<Integer> tryMinimal2(UndirectedSparseGraphTO<Integer, Integer> graphRead,
-            Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        List<Integer> ltmp = new ArrayList<>(tmp);
-        if (verbose) {
-            System.out.println("tentando reduzir: " + s.size());
-            System.out.println("s: " + s);
-        }
-        Collection<Integer> vertices = graphRead.getVertices();
-        int cont = 0;
-        for_p:
-        for (int h = 0; h < ltmp.size(); h++) {
-            Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
-                continue;
-            }
-            for (int j = h + 1; j < ltmp.size(); j++) {
-                Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < kr[y] || y.equals(x)
-                        || !s.contains(y)) {
-                    continue;
-                }
-                Set<Integer> t = new LinkedHashSet<>(s);
-                t.remove(x);
-                t.remove(y);
-
-                int contadd = 0;
-
-                int[] aux = new int[(Integer) graphRead.maxVertex() + 1];
-                for (int i = 0; i < aux.length; i++) {
-                    aux[i] = 0;
-                }
-
-                Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-                for (Integer iv : t) {
-                    Integer v = iv;
-                    mustBeIncluded.add(v);
-                    aux[v] = kr[v];
-                }
-                while (!mustBeIncluded.isEmpty()) {
-                    Integer verti = mustBeIncluded.remove();
-                    contadd++;
-                    Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                    for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)) {
-                            continue;
-                        }
-                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                            if (aux[vertn] == kr[vertn]) {
-                                mustBeIncluded.add(vertn);
-                            }
-                        }
-                    }
-                    aux[verti] += kr[verti];
-                }
-
-                for (Integer z : vertices) {
-                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
-                        continue;
-                    }
-                    int contz = contadd;
-                    int[] auxb = (int[]) aux.clone();
-                    mustBeIncluded.add(z);
-                    auxb[z] = kr[z];
-                    while (!mustBeIncluded.isEmpty()) {
-                        Integer verti = mustBeIncluded.remove();
-                        contz++;
-                        Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                        for (Integer vertn : neighbors) {
-                            if (vertn.equals(verti)) {
-                                continue;
-                            }
-                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                                if (auxb[vertn] == kr[vertn]) {
-                                    mustBeIncluded.add(vertn);
-                                }
-                            }
-                        }
-                        auxb[verti] += kr[verti];
-                    }
-
-                    if (contz == vertices.size()) {
-                        if (verbose) {
-                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
-                            System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                        }
-                        t.add(z);
-                        s = t;
-                        ltmp = new ArrayList<>(s);
-//                        h--;
-                        h = 0;
-                        continue for_p;
-                    }
-                }
-
-            }
-            cont++;
-            
-        }
-        return s;
-    }
-    
-
-    public Set<Integer> tryMinimal2KeepSize(UndirectedSparseGraphTO<Integer, Integer> graphRead,
-            Set<Integer> tmp, int sizeKeep) {
-        Set<Integer> s = tmp;
-        List<Integer> ltmp = new ArrayList<>(tmp);
-        if (verbose) {
-            System.out.println("tentando reduzir-keep size: " + s.size());
-//            System.out.println("s: " + s);
-        }
-        Collection<Integer> vertices = graphRead.getVertices();
-        int cont = -1;
-        for_p:
-        for (int h = 0; h < ltmp.size(); h++) {
-            cont++;
-            Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < K || !s.contains(x)) {
-                continue;
-            }
-            for (int j = h + 1; j < ltmp.size(); j++) {
-                Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < K || y.equals(x)
-                        || !s.contains(y)) {
-                    continue;
-                }
-                Set<Integer> t = new LinkedHashSet<>(s);
-                t.remove(x);
-                t.remove(y);
-
-                int contadd = 0;
-
-                int[] aux = new int[(Integer) graphRead.maxVertex() + 1];
-                for (int i = 0; i < aux.length; i++) {
-                    aux[i] = 0;
-                }
-
-                Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-                for (Integer iv : t) {
-                    Integer v = iv;
-                    mustBeIncluded.add(v);
-                    aux[v] = K;
-                }
-                while (!mustBeIncluded.isEmpty()) {
-                    Integer verti = mustBeIncluded.remove();
-                    contadd++;
-                    Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                    for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)) {
-                            continue;
-                        }
-                        if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                            if (aux[vertn] == K) {
-                                mustBeIncluded.add(vertn);
-                            }
-                        }
-                    }
-                    aux[verti] += K;
-                }
-
-                for (Integer z : vertices) {
-                    if (aux[z] >= K
-                            || z.equals(x)
-                            || z.equals(y)) {
-                        continue;
-                    }
-                    int contz = contadd;
-                    int[] auxb = (int[]) aux.clone();
-                    mustBeIncluded.add(z);
-                    auxb[z] = K;
-                    while (!mustBeIncluded.isEmpty()) {
-                        Integer verti = mustBeIncluded.remove();
-                        contz++;
-                        Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                        for (Integer vertn : neighbors) {
-                            if (vertn.equals(verti)) {
-                                continue;
-                            }
-                            if (!vertn.equals(verti) && auxb[vertn] <= K - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                                if (auxb[vertn] == K) {
-                                    mustBeIncluded.add(vertn);
-                                }
-                            }
-                        }
-                        auxb[verti] += K;
-                    }
-
-                    if (contz == sizeKeep) {
-                        if (verbose) {
-                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
-                            System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                        }
-                        t.add(z);
-                        s = t;
-                        ltmp = new ArrayList<>(s);
-//                        h--;
-                        h = 0;
-                        continue for_p;
-                    }
-                }
-
-            }
-
-        }
-        return s;
     }
 
     public void printPesoAux(int[] auxb) {
@@ -985,11 +695,12 @@ public class GraphHullNumberHeuristicV5Tmp3
     }
 
     public static void main(String... args) throws IOException {
-        GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
-        GraphSubgraph opsubgraph = new GraphSubgraph();
-        GraphSubgraphNeighborHood opsubgraphn = new GraphSubgraphNeighborHood();
-        opref.setVerbose(false);
+//        GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
+//        GraphSubgraph opsubgraph = new GraphSubgraph();
+//        GraphSubgraphNeighborHood opsubgraphn = new GraphSubgraphNeighborHood();
+//        opref.setVerbose(false);
         GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
+
         GraphTSSCordasco optss = new GraphTSSCordasco();
 
         System.out.println("Teste greater: ");
@@ -1000,11 +711,11 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadGraphG6("S?????????????????w@oK?B??GW@OE?g");
 //        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
 //        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
@@ -1019,46 +730,46 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadGraph(new File("tmp.es"));
         System.out.println(graph.toResumedString());
 //        op.K = 3;
-        op.verbose = false;
+        op.setVerbose(true);
+        op.setR(2);
 ////        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraph.subGraphInduced(graph, Set.of(388, 1129, 1185, 1654, 3584, 3997));
 //        System.out.println(subGraph.getEdgeString());
 //        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
 //        System.out.println(subGraph.getEdgeString());
-        op.K = opref.K = 2;
         op.startVertice = false;
 
         if (false) {
-            Map<Integer, Integer> numConnectedComponents = op.numConnectedComponents(graph);
-            Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-            for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
-                System.out.print("" + e.getKey() + ": \n -");
-                for (Integer vn : e.getValue()) {
-                    System.out.print(vn + ", ");
-                }
-                System.out.println();
-
-                System.out.println("H: ");
-                UndirectedSparseGraphTO subGraphInduced = opsubgraph.subGraphInduced(graph, e.getValue());
-                Set h1 = op.buildOptimizedHullSet(subGraphInduced);
-                System.out.println(" - hnv[" + h1.size() + "]:" + h1);
-//            if (e.getValue().size() >= 1000) {
-//            if (e.getValue().contains(1381)) {
-//                System.out.println("Dump: ");
-//                System.out.println(subGraphInduced.getEdgeString());
+//            Map<Integer, Integer> numConnectedComponents = op.numConnectedComponents(graph);
+//            Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
+//            for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
+//                System.out.print("" + e.getKey() + ": \n -");
+//                for (Integer vn : e.getValue()) {
+//                    System.out.print(vn + ", ");
+//                }
+//                System.out.println();
 //
+//                System.out.println("H: ");
+//                UndirectedSparseGraphTO subGraphInduced = opsubgraph.subGraphInduced(graph, e.getValue());
+//                Set h1 = op.buildOptimizedHullSet(subGraphInduced);
+//                System.out.println(" - hnv[" + h1.size() + "]:" + h1);
+////            if (e.getValue().size() >= 1000) {
+////            if (e.getValue().contains(1381)) {
+////                System.out.println("Dump: ");
+////                System.out.println(subGraphInduced.getEdgeString());
+////
+////            }
+////            Set<Integer> h2 = optss.tssCordasco(subGraphInduced);
+////            System.out.println(" - tss[" + h2.size() + "]:" + h2);
+//                if (e.getValue().size() <= 100) {
+//                    Set h3 = opref.buildOptimizedHullSet(subGraphInduced);
+//                    System.out.println(" - ref[" + h3.size() + "]:" + h3);
+//                    if (h1.size() != h3.size()) {
+//                        System.out.println(" - DIVERGETNE: " + h1.size() + " " + h3.size());
+//                    }
+//                }
 //            }
-//            Set<Integer> h2 = optss.tssCordasco(subGraphInduced);
-//            System.out.println(" - tss[" + h2.size() + "]:" + h2);
-                if (e.getValue().size() <= 100) {
-                    Set h3 = opref.buildOptimizedHullSet(subGraphInduced);
-                    System.out.println(" - ref[" + h3.size() + "]:" + h3);
-                    if (h1.size() != h3.size()) {
-                        System.out.println(" - DIVERGETNE: " + h1.size() + " " + h3.size());
-                    }
-                }
-            }
         }
         if (true) {
 //            return;
@@ -1075,33 +786,35 @@ public class GraphHullNumberHeuristicV5Tmp3
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
-        Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
+//        op.checkIfHullSet(graph, buildOptimizedHullSet);
+        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+        if (!checkIfHullSet) {
+            System.err.println("FAIL: fail on check hull setg");
+        }
+//        Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
 
-        System.out.println(
-                "REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
-
+//        System.out.println(
+//                "REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
         Integer[] optHuull = buildOptimizedHullSet.toArray(new Integer[0]);
 
-        for (int i = 1;
-                i < buildOptimizedHullSet.size();
-                i++) {
-            System.out.println("tentador constuir um conjunto " + i + " menor: " + findMinHullSetGraph.size());
-            System.out.print("S: ");
-            Integer[] arr = new Integer[i];
-            for (int j = 0; j < i; j++) {
-                arr[j] = optHuull[j];
-                System.out.print(arr[j] + ", ");
-            }
-            System.out.println();
-            Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), arr);
-            if (findHullSubSetBruteForce == null) {
-                System.out.println(" Falhou ");
-                break;
-            }
-
-            System.out.println("Encontrado-[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
-        }
-
+//        for (int i = 1;
+//                i < buildOptimizedHullSet.size();
+//                i++) {
+//            System.out.println("tentador constuir um conjunto " + i + " menor: " + findMinHullSetGraph.size());
+//            System.out.print("S: ");
+//            Integer[] arr = new Integer[i];
+//            for (int j = 0; j < i; j++) {
+//                arr[j] = optHuull[j];
+//                System.out.print(arr[j] + ", ");
+//            }
+//            System.out.println();
+//            Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), arr);
+//            if (findHullSubSetBruteForce == null) {
+//                System.out.println(" Falhou ");
+//                break;
+//            }
+//            System.out.println("Encontrado-[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
+//        }
         if (true) {
             return;
         }
@@ -1130,8 +843,8 @@ public class GraphHullNumberHeuristicV5Tmp3
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
-                findMinHullSetGraph = op.findMinHullSetGraph(graph);
-                System.out.printf("%d", findMinHullSetGraph.size());
+//                findMinHullSetGraph = op.findMinHullSetGraph(graph);
+//                System.out.printf("%d", findMinHullSetGraph.size());
 
                 System.out.printf("\t");
 
@@ -1139,4 +852,5 @@ public class GraphHullNumberHeuristicV5Tmp3
             System.out.println();
         }
     }
+
 }
