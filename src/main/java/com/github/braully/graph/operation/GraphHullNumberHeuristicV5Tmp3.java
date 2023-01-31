@@ -77,7 +77,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         return buildOptimizedHullSet(graph);
 
     }
-
+    boolean esgotado = false;
     int bestVertice = -1;
     int maiorGrau = 0;
     int maiorGrauContaminacao = 0;
@@ -90,6 +90,9 @@ public class GraphHullNumberHeuristicV5Tmp3
     int maiorProfundidadeHS = 0;
     int maiorAux = 0;
     double maiorDouble = 0;
+    Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+    MapCountOpt mapCount;
+    List<Integer> melhores = new ArrayList<Integer>();
 
     protected Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
             Integer v, Set<Integer> sini, int[] auxini, int sizeHsini, List<Integer> verticeStart) {
@@ -123,10 +126,8 @@ public class GraphHullNumberHeuristicV5Tmp3
         int commit = sini.size();
 
         bestVertice = -1;
-        boolean esgotado = false;
-        List<Integer> melhores = new ArrayList<Integer>();
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        MapCountOpt mapCount = new MapCountOpt(maxVertex + 1);
+
+        mapCount = new MapCountOpt(maxVertex + 1);
 //        MapCountOpt mapCountS = new MapCountOpt(maxVertex + 1);
 
 //        for (Integer vt : sini) {
@@ -161,233 +162,9 @@ public class GraphHullNumberHeuristicV5Tmp3
                 System.out.println(" * n: " + vertexCount);
                 System.out.printf("- vert: del conta pconta prof aux grau\n");
             }
-            for (Integer i : vertices) {
-                //Se vertice já foi adicionado, ignorar
-                if (aux[i] >= kr[i]) {
-                    continue;
-                }
-                int profundidadeS = bdls.getDistanceSafe(graph, i);
-                if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
-                    continue;
-                }
-
-                int grauContaminacao = 0;
-                int contaminadoParcialmente = 0;
-                double contParicalmenteD = 0;
-                double ddouble = 0;
-                double bonusTotal = 0;
-                double dificuldadeTotal = 0;
-                int grauI = graph.degree(i);
-
-                double bonusHs = 0;
-                double dificuldadeHs = 0;
-                mustBeIncluded.clear();
-                mapCount.clear();
-                mustBeIncluded.add(i);
-                mapCount.setVal(i, kr[i]);
-//                System.out.println(s.size() + "-avaliando: " + i);
-                while (!mustBeIncluded.isEmpty()) {
-                    Integer verti = mustBeIncluded.remove();
-                    Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-                    for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)
-                                || vertn.equals(i)
-                                || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
-                            continue;
-                        }
-                        Integer inc = mapCount.inc(vertn);
-                        if ((inc + aux[vertn]) == kr[vertn]) {
-                            mustBeIncluded.add(vertn);
-                            bonusHs += graph.degree(vertn) - kr[vertn];
-                            dificuldadeHs += (kr[vertn] - aux[vertn]);
-                        }
-                    }
-                    grauContaminacao++;
-                }
-
-                for (Integer x : mapCount.keySet()) {
-                    if (mapCount.getCount(x) + aux[x] < kr[x]) {
-                        int dx = graph.degree(x);
-//                        double bonus = Math.max(1, dx - kr[x]);
-//                        double bonus = kr[x] - dx;
-                        double bonus = dx - kr[x];
-                        double dificuldade = (kr[x] - aux[x]);
-                        contaminadoParcialmente++;
-                        contParicalmenteD += (bonus / dificuldade);
-                    }
-                }
-
-//                dificuldadeTotal = kr[i] - aux[i];
-//                bonusTotal = grauI - kr[i];
-                bonusTotal = bonusHs;
-                dificuldadeTotal = dificuldadeHs;
-                int deltaHsi = grauContaminacao;
-
-                if (checkDeltaHsi) {
-                    int[] auxb = aux.clone();
-                    int deltaHsib = addVertToS(i, null, graph, auxb);
-                    if (deltaHsi != deltaHsib) {
-                        System.err.println("fail on deltahsi: " + deltaHsi + "/" + deltaHsib);
-                    }
-                }
-                //Contabilizar quantos vertices foram adicionados
-//                for (int j = 0; j < vertexCount; j++) {
-//                    if (auxb[j] >= K) {
-//                        grauContaminacao++;
-//                    }
-//                    if (auxb[j] > 0 && auxb[j] < K) {
-//                        contaminadoParcialmente++;
-//                    }
-//                }
-                int di = graph.degree(i);
-                int deltadei = di - aux[i];
-
-                ddouble = contaminadoParcialmente / graph.degree(i);
-//                int profundidadeHS = bdlhs.getDistance(graph, i);
-
-//                if (etapaVerbose == s.size()) {
-//                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-//                            i, deltaHsi, grauContaminacao,
-//                            contaminadoParcialmente, profundidadeS, aux[i], di);
-//                }
-//                System.out.printf("- vert: del conta pconta prof aux grau");
-//                System.out.printf(" %d: ");
-                if (bestVertice == -1) {
-                    melhores.clear();
-                    melhores.add(i);
-                    maiorDeltaHs = deltaHsi;
-                    maiorGrauContaminacao = grauContaminacao;
-                    maiorContaminadoParcialmente = contaminadoParcialmente;
-                    maiorContParcialD = contParicalmenteD;
-                    maiorBonusTotal = bonusTotal;
-                    maiorDificuldadeTotal = dificuldadeTotal;
-                    bestVertice = i;
-                    maiorProfundidadeS = profundidadeS;
-//                    maiorProfundidade = bdl.getDistance(graph, i);
-                    maiorDouble = ddouble;
-                    maiorAux = aux[i];
-                    maiorGrau = di;
-//                    maiorProfundidadeHS = profundidadeHS;
-                    if (etapaVerbose == s.size()) {
-                        System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-                                i, deltaHsi, grauContaminacao,
-                                contaminadoParcialmente, profundidadeS, aux[i], di);
-//                        System.out.print("  * ");
-                        System.out.print("  * ");
-//System.out.print("  * ");
-                        for (Integer x : mapCount.keySet()) {
-                            if (x.equals(i)) {
-                                continue;
-                            }
-                            if (aux[x] < K && mapCount.getCount(x) + aux[x] >= K) {
-                                System.out.print(" +" + x);
-                            }
-                        }
-                        for (Integer x : mapCount.keySet()) {
-                            if (x.equals(i)) {
-                                continue;
-                            }
-                            if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < K) {
-                                System.out.print(" +/-" + x);
-                            }
-                        }
-//                            System.out.println();
-                        System.out.println();
-                    }
-                } else {
-                    //Canonico
-//                    Boolean greater = isGreater(
-//                            deltaHsi, maiorDeltaHs,
-//                            grauContaminacao, maiorGrauContaminacao,
-//                            profundidadeS, maiorProfundidadeS,
-//                            //                            profundidadeHS, maiorProfundidadeHS,
-//                            contaminadoParcialmente, maiorContaminadoParcialmente,
-//                            //                            (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
-//                            -aux[i], -maiorAux
-//                    );
-
-                    Boolean greater = isGreater(
-                            deltaHsi, maiorDeltaHs,
-                            //                            bonusTotal, maiorBonusTotal,
-                            //                            trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
-                            //                            trans(aux[i]), trans(maiorAux),
-                            //                            profundidadeS, maiorProfundidadeS,
-                            //                            profundidadeHS, maiorProfundidadeHS,
-                            trans(maiorContParcialD), trans(contParicalmenteD)
-                    //                                                contaminadoParcialmente, maiorContaminadoParcialmente
-                    //                            (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
-                    );
-                    if (greater == null) {
-                        melhores.add(i);
-                        if (etapaVerbose == s.size()) {
-                            System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-                                    i, deltaHsi, grauContaminacao,
-                                    contaminadoParcialmente, profundidadeS, aux[i], di);
-
-                            System.out.print("  * ");
-//System.out.print("  * ");
-                            for (Integer x : mapCount.keySet()) {
-                                if (x.equals(i)) {
-                                    continue;
-                                }
-                                if (aux[x] < K && mapCount.getCount(x) + aux[x] >= K) {
-                                    System.out.print(" +" + x);
-                                }
-                            }
-                            for (Integer x : mapCount.keySet()) {
-                                if (x.equals(i)) {
-                                    continue;
-                                }
-                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < K) {
-                                    System.out.print(" +/-" + x);
-                                }
-                            }
-//                            System.out.println();
-                            System.out.println();
-                        }
-                    } else if (greater) {
-                        melhores.clear();
-                        melhores.add(i);
-                        maiorDeltaHs = deltaHsi;
-                        maiorGrauContaminacao = grauContaminacao;
-                        maiorContaminadoParcialmente = contaminadoParcialmente;
-                        maiorContParcialD = contParicalmenteD;
-                        bestVertice = i;
-                        maiorProfundidadeS = profundidadeS;
-                        maiorBonusTotal = bonusTotal;
-                        maiorDificuldadeTotal = dificuldadeTotal;
-                        maiorGrau = di;
-                        maiorDouble = ddouble;
-                        maiorAux = aux[i];
-//                        maiorProfundidadeHS = profundidadeHS;
-//                        System.out.printf("- vert: del conta pconta prof aux grau");
-                        if (etapaVerbose == s.size()) {
-                            System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-                                    i, deltaHsi, grauContaminacao,
-                                    contaminadoParcialmente, profundidadeS, aux[i], di);
-
-                            System.out.print("  * ");
-                            for (Integer x : mapCount.keySet()) {
-                                if (x.equals(i)) {
-                                    continue;
-                                }
-                                if (aux[x] < kr[x] && mapCount.getCount(x) + aux[x] >= kr[x]) {
-                                    System.out.print(" +" + x);
-                                }
-                            }
-                            for (Integer x : mapCount.keySet()) {
-                                if (x.equals(i)) {
-                                    continue;
-                                }
-                                if (aux[x] == 0 && mapCount.getCount(x) + aux[x] < kr[x]) {
-                                    System.out.print(" +/-" + x);
-                                }
-                            }
-                            System.out.println();
-                        }
-                    }
-                }
-            }
+//            void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
+//            int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) 
+            escolherMelhorVertice(graph, aux, vertices, bdls, sizeHs);
             if (etapaVerbose == s.size()) {
                 System.out.println(" - " + bestVertice);
                 System.out.println(" - " + melhores);
@@ -685,43 +462,10 @@ public class GraphHullNumberHeuristicV5Tmp3
         op.startVertice = false;
 
         if (false) {
-//            Map<Integer, Integer> numConnectedComponents = op.numConnectedComponents(graph);
-//            Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-//            for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
-//                System.out.print("" + e.getKey() + ": \n -");
-//                for (Integer vn : e.getValue()) {
-//                    System.out.print(vn + ", ");
-//                }
-//                System.out.println();
-//
-//                System.out.println("H: ");
-//                UndirectedSparseGraphTO subGraphInduced = opsubgraph.subGraphInduced(graph, e.getValue());
-//                Set h1 = op.buildOptimizedHullSet(subGraphInduced);
-//                System.out.println(" - hnv[" + h1.size() + "]:" + h1);
-////            if (e.getValue().size() >= 1000) {
-////            if (e.getValue().contains(1381)) {
-////                System.out.println("Dump: ");
-////                System.out.println(subGraphInduced.getEdgeString());
-////
-////            }
-////            Set<Integer> h2 = optss.tssCordasco(subGraphInduced);
-////            System.out.println(" - tss[" + h2.size() + "]:" + h2);
-//                if (e.getValue().size() <= 100) {
-//                    Set h3 = opref.buildOptimizedHullSet(subGraphInduced);
-//                    System.out.println(" - ref[" + h3.size() + "]:" + h3);
-//                    if (h1.size() != h3.size()) {
-//                        System.out.println(" - DIVERGETNE: " + h1.size() + " " + h3.size());
-//                    }
-//                }
-//            }
         }
         if (true) {
 //            return;
         }
-//        System.out.println();
-//        op.K = 2;
-//        op.etapaVerbose = 1;
-//        op.startVertice = false;
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
 
@@ -735,36 +479,11 @@ public class GraphHullNumberHeuristicV5Tmp3
         if (!checkIfHullSet) {
             System.err.println("FAIL: fail on check hull setg");
         }
-//        Set<Integer> findMinHullSetGraph = opref.findMinHullSetGraph(graph);
-
-//        System.out.println(
-//                "REF-S[" + findMinHullSetGraph.size() + "]: " + findMinHullSetGraph);
         Integer[] optHuull = buildOptimizedHullSet.toArray(new Integer[0]);
-
-//        for (int i = 1;
-//                i < buildOptimizedHullSet.size();
-//                i++) {
-//            System.out.println("tentador constuir um conjunto " + i + " menor: " + findMinHullSetGraph.size());
-//            System.out.print("S: ");
-//            Integer[] arr = new Integer[i];
-//            for (int j = 0; j < i; j++) {
-//                arr[j] = optHuull[j];
-//                System.out.print(arr[j] + ", ");
-//            }
-//            System.out.println();
-//            Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), arr);
-//            if (findHullSubSetBruteForce == null) {
-//                System.out.println(" Falhou ");
-//                break;
-//            }
-//            System.out.println("Encontrado-[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
-//        }
         if (true) {
             return;
         }
 
-//        Set<Integer> findHullSubSetBruteForce = op.findHullSubSetBruteForce(graph, findMinHullSetGraph.size(), 19, 14);
-//        System.out.println("Try search[" + findHullSubSetBruteForce.size() + "]: " + findHullSubSetBruteForce);
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
 
         op.setVerbose(
@@ -794,6 +513,150 @@ public class GraphHullNumberHeuristicV5Tmp3
 
             }
             System.out.println();
+        }
+    }
+
+    void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
+            int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) {
+        for (Integer i : vertices) {
+            //Se vertice já foi adicionado, ignorar
+            if (aux[i] >= kr[i]) {
+                continue;
+            }
+            int profundidadeS = bdls.getDistanceSafe(graph, i);
+            if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
+                continue;
+            }
+
+            int grauContaminacao = 0;
+            int contaminadoParcialmente = 0;
+            double contParicalmenteD = 0;
+            double ddouble = 0;
+            double bonusTotal = 0;
+            double dificuldadeTotal = 0;
+            int grauI = graph.degree(i);
+
+            double bonusHs = 0;
+            double dificuldadeHs = 0;
+            mustBeIncluded.clear();
+            mapCount.clear();
+            mustBeIncluded.add(i);
+            mapCount.setVal(i, kr[i]);
+//                System.out.println(s.size() + "-avaliando: " + i);
+            while (!mustBeIncluded.isEmpty()) {
+                Integer verti = mustBeIncluded.remove();
+                Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+                for (Integer vertn : neighbors) {
+                    if (vertn.equals(verti)
+                            || vertn.equals(i)
+                            || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
+                        continue;
+                    }
+                    Integer inc = mapCount.inc(vertn);
+                    if ((inc + aux[vertn]) == kr[vertn]) {
+                        mustBeIncluded.add(vertn);
+                        bonusHs += graph.degree(vertn) - kr[vertn];
+                        dificuldadeHs += (kr[vertn] - aux[vertn]);
+                    }
+                }
+                grauContaminacao++;
+            }
+
+            for (Integer x : mapCount.keySet()) {
+                if (mapCount.getCount(x) + aux[x] < kr[x]) {
+                    int dx = graph.degree(x);
+//                        double bonus = Math.max(1, dx - kr[x]);
+//                        double bonus = kr[x] - dx;
+                    double bonus = dx - kr[x];
+                    double dificuldade = (kr[x] - aux[x]);
+                    contaminadoParcialmente++;
+                    contParicalmenteD += (bonus / dificuldade);
+                }
+            }
+
+//                dificuldadeTotal = kr[i] - aux[i];
+//                bonusTotal = grauI - kr[i];
+            bonusTotal = bonusHs;
+            dificuldadeTotal = dificuldadeHs;
+            int deltaHsi = grauContaminacao;
+
+            if (checkDeltaHsi) {
+                int[] auxb = aux.clone();
+                int deltaHsib = addVertToS(i, null, graph, auxb);
+                if (deltaHsi != deltaHsib) {
+                    System.err.println("fail on deltahsi: " + deltaHsi + "/" + deltaHsib);
+                }
+            }
+            //Contabilizar quantos vertices foram adicionados
+//                for (int j = 0; j < vertexCount; j++) {
+//                    if (auxb[j] >= K) {
+//                        grauContaminacao++;
+//                    }
+//                    if (auxb[j] > 0 && auxb[j] < K) {
+//                        contaminadoParcialmente++;
+//                    }
+//                }
+            int di = graph.degree(i);
+            int deltadei = di - aux[i];
+
+            ddouble = contaminadoParcialmente / graph.degree(i);
+//                int profundidadeHS = bdlhs.getDistance(graph, i);
+
+//                if (etapaVerbose == s.size()) {
+//                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
+//                            i, deltaHsi, grauContaminacao,
+//                            contaminadoParcialmente, profundidadeS, aux[i], di);
+//                }
+//                System.out.printf("- vert: del conta pconta prof aux grau");
+//                System.out.printf(" %d: ");
+            if (bestVertice == -1) {
+                melhores.clear();
+                melhores.add(i);
+                maiorDeltaHs = deltaHsi;
+                maiorGrauContaminacao = grauContaminacao;
+                maiorContaminadoParcialmente = contaminadoParcialmente;
+                maiorContParcialD = contParicalmenteD;
+                maiorBonusTotal = bonusTotal;
+                maiorDificuldadeTotal = dificuldadeTotal;
+                bestVertice = i;
+                maiorProfundidadeS = profundidadeS;
+//                    maiorProfundidade = bdl.getDistance(graph, i);
+                maiorDouble = ddouble;
+                maiorAux = aux[i];
+                maiorGrau = di;
+            } else {
+
+                Boolean greater = isGreater(
+                        deltaHsi, maiorDeltaHs,
+                        // bonusTotal, maiorBonusTotal,
+                        // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
+                        // trans(aux[i]), trans(maiorAux),
+                        // profundidadeHS, maiorProfundidadeHS,
+                        maiorBonusTotal, bonusTotal,
+                        trans(maiorContParcialD), trans(contParicalmenteD)
+//                        profundidadeS, maiorProfundidadeS
+
+                        // contaminadoParcialmente, maiorContaminadoParcialmente
+                        // (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
+                );
+                if (greater == null) {
+                    melhores.add(i);
+                } else if (greater) {
+                    melhores.clear();
+                    melhores.add(i);
+                    maiorDeltaHs = deltaHsi;
+                    maiorGrauContaminacao = grauContaminacao;
+                    maiorContaminadoParcialmente = contaminadoParcialmente;
+                    maiorContParcialD = contParicalmenteD;
+                    bestVertice = i;
+                    maiorProfundidadeS = profundidadeS;
+                    maiorBonusTotal = bonusTotal;
+                    maiorDificuldadeTotal = dificuldadeTotal;
+                    maiorGrau = di;
+                    maiorDouble = ddouble;
+                    maiorAux = aux[i];
+                }
+            }
         }
     }
 
