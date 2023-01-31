@@ -20,7 +20,7 @@ import java.util.Set;
  *
  * @author strike
  */
-public abstract class AbstractHeuristic {
+public abstract class AbstractHeuristic implements IGraphOperation {
 
     public Integer K;
     public Integer R;

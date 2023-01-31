@@ -11,6 +11,7 @@ import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
 import com.github.braully.graph.operation.GraphTSSCordasco;
+import com.github.braully.graph.operation.GraphTSSGreedy;
 import com.github.braully.graph.operation.IGraphOperation;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -40,18 +41,23 @@ public class ComparadorHeuristicas {
 //        heur.setVerbose(false);
         heur.setVerbose(false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
+        GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         int k = 2;
 
         IGraphOperation[] operations = new IGraphOperation[]{
-//                        heur,
-                        tss,
-            heur5,
-//            heur5b
+            //            heur,
+            //                        tss,
+//            tssg,
+            heur5, 
+            tss, //            heur5, //            heur5b
         };
 
-        heur.K = tss.K = heur5.K = heur5b.K = k;
-        heur5.startVertice = true;
+//        heur.K = tss.K = heur5.K = heur5b.K = k;
+        heur5.setR(k);
+        tss.setR(k);
+        tssg.setR(k);
+        heur5.startVertice = false;
         int igual = 0;
         int melhor = 0;
         int pior = 0;
@@ -120,10 +126,15 @@ public class ComparadorHeuristicas {
             System.out.println("Primeira falha em: " + primeiraFalha);
         }
         System.out.printf("Differentes %d/%d (%dpct)\n", contdiff, idx, (contdiff * 100 / idx));
+        System.out.println("------------");
         System.out.println("Resultado ");
         System.out.println("total: " + idx);
         System.out.println("Melhor: " + melhor);
         System.out.println("Pior: " + pior);
+        System.out.println("------------");
+        System.out.println("Melhor: " + (melhor * 100 / idx) + "pct");
+        System.out.println("Igual: " + ((idx - (melhor + pior)) * 100 / idx) + "pct"
+        );
         System.out.println("Pior: " + (pior * 100 / idx) + "pct");
     }
 }

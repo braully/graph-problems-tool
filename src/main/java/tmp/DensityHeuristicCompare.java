@@ -28,13 +28,13 @@ import java.util.Map;
 public class DensityHeuristicCompare {
 
     public static final int INI_V = 1;
-    public static final int MAX_V = 500;
+    public static final int MAX_V = 100;
 
     public static void main(String... args) throws IOException {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
         GraphIterationNumberOptm operacao = new GraphIterationNumberOptm();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        GraphHullNumberHeuristicV5Tmp3Bkp heur5 = new GraphHullNumberHeuristicV5Tmp3Bkp();
+        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
 //        GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
 //        GraphHullNumberHeuristicV5Tmp2 heur5 = new GraphHullNumberHeuristicV5Tmp2();
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
@@ -53,10 +53,9 @@ public class DensityHeuristicCompare {
         BufferedWriter writerGraphs = new BufferedWriter(new FileWriter(resultFileGraphs, true));
 
         IGraphOperation[] operations = new IGraphOperation[]{
-//            heur,
+            //            heur,
             tss,
-            heur5,
-        };
+            heur5,};
 
         heur.setVerbose(false);
 
@@ -96,7 +95,8 @@ public class DensityHeuristicCompare {
             int ngraphs = 10;
             int windows = 10;
             for (int nv = INI_V; nv <= MAX_V; nv++) {
-                tss.K = heur.K = heur5.K = k;
+                tss.setR(k);
+                heur5.setR(k);
 
                 System.out.printf("%3d %3d \t", k, nv);
 

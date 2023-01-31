@@ -237,7 +237,7 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
 //        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
 //        System.out.println(subGraph.getEdgeString());
-        optss.setR(2);
+        optss.setR(4);
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = optss.tssCordasco(graph);
 

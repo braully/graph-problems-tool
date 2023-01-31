@@ -25,13 +25,13 @@ package tmp;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
+import com.github.braully.graph.operation.AbstractHeuristic;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV4;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.GraphTSSGreedy;
@@ -100,13 +100,13 @@ public class ExecBigDataSets {
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
-        IGraphOperation[] operations = new IGraphOperation[]{
+        AbstractHeuristic[] operations = new AbstractHeuristic[]{
             tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
             //            heur5t,
-            tssg,
+            //            tssg,
             heur5t2
         };
         long totalTime[] = new long[operations.length];
@@ -119,9 +119,12 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 1; k <= 10; k++) {
-            heur1.K = heur2.K = heur3.K
-                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
+        for (int k = 2; k <= 10; k++) {
+//            heur1.K = heur2.K = heur3.K
+//                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
+            tss.setR(k);
+            heur5t2.setR(k);
+            tssg.setR(k);
             System.out.println("-------------\n\nK: " + k);
 
             for (String s : dataSets) {
@@ -172,7 +175,7 @@ public class ExecBigDataSets {
                     writer.flush();
 
                     if (doOperation != null) {
-                        boolean checkIfHullSet = heur1.checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)).toArray(new Integer[0]));
+                        boolean checkIfHullSet = operations[i].checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)));
                         if (!checkIfHullSet) {
                             System.out.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
                             System.err.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
