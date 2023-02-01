@@ -11,8 +11,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -28,6 +30,10 @@ public abstract class AbstractHeuristic implements IGraphOperation {
     protected int[] kr;
     protected boolean verbose;
     static final String type = "Contamination";
+
+    public static final String MINIMAL = "minimal";
+
+    public Map<String, Boolean> parameters = new LinkedHashMap<>();
 
     public String getTypeProblem() {
         return type;

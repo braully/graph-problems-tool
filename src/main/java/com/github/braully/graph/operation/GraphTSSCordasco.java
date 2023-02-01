@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +26,32 @@ import util.UtilProccess;
  */
 public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperation {
 
-    static final String type = "P3-Convexity";
     static final String description = "TSS-Cordasco";
+
+    {
+        parameters.put(MINIMAL, true);
+    }
+
+    protected boolean tryMiminal() {
+        Boolean get = parameters.get(MINIMAL);
+        return get != null && get;
+    }
+
+    public String getName() {
+        StringBuilder sb = new StringBuilder(description);
+        for (String par : parameters.keySet()) {
+            Boolean get = parameters.get(par);
+            if (get != null) {
+                if (get) {
+                    sb.append("+");
+                } else {
+                    sb.append("-");
+                }
+                sb.append(par);
+            }
+        }
+        return sb.toString();
+    }
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
     public int K = 2;
@@ -178,20 +203,14 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
             //A cada iteração: O vértice escolhido é removido do grafo
             U.remove(v);
         }
-        S = tryMinimal(graph, S);
+        if (tryMiminal()) {
+            S = tryMinimal(graph, S);
+        }
         return S;
     }
 
     double calcularAvaliacao(double k, double delta) {
         return k / (delta * (delta + 1));
-    }
-
-    public String getTypeProblem() {
-        return type;
-    }
-
-    public String getName() {
-        return description;
     }
 
     public static void main(String... args) throws FileNotFoundException, IOException {
@@ -250,4 +269,5 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
             throw new IllegalStateException("NOT HULL SET");
         }
     }
+
 }

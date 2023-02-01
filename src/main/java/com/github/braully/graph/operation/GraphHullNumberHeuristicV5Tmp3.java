@@ -81,9 +81,12 @@ public class GraphHullNumberHeuristicV5Tmp3
     int maiorGrauContaminacao = 0;
     int maiorDeltaHs = 0;
     int maiorContaminadoParcialmente = 0;
-    double maiorContParcialD = 0.0;
+    double maiorBonusParcialNormalizado = 0.0;
     double maiorDificuldadeTotal = 0;
     double maiorBonusTotal = 0;
+    double maiorBonusTotalNormalizado = 0;
+    double maiorBonusParcial = 0;
+    double maiorDificuldadeParcial = 0;
     int maiorProfundidadeS = 0;
     int maiorProfundidadeHS = 0;
     int maiorAux = 0;
@@ -144,7 +147,7 @@ public class GraphHullNumberHeuristicV5Tmp3
             maiorGrauContaminacao = 0;
             maiorDeltaHs = 0;
             maiorContaminadoParcialmente = 0;
-            maiorContParcialD = 0;
+            maiorBonusParcialNormalizado = 0;
             maiorDificuldadeTotal = 0;
             maiorBonusTotal = 0;
             maiorProfundidadeS = 0;
@@ -278,15 +281,15 @@ public class GraphHullNumberHeuristicV5Tmp3
         aux[verti] = aux[verti] + kr[verti];
         if (s != null) {
             s.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-            for (Integer vertn : neighbors) {
-                if ((++scount[vertn]) == kr[vertn] && s.contains(vertn)) {
-                    if (verbose) {
-                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
-                    }
-                    s.remove(vertn);
-                }
-            }
+//            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+//            for (Integer vertn : neighbors) {
+//                if ((++scount[vertn]) == kr[vertn] && s.contains(vertn)) {
+//                    if (verbose) {
+//                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
+//                    }
+//                    s.remove(vertn);
+//                }
+//            }
         }
         mustBeIncluded.clear();
         mustBeIncluded.add(verti);
@@ -333,7 +336,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
             if (kr[v] == 0) {
-                sizeHs = sizeHs + addVertToS(v, null, graphRead, auxini);
+                sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
             }
         }
 //        vertices.sort(Comparator
@@ -477,7 +480,7 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
@@ -485,9 +488,9 @@ public class GraphHullNumberHeuristicV5Tmp3
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
@@ -500,7 +503,7 @@ public class GraphHullNumberHeuristicV5Tmp3
         System.out.println(graph.toResumedString());
 //        op.K = 3;
         op.setVerbose(true);
-        op.setR(2);
+        op.setR(3);
 ////        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraph.subGraphInduced(graph, Set.of(388, 1129, 1185, 1654, 3584, 3997));
 //        System.out.println(subGraph.getEdgeString());
@@ -581,7 +584,10 @@ public class GraphHullNumberHeuristicV5Tmp3
 
             int grauContaminacao = 0;
             int contaminadoParcialmente = 0;
-            double contParicalmenteD = 0;
+            double bonusParcialNormalizado = 0;
+            double bonusTotalNormalizado = 0;
+            double bonusParcial = 0;
+            double dificuldadeParcial = 0;
             double ddouble = 0;
             double bonusTotal = 0;
             double dificuldadeTotal = 0;
@@ -620,9 +626,11 @@ public class GraphHullNumberHeuristicV5Tmp3
 //                        double bonus = Math.max(1, dx - kr[x]);
 //                        double bonus = kr[x] - dx;
                     double bonus = dx - kr[x];
+                    bonusParcial += bonus;
                     double dificuldade = (kr[x] - aux[x]);
+                    dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    contParicalmenteD += (bonus / dificuldade);
+                    bonusParcialNormalizado += (bonus / dificuldade);
                 }
             }
 
@@ -630,11 +638,12 @@ public class GraphHullNumberHeuristicV5Tmp3
 //                bonusTotal = grauI - kr[i];
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
+            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
             int deltaHsi = grauContaminacao;
 
             if (checkDeltaHsi) {
                 int[] auxb = aux.clone();
-                int deltaHsib = addVertToS(i, null, graph, auxb);
+                int deltaHsib = addVertToAux(i, graph, auxb);
                 if (deltaHsi != deltaHsib) {
                     System.err.println("fail on deltahsi: " + deltaHsi + "/" + deltaHsib);
                 }
@@ -667,7 +676,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                 maiorDeltaHs = deltaHsi;
                 maiorGrauContaminacao = grauContaminacao;
                 maiorContaminadoParcialmente = contaminadoParcialmente;
-                maiorContParcialD = contParicalmenteD;
+                maiorBonusParcialNormalizado = bonusParcialNormalizado;
                 maiorBonusTotal = bonusTotal;
                 maiorDificuldadeTotal = dificuldadeTotal;
                 bestVertice = i;
@@ -676,16 +685,21 @@ public class GraphHullNumberHeuristicV5Tmp3
                 maiorDouble = ddouble;
                 maiorAux = aux[i];
                 maiorGrau = di;
+                maiorBonusTotalNormalizado = bonusTotalNormalizado;
+                maiorBonusParcial = bonusParcial;
+                maiorDificuldadeParcial = dificuldadeParcial;
             } else {
 
-                Boolean greater = isGreater(
-                        deltaHsi, maiorDeltaHs,
+                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
                         // bonusTotal, maiorBonusTotal,
                         // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
                         // trans(aux[i]), trans(maiorAux),
                         // profundidadeHS, maiorProfundidadeHS,
-                        maiorBonusTotal, bonusTotal,
-                        trans(maiorContParcialD), trans(contParicalmenteD)
+                        bonusTotal, maiorBonusTotal,
+                        bonusParcial, maiorBonusParcial
+                //                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
+                //                        bonusParcialNormalizado, maiorBonusParcialNormalizado
+                //                        trans(dificuldadeTotal), trans(maiorDificuldadeTotal)
                 //                        profundidadeS, maiorProfundidadeS
 
                 // contaminadoParcialmente, maiorContaminadoParcialmente
@@ -699,7 +713,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                     maiorDeltaHs = deltaHsi;
                     maiorGrauContaminacao = grauContaminacao;
                     maiorContaminadoParcialmente = contaminadoParcialmente;
-                    maiorContParcialD = contParicalmenteD;
+                    maiorBonusParcialNormalizado = bonusParcialNormalizado;
                     bestVertice = i;
                     maiorProfundidadeS = profundidadeS;
                     maiorBonusTotal = bonusTotal;
@@ -707,6 +721,9 @@ public class GraphHullNumberHeuristicV5Tmp3
                     maiorGrau = di;
                     maiorDouble = ddouble;
                     maiorAux = aux[i];
+                    maiorBonusTotalNormalizado = bonusTotalNormalizado;
+                    maiorBonusParcial = bonusParcial;
+                    maiorDificuldadeParcial = dificuldadeParcial;
                 }
             }
         }
