@@ -2,11 +2,11 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
-import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -16,16 +16,15 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import static tmp.DensityHeuristicCompare.INI_V;
-import static tmp.DensityHeuristicCompare.MAX_V;
 import util.BFSUtil;
 import util.MapCountOpt;
 import util.UtilProccess;
 
-public class GraphHullNumberHeuristicV5Tmp3
+public class GraphHNVOptm
         extends AbstractHeuristic implements IGraphOperation {
 
     public boolean startVertice = true;
@@ -35,19 +34,51 @@ public class GraphHullNumberHeuristicV5Tmp3
     public boolean checkstartv = false;
     public boolean checkDeltaHsi = false;
 
-    private static final Logger log = Logger.getLogger(GraphHullNumberHeuristicV5Tmp3.class);
+    private static final Logger log = Logger.getLogger(GraphHNVOptm.class);
 
-    static final String description = "HHn-v2";
+    static final String description = "HHnV2";
     int etapaVerbose = -1;
     boolean checkaddirmao = true;
     boolean rollbackEnable = false;
+    //
+    public static final String pdeltaHsi = "deltaHsi";
+    public static final String pbonusTotal = "bonusTotal";
+    public static final String pbonusParcial = "bonusParcial";
+    public static final String pdificuldadeTotal = "dificuldadeTotal";
+    public static final String pdificuldadeParcial = "dificuldadeParcial";
+    public static final String pbonusTotalNormalizado = "bonusTotalNormalizado";
+    public static final String pbonusParcialNormalizado = "bonusParcialNormalizado";
+    public static final String pprofundidadeS = "profundidadeS";
+    public static final String pgrau = "grau";
+    public static final String paux = "aux";
+
+    public static final List<String> allParameters = List.of(pdeltaHsi, pbonusTotal,
+            pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
+            pbonusTotalNormalizado, pbonusParcialNormalizado,
+            pprofundidadeS, pgrau, paux);
+
+    {
+//        parameters.put(type, verbose)
+    }
 
     @Override
     public String getName() {
-        return description;
+        StringBuilder sb = new StringBuilder(description);
+        for (String par : parameters.keySet()) {
+            Boolean get = parameters.get(par);
+            if (get != null) {
+                if (get) {
+                    sb.append("+");
+                } else {
+                    sb.append("-");
+                }
+                sb.append(par);
+            }
+        }
+        return sb.toString();
     }
 
-    public GraphHullNumberHeuristicV5Tmp3() {
+    public GraphHNVOptm() {
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -445,9 +476,9 @@ public class GraphHullNumberHeuristicV5Tmp3
             hullSet = sini;
 
         }
-//        if (!checkIfHullSet(graphRead, hullSet)) {
-//            throw new IllegalStateException("NOT HULL SET");
-//        }
+        if (!checkIfHullSet(graphRead, hullSet)) {
+            throw new IllegalStateException("NOT HULL SET");
+        }
         return hullSet;
     }
 
@@ -458,113 +489,6 @@ public class GraphHullNumberHeuristicV5Tmp3
         }
         System.out.print("{" + peso + "}");
         UtilProccess.printArray(auxb);
-    }
-
-    public static void main(String... args) throws IOException {
-//        GraphHullNumberHeuristicV1 opref = new GraphHullNumberHeuristicV1();
-//        GraphSubgraph opsubgraph = new GraphSubgraph();
-//        GraphSubgraphNeighborHood opsubgraphn = new GraphSubgraphNeighborHood();
-//        opref.setVerbose(false);
-        GraphHullNumberHeuristicV5Tmp3 op = new GraphHullNumberHeuristicV5Tmp3();
-
-        GraphTSSCordasco optss = new GraphTSSCordasco();
-
-        System.out.println("Teste greater: ");
-
-        UndirectedSparseGraphTO<Integer, Integer> graph = null;
-//        graph = new UndirectedSparseGraphTO("681-753,681-1381,681-4658,753-1381,753-4658,1381-2630,1381-2819,1381-4220,1381-4658,2630-2819,2630-3088,2630-4220,2819-3088,2819-4220,");
-
-//        graph = UtilGraph.loadGraphG6("S?????????????????w@oK?B??GW@OE?g");
-//        graph = UtilGraph.loadGraphG6("S??A?___?O_aOOCGCO?OG@AAB_??Fvw??");
-//        graph = UtilGraph.loadGraphG6("Ss_?G?@???coH`CEABGR?AWDe?A_oAR??");
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-AstroPh/ca-AstroPh.txt"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepPh/ca-HepPh.txt"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-CondMat/ca-CondMat.txt"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
-//        GraphStatistics statistics = new GraphStatistics();
-//        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
-//        System.out.println(graph.getName());
-//        graph = UtilGraph.loadGraphG6("U?GoA?ACCA?_E???O?@???@c@`_?Q_C`DGs?o_Q?");
-//        graph = UtilGraph.loadGraph(new File("tmp.es"));
-        System.out.println(graph.toResumedString());
-//        op.K = 3;
-        op.setVerbose(true);
-        op.setR(3);
-////        System.out.println("Subgraph: ");
-//        UndirectedSparseGraphTO subGraph = opsubgraph.subGraphInduced(graph, Set.of(388, 1129, 1185, 1654, 3584, 3997));
-//        System.out.println(subGraph.getEdgeString());
-//        System.out.println("Subgraph: ");
-//        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
-//        System.out.println(subGraph.getEdgeString());
-        op.startVertice = false;
-
-        if (false) {
-        }
-        if (true) {
-//            return;
-        }
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-
-        UtilProccess.printEndTime();
-
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
-//        op.checkIfHullSet(graph, buildOptimizedHullSet);
-        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-        if (!checkIfHullSet) {
-            System.err.println("FAIL: fail on check hull setg");
-        }
-        Integer[] optHuull = buildOptimizedHullSet.toArray(new Integer[0]);
-        if (true) {
-            return;
-        }
-
-        GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
-
-        op.setVerbose(
-                true);
-
-        System.out.print(
-                "Dens:\t");
-        for (double density = 0.1;
-                density <= 0.9; density
-                += 0.1) {
-            System.out.printf("%.1f \t", density);
-
-        }
-
-        for (int nv = INI_V;
-                nv <= MAX_V;
-                nv++) {
-
-            System.out.printf("%3d: \t", nv);
-
-            for (double density = 0.1; density <= 0.9; density += 0.1) {
-                graph = generator.generate(nv, density);
-//                findMinHullSetGraph = op.findMinHullSetGraph(graph);
-//                System.out.printf("%d", findMinHullSetGraph.size());
-
-                System.out.printf("\t");
-
-            }
-            System.out.println();
-        }
     }
 
     void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
@@ -690,21 +614,73 @@ public class GraphHullNumberHeuristicV5Tmp3
                 maiorDificuldadeParcial = dificuldadeParcial;
             } else {
 
-                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
-                        // bonusTotal, maiorBonusTotal,
-                        // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
-                        // trans(aux[i]), trans(maiorAux),
-                        // profundidadeHS, maiorProfundidadeHS,
-                        bonusTotal, maiorBonusTotal,
-                        bonusParcial, maiorBonusParcial
-                //                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
-                //                        bonusParcialNormalizado, maiorBonusParcialNormalizado
-                //                        trans(dificuldadeTotal), trans(maiorDificuldadeTotal)
-                //                        profundidadeS, maiorProfundidadeS
-
-                // contaminadoParcialmente, maiorContaminadoParcialmente
-                // (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
-                );
+                double[] list = new double[parameters.size() * 2];
+                int cont = 0;
+                for (String p : parameters.keySet()) {
+                    Boolean get = parameters.get(p);
+                    double p1 = 0, p2 = 0;
+                    if (get != null) {
+                        switch (p) {
+                            case pdeltaHsi:
+                                p1 = deltaHsi;
+                                p2 = maiorDeltaHs;
+                                break;
+                            case pbonusTotal:
+                                p1 = bonusTotal;
+                                p2 = maiorBonusTotal;
+                                break;
+                            case pbonusParcial:
+                                p1 = bonusParcial;
+                                p2 = maiorBonusParcial;
+                                break;
+                            case pbonusTotalNormalizado:
+                                p1 = bonusParcialNormalizado;
+                                p2 = maiorBonusTotalNormalizado;
+                                break;
+                            case pdificuldadeTotal:
+                                p1 = dificuldadeTotal;
+                                p2 = maiorDificuldadeTotal;
+                                break;
+                            case pdificuldadeParcial:
+                                p1 = dificuldadeParcial;
+                                p2 = maiorDificuldadeParcial;
+                                break;
+                            case pprofundidadeS:
+                                p1 = profundidadeS;
+                                p2 = maiorProfundidadeS;
+                                break;
+                            case paux:
+                                p1 = aux[i];
+                                p2 = maiorAux;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (get) {
+                            list[cont++] = p1;
+                            list[cont++] = p2;
+                        } else {
+                            list[cont++] = -p1;
+                            list[cont++] = -p2;
+                        }
+                    }
+                }
+                Boolean greater = isGreater(list);
+//                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
+//                        // bonusTotal, maiorBonusTotal,
+//                        // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
+//                        // trans(aux[i]), trans(maiorAux),
+//                        // profundidadeHS, maiorProfundidadeHS,
+//                        bonusTotal, maiorBonusTotal,
+//                        bonusParcial, maiorBonusParcial
+//                //                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
+//                //                        bonusParcialNormalizado, maiorBonusParcialNormalizado
+//                //                        trans(dificuldadeTotal), trans(maiorDificuldadeTotal)
+//                //                        profundidadeS, maiorProfundidadeS
+//
+//                // contaminadoParcialmente, maiorContaminadoParcialmente
+//                // (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
+//                );
                 if (greater == null) {
                     melhores.add(i);
                 } else if (greater) {
@@ -729,4 +705,85 @@ public class GraphHullNumberHeuristicV5Tmp3
         }
     }
 
+    public static void main(String... args) throws IOException {
+        GraphHNVOptm op = new GraphHNVOptm();
+        int totalGlobal = 0;
+        int melhorGlobal = 0;
+        int piorGlobal = 0;
+
+        String strFile = "hog-graphs-ge20-le50-ordered.g6";
+        UndirectedSparseGraphTO<Integer, Integer> graph = null;
+        //
+        for (int r = 1; r <= 5; r++) {
+            BufferedReader files = new BufferedReader(new FileReader(strFile));
+            String line = null;
+            int cont = 0;
+            MapCountOpt contMelhor = new MapCountOpt(allParameters.size());
+            while (null != (line = files.readLine())) {
+                graph = UtilGraph.loadGraphG6(line);
+                op.setR(r);
+                Integer melhor = null;
+                List<Integer> melhores = new ArrayList<>();
+                for (int ip = 0; ip < allParameters.size(); ip++) {
+                    String p = allParameters.get(ip);
+                    op.resetParameters();
+                    op.setParameter(p, true);
+                    Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
+                    String name = op.getName();
+                    int res = optmHullSet.size();
+                    String out = "R\t g" + cont++ + "\t r"
+                            + r + "\t" + name
+                            + "\t" + res + "\n";
+                    if (melhor == null) {
+                        melhor = res;
+                        melhores.add(ip);
+                    } else if (melhor == res) {
+                        melhores.add(ip);
+                    } else if (melhor > res) {
+                        melhores.clear();
+                        melhores.add(ip);
+                    }
+//                    System.out.print("xls: " + out);
+                }
+                for (Integer i : melhores) {
+                    contMelhor.inc(i);
+                }
+
+                cont++;
+            }
+            files.close();
+            System.out.println("\n---------------");
+            System.out.println("Resumo r:" + r);
+
+            Map<String, Integer> map = new HashMap<>();
+            for (int ip = 0; ip < allParameters.size(); ip++) {
+                String p = allParameters.get(ip);
+//                System.out.println(p + ": " + contMelhor.getCount(ip));
+                map.put(p, contMelhor.getCount(ip));
+            }
+            List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+            entrySet.sort(
+                    Comparator.comparingInt(
+                            (Entry<String, Integer> v) -> -v.getValue()
+                    )
+                            .thenComparing(v -> v.getKey())
+            );
+            for (Entry<String, Integer> e : entrySet) {
+                String p = e.getKey();
+                System.out.println(p + ": " + e.getValue());
+            }
+//            for (int ip = 0; ip < allParameters.size(); ip++) {
+//                String p = allParameters.get(ip);
+//                System.out.println(p + ": " + contMelhor.getCount(ip));
+//            }
+        }
+    }
+
+    void resetParameters() {
+        parameters.clear();
+    }
+
+    void setParameter(String p, boolean b) {
+        this.parameters.put(p, b);
+    }
 }
