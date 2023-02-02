@@ -714,7 +714,7 @@ public class GraphHNVOptm
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
-        for (int r = 1; r <= 5; r++) {
+        for (int r = 1; r <= 10; r++) {
             BufferedReader files = new BufferedReader(new FileReader(strFile));
             String line = null;
             int cont = 0;

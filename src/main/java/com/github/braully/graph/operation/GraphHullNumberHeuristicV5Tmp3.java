@@ -689,22 +689,34 @@ public class GraphHullNumberHeuristicV5Tmp3
                 maiorBonusParcial = bonusParcial;
                 maiorDificuldadeParcial = dificuldadeParcial;
             } else {
-
-                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
-                        // bonusTotal, maiorBonusTotal,
-                        // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
-                        // trans(aux[i]), trans(maiorAux),
-                        // profundidadeHS, maiorProfundidadeHS,
-                        bonusTotal, maiorBonusTotal,
-                        bonusParcial, maiorBonusParcial
-                //                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
-                //                        bonusParcialNormalizado, maiorBonusParcialNormalizado
-                //                        trans(dificuldadeTotal), trans(maiorDificuldadeTotal)
-                //                        profundidadeS, maiorProfundidadeS
-
-                // contaminadoParcialmente, maiorContaminadoParcialmente
-                // (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
+                Boolean greater = isGreater(
+                        //                        aux[i], maiorAux,
+                        dificuldadeTotal, maiorDificuldadeTotal,
+                        deltaHsi, maiorDeltaHs,
+                        profundidadeS, maiorProfundidadeS,
+                        dificuldadeParcial, maiorDificuldadeParcial,
+                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
+                        bonusParcialNormalizado, maiorBonusParcialNormalizado
+                //                        grauI, maiorGrau//,
+                //                        bonusTotal, maiorBonusTotal,
+                //                        bonusParcial, maiorBonusParcial
                 );
+
+//                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
+//                        // bonusTotal, maiorBonusTotal,
+//                        // trans(dificuldadeTotal), trans(maiorDificuldadeTotal),
+//                        // trans(aux[i]), trans(maiorAux),
+//                        // profundidadeHS, maiorProfundidadeHS,
+//                        bonusTotal, maiorBonusTotal,
+//                        bonusParcial, maiorBonusParcial
+//                //                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
+//                //                        bonusParcialNormalizado, maiorBonusParcialNormalizado
+//                //                        trans(dificuldadeTotal), trans(maiorDificuldadeTotal)
+//                //                        profundidadeS, maiorProfundidadeS
+//
+//                // contaminadoParcialmente, maiorContaminadoParcialmente
+//                // (int) Math.round(ddouble * 10), (int) Math.round(maiorDouble * 10),
+//                );
                 if (greater == null) {
                     melhores.add(i);
                 } else if (greater) {
