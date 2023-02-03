@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 import util.BFSUtil;
 import util.MapCountOpt;
@@ -718,16 +720,22 @@ public class GraphHNVOptm
             BufferedReader files = new BufferedReader(new FileReader(strFile));
             String line = null;
             int cont = 0;
-            MapCountOpt contMelhor = new MapCountOpt(allParameters.size());
+            MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
             while (null != (line = files.readLine())) {
                 graph = UtilGraph.loadGraphG6(line);
                 op.setR(r);
                 Integer melhor = null;
-                List<Integer> melhores = new ArrayList<>();
-                for (int ip = 0; ip < allParameters.size(); ip++) {
-                    String p = allParameters.get(ip);
+                List<int[]> melhores = new ArrayList<>();
+//                for (int ip = 0; ip < allParameters.size(); ip++) {
+
+                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), 2);
+                while (combinationsIterator.hasNext()) {
+                    int[] currentSet = combinationsIterator.next();
                     op.resetParameters();
-                    op.setParameter(p, true);
+                    for (int ip : currentSet) {
+                        String p = allParameters.get(ip);
+                        op.setParameter(p, true);
+                    }
                     Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
                     String name = op.getName();
                     int res = optmHullSet.size();
@@ -736,19 +744,20 @@ public class GraphHNVOptm
                             + "\t" + res + "\n";
                     if (melhor == null) {
                         melhor = res;
-                        melhores.add(ip);
+                        melhores.add(currentSet);
                     } else if (melhor == res) {
-                        melhores.add(ip);
+                        melhores.add(currentSet);
                     } else if (melhor > res) {
                         melhores.clear();
-                        melhores.add(ip);
+                        melhores.add(currentSet);
                     }
 //                    System.out.print("xls: " + out);
                 }
-                for (Integer i : melhores) {
+//                for (Integer i : melhores) {
+                for (int[] ip : melhores) {
+                    int i = array2idx(ip);
                     contMelhor.inc(i);
                 }
-
                 cont++;
             }
             files.close();
@@ -756,10 +765,20 @@ public class GraphHNVOptm
             System.out.println("Resumo r:" + r);
 
             Map<String, Integer> map = new HashMap<>();
-            for (int ip = 0; ip < allParameters.size(); ip++) {
-                String p = allParameters.get(ip);
+//            for (int ip = 0; ip < allParameters.size(); ip++) {
+//                String p = allParameters.get(ip);
+////                System.out.println(p + ": " + contMelhor.getCount(ip));
+//                map.put(p, contMelhor.getCount(ip));
+//            }
+            for (int[] i : allarrays()) {
+                StringBuilder sb = new StringBuilder();
+                for (int ip : i) {
+                    sb.append(allParameters.get(ip));
+//                    String p = allParameters.get(ip);
+                    sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
-                map.put(p, contMelhor.getCount(ip));
+                }
+                map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
             }
             List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
             entrySet.sort(
@@ -777,6 +796,24 @@ public class GraphHNVOptm
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
 //            }
         }
+    }
+
+    static Map<Integer, int[]> map = new HashMap<>();
+
+    static int[] offset = new int[]{1, 100};
+
+    public static int array2idx(int[] ip) {
+        int cont = 0;
+        for (int i = 0; i < ip.length; i++) {
+            int ipp = ip[i];
+            cont = cont + offset[i] * ipp;
+        }
+        map.put(cont, ip);
+        return cont;
+    }
+
+    public static Collection<int[]> allarrays() {
+        return map.values();
     }
 
     void resetParameters() {

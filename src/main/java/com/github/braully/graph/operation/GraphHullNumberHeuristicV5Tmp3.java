@@ -614,7 +614,7 @@ public class GraphHullNumberHeuristicV5Tmp3
                         mustBeIncluded.add(vertn);
                         bonusHs += degree[vertn] - kr[vertn];
                         dificuldadeHs += (kr[vertn] - aux[vertn]);
-                        pularAvaliacao[vertn] = sizeHs;
+//                        pularAvaliacao[vertn] = sizeHs;
                     }
                 }
                 grauContaminacao++;
@@ -691,12 +691,15 @@ public class GraphHullNumberHeuristicV5Tmp3
             } else {
                 Boolean greater = isGreater(
                         //                        aux[i], maiorAux,
-                        dificuldadeTotal, maiorDificuldadeTotal,
                         deltaHsi, maiorDeltaHs,
-                        profundidadeS, maiorProfundidadeS,
+                        dificuldadeTotal, maiorDificuldadeTotal,
+                        bonusTotal, maiorBonusTotal,
+//                        profundidadeS, maiorProfundidadeS,
                         dificuldadeParcial, maiorDificuldadeParcial,
-                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
-                        bonusParcialNormalizado, maiorBonusParcialNormalizado
+                        bonusParcial, maiorBonusParcial,
+                         profundidadeS, maiorProfundidadeS
+//                        bonusTotalNormalizado, maiorBonusTotalNormalizado,
+//                        bonusParcialNormalizado, maiorBonusParcialNormalizado
                 //                        grauI, maiorGrau//,
                 //                        bonusTotal, maiorBonusTotal,
                 //                        bonusParcial, maiorBonusParcial

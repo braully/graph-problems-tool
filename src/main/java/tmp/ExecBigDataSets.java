@@ -70,10 +70,10 @@ public class ExecBigDataSets {
             "Douban",
             "Delicious",
             "BlogCatalog3",
-            "BlogCatalog2",
-            "Livemocha",
+//            "BlogCatalog2",
+//            "Livemocha",
             "BlogCatalog",
-            "BuzzNet",
+//            "BuzzNet",
             "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();

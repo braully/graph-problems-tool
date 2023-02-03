@@ -29,7 +29,7 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
     static final String description = "TSS-Cordasco";
 
     {
-//        parameters.put(MINIMAL, true);
+        parameters.put(MINIMAL, null);
     }
 
     protected boolean tryMiminal() {
