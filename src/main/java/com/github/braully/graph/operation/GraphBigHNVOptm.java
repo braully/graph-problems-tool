@@ -6,13 +6,13 @@ import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,7 +28,7 @@ import util.BFSUtil;
 import util.MapCountOpt;
 import util.UtilProccess;
 
-public class GraphHNVOptm
+public class GraphBigHNVOptm
         extends AbstractHeuristic implements IGraphOperation {
 
     public boolean startVertice = true;
@@ -38,7 +38,7 @@ public class GraphHNVOptm
     public boolean checkstartv = false;
     public boolean checkDeltaHsi = false;
 
-    private static final Logger log = Logger.getLogger(GraphHNVOptm.class);
+    private static final Logger log = Logger.getLogger(GraphBigHNVOptm.class);
 
     static final String description = "HHnV2";
     int etapaVerbose = -1;
@@ -82,7 +82,7 @@ public class GraphHNVOptm
         return sb.toString();
     }
 
-    public GraphHNVOptm() {
+    public GraphBigHNVOptm() {
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -710,21 +710,43 @@ public class GraphHNVOptm
     }
 
     public static void main(String... args) throws IOException {
-        GraphHNVOptm op = new GraphHNVOptm();
+        GraphBigHNVOptm op = new GraphBigHNVOptm();
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
 
-        String strFile = "hog-graphs-ge20-le50-ordered.g6";
+        String[] dataSets = new String[]{
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat", "ca-HepPh",
+            "ca-AstroPh",
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
+            //            "BlogCatalog2",
+            //            "Livemocha",
+            "BlogCatalog",
+            //            "BuzzNet",
+            "Last.fm", //             "YouTube2"
+        };
+//        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
+
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
         for (int r = 2; r <= 10; r++) {
-            BufferedReader files = new BufferedReader(new FileReader(strFile));
-            String line = null;
             int cont = 0;
             MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
-            while (null != (line = files.readLine())) {
-                graph = UtilGraph.loadGraphG6(line);
+            for (String s : dataSets) {
+                System.out.println("\n-DATASET: " + s);
+
+                try {
+                    graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/nodes.csv"),
+                            new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/edges.csv"));
+                } catch (FileNotFoundException e) {
+                    graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/" + s + ".txt"));
+                }
+                if (graph == null) {
+                    System.out.println("Fail to Load GRAPH: " + s);
+                }
                 op.setR(r);
                 Integer melhor = null;
                 List<int[]> melhores = new ArrayList<>();
@@ -788,38 +810,38 @@ public class GraphHNVOptm
                     contMelhor.inc(i);
                 }
                 cont++;
-            }
-            files.close();
-            System.out.println("\n---------------");
-            System.out.println("Resumo r:" + r);
+                System.out.println("\n---------------");
+                System.out.println("Melhor parcial r: " + r + " dataset: " + s + " melhor: " + melhor);
 
-            Map<String, Integer> map = new HashMap<>();
+                Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-            for (int[] i : allarrays()) {
-                StringBuilder sb = new StringBuilder();
-                for (int ip : i) {
-                    sb.append(allParameters.get(ip));
+                for (int[] i : allarrays()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int ip : i) {
+                        sb.append(allParameters.get(ip));
 //                    String p = allParameters.get(ip);
-                    sb.append("-");
+                        sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
+                    }
+                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
                 }
-                map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
+                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+                entrySet.sort(
+                        Comparator.comparingInt(
+                                (Entry<String, Integer> v) -> -v.getValue()
+                        )
+                                .thenComparing(v -> v.getKey())
+                );
+                for (Entry<String, Integer> e : entrySet) {
+                    String p = e.getKey();
+                    System.out.println(p + ": " + e.getValue());
+                }
             }
-            List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-            entrySet.sort(
-                    Comparator.comparingInt(
-                            (Entry<String, Integer> v) -> -v.getValue()
-                    )
-                            .thenComparing(v -> v.getKey())
-            );
-            for (Entry<String, Integer> e : entrySet) {
-                String p = e.getKey();
-                System.out.println(p + ": " + e.getValue());
-            }
+
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
@@ -827,7 +849,7 @@ public class GraphHNVOptm
         }
     }
 
-    private static int apply(GraphHNVOptm op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {
+    private static int apply(GraphBigHNVOptm op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {
         op.resetParameters();
         for (int ip : currentSet) {
             String p = allParameters.get(ip);
