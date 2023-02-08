@@ -6,14 +6,11 @@ import com.github.braully.graph.UtilGraph;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import util.UtilParse;
@@ -24,10 +21,10 @@ import util.UtilProccess;
  * Reference: Discovering Small Target Sets in Social Networks: A Fast and
  * Effective Algorithm
  */
-public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation {
+public class GraphTIPDecomp2 extends AbstractHeuristic implements IGraphOperation {
 
     static final String type = "P3-Convexity";
-    static final String description = "TSS-Greedy";
+    static final String description = "TIPDecomp";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
     public int K = 2;
@@ -42,7 +39,7 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
 
         /* Processar a buscar pelo hullset e hullnumber */
         Map<String, Object> response = new HashMap<>();
-        Set s = tssGreedy(graph, reqList);
+        Set s = tipDecomp(graph, reqList);
 
         try {
             response.put("TSS", "" + s);
@@ -56,66 +53,55 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
         return response;
     }
 
-    public Set<Integer> tssGreedy(UndirectedSparseGraphTO graph) {
-        return tssGreedy(graph, null);
+    public Set<Integer> tipDecomp(UndirectedSparseGraphTO graph) {
+        return tipDecomp(graph, null);
     }
 
-    public Set<Integer> tssGreedy(UndirectedSparseGraphTO graph, List<Integer> reqList) {
-        Set<Integer> S = new LinkedHashSet<>();
-        Set<Integer> U = new LinkedHashSet<>(graph.getVertices());
+    public Set<Integer> tipDecomp(UndirectedSparseGraphTO graph, List<Integer> reqList) {
+        Set<Integer> S = new LinkedHashSet<>(graph.getVertices());
         initKr(graph);
         int n = graph.getVertexCount();
 
         int[] delta = new int[n];
         int[] k = new int[n];
+        int[] dist = new int[n];
 
         Set<Integer>[] N = new Set[n];
 
-        for (Integer v : U) {
+        for (Integer v : S) {
             delta[v] = graph.degree(v);
             k[v] = kr[v];
             N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
+            dist[v] = delta[v] - kr[v];
         }
 
-        while (U.size() > 0) {
+        boolean flag = true;
+
+        while (flag) {
             Integer v = null;
-            int min_d = Integer.MAX_VALUE;
-            for (Integer u : U) {
-                double x = calcularAvaliacao(k[u], delta[u]);
-                if (k[u] < min_d) {
-                    min_d = k[u];
-                    v = u;
+            for (var vi : S) {
+                if (v == null) {
+                    v = vi;
+                } else if (dist[v] > dist[vi]) {
+                    v = vi;
                 }
             }
-            if (k[v] > 0) {
-                double max_x = -1;
-                for (Integer u : U) {
-                    double x = N[u].size();
-                    if (x > max_x) {
-                        max_x = x;
-                        v = u;
+            if (dist[v] == Integer.MAX_VALUE) {
+                flag = false;
+            } else {
+                S.remove(v);
+                for (Integer u : N[v]) {
+                    if (dist[u] > 0) {
+                        dist[u]--;
+                    } else {
+                        dist[u] = Integer.MAX_VALUE;
                     }
+                    N[u].remove(v);
                 }
-                S.add(v);
             }
-
-            //v será dominado por seus vizinhos
-            for (Integer u : N[v]) {
-                k[u] = Math.max(0, k[u] - 1);
-                N[u].remove(v);
-                delta[u] = delta[u] - 1;
-            }
-            U.remove(v);
         }
-        S = tryMinimal(graph, S);
+//        S = tryMinimal(graph, S);
         return S;
-    }
-
-    double calcularAvaliacao(double k, double delta) {
-//        return k / (delta * (delta + 1));
-//        return k - delta;
-//        return k/delta;
-        return delta / k;
     }
 
     public String getTypeProblem() {
@@ -127,17 +113,19 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
     }
 
     public static void main(String... args) throws FileNotFoundException, IOException {
-        GraphTSSGreedy optss = new GraphTSSGreedy();
+        GraphTIPDecomp2 optss = new GraphTIPDecomp2();
 
         System.out.println("Teste greater: ");
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv")); 
         System.out.println(graph.toResumedString());
-        optss.setR(5);
-        optss.setTryMinimal();
+        optss.setR(3);
         UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = optss.tssGreedy(graph);
+        Set<Integer> buildOptimizedHullSet = optss.tipDecomp(graph);
 
         UtilProccess.printStartTime();
 
@@ -148,5 +136,4 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
             throw new IllegalStateException("NOT HULL SET");
         }
     }
-
 }

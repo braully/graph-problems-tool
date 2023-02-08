@@ -7,6 +7,7 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.NEIGHBOOR_COUNT_INCLUDED;
+import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  *
@@ -360,5 +363,35 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             aux[verti] += kr[verti];
         }
         return fecho.size() == graph.getVertexCount();
+    }
+public Map<Integer, Set<Integer>> connectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        int ret = 0;
+        Map<Integer, Set<Integer>> map = new TreeMap<>();
+        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
+        if (graph != null && graph.getVertexCount() > 0) {
+            Collection<Integer> vertices = graph.getVertices();
+            TreeSet<Integer> verts = new TreeSet<>(vertices);
+            while (!verts.isEmpty()) {
+                Integer first = verts.first();
+                bdl.labelDistances(graph, first);
+                int contn = 1;
+                Set<Integer> acc = new LinkedHashSet<>();
+                acc.add(first);
+                for (Integer v : vertices) {
+                    if (bdl.getDistance(graph, v) >= 0) {
+                        verts.remove(v);
+                        contn++;
+                        acc.add(v);
+                    }
+                }
+                ret++;
+                map.put(ret, acc);
+            }
+        }
+        return map;
+    }
+
+    protected void setTryMinimal() {
+        parameters.put(MINIMAL, true);
     }
 }

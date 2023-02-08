@@ -133,10 +133,7 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
                 }
 
                 for (Integer u : N[v]) {
-                    if (!u.equals(v)) {
-                        N[u].remove(v);
-                    }
-
+                    N[u].remove(v);
                     delta[u] = delta[u] - 1;
                     if (k[u] > 0) {
                         k[u] = k[u] - 1;
@@ -164,10 +161,7 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
                     S.add(v);
 
                     for (Integer u : N[v]) {
-                        if (!u.equals(v)) {
-                            N[u].remove(v);
-                        }
-
+                        N[u].remove(v);
                         k[u] = k[u] - 1;
                         delta[u] = delta[u] - 1;
                         if (k[u] == 0) {
@@ -188,10 +182,11 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
 
                     //cout << "Caso 3: " << v.Id() << endl;
                     //v será dominado por seus vizinhos
+                    if (v == null) {
+                        System.out.print(" " + v);
+                    }
                     for (Integer u : N[v]) {
-                        if (!u.equals(v)) {
-                            N[u].remove(v);
-                        }
+                        N[u].remove(v);
                         delta[u] = delta[u] - 1;
                         if (delta[u] < k[u]) {
                             delta_k.add(u);
@@ -211,6 +206,10 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
 
     double calcularAvaliacao(double k, double delta) {
         return k / (delta * (delta + 1));
+//        return k / (delta * (delta + 1));
+//        return (k + 1) - delta;
+//        return k / delta;
+//        return (k + 1) - delta;
     }
 
     public static void main(String... args) throws FileNotFoundException, IOException {
@@ -241,12 +240,16 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        GraphStatistics statistics = new GraphStatistics();
 //        System.out.println(graph.getName() + ": " + statistics.doOperation(graph));
 //        System.out.println(graph.getName());
 //        graph = UtilGraph.loadGraphG6("U?GoA?ACCA?_E???O?@???@c@`_?Q_C`DGs?o_Q?");
 //        graph = UtilGraph.loadGraph(new File("tmp.es"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+
         System.out.println(graph.toResumedString());
 //        op.K = 3;
 //        optss.verbose = false;
@@ -256,7 +259,8 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
 //        System.out.println("Subgraph: ");
 //        UndirectedSparseGraphTO subGraph = opsubgraphn.subGraphInduced(graph, Set.of(1381, 3088, 2630));
 //        System.out.println(subGraph.getEdgeString());
-        optss.setR(4);
+        optss.setR(10);
+        optss.setTryMinimal();
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = optss.tssCordasco(graph);
 

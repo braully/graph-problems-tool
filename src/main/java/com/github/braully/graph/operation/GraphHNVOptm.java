@@ -6,6 +6,7 @@ import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -60,6 +61,7 @@ public class GraphHNVOptm
             pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
             pbonusTotalNormalizado, pbonusParcialNormalizado,
             pprofundidadeS, pgrau, paux);
+    public boolean decompor = false;
 
     {
 //        parameters.put(type, verbose)
@@ -341,10 +343,58 @@ public class GraphHNVOptm
 
         return countIncluded;
     }
+    boolean pularAvaliacaoOffset = false;
     int[] pularAvaliacao = null;
     int[] scount = null;
     int[] degree = null;
 //    @Override
+
+    public Set<Integer> tipDecomp(UndirectedSparseGraphTO graph) {
+        Set<Integer> S = new LinkedHashSet<>(graph.getVertices());
+//        initKr(graph);
+        int n = (Integer) graph.maxVertex() + 1;
+
+        int[] delta = new int[n];
+        int[] k = new int[n];
+        int[] dist = new int[n];
+
+        Set<Integer>[] N = new Set[n];
+
+        for (Integer v : S) {
+            delta[v] = graph.degree(v);
+            k[v] = kr[v];
+            N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
+            dist[v] = delta[v] - kr[v];
+        }
+
+        boolean flag = true;
+
+        while (flag) {
+            Integer v = null;
+            for (var vi : S) {
+                if (v == null) {
+                    v = vi;
+                } else if (dist[v] > dist[vi]) {
+                    v = vi;
+                }
+            }
+            if (dist[v] == Integer.MAX_VALUE) {
+                flag = false;
+            } else {
+                S.remove(v);
+                for (Integer u : N[v]) {
+                    if (dist[u] > 0) {
+                        dist[u]--;
+                    } else {
+                        dist[u] = Integer.MAX_VALUE;
+                    }
+                    N[u].remove(v);
+                }
+            }
+        }
+//        S = tryMinimal(graph, S);
+        return S;
+    }
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
@@ -374,10 +424,21 @@ public class GraphHNVOptm
                 sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
             }
         }
+        if (decompor) {
+            Set<Integer> tipDecomp = tipDecomp(graphRead);
+            for (Integer v : tipDecomp) {
+                degree[v] = graphRead.degree(v);
+                if (degree[v] <= kr[v] - 1) {
+                    sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
+                }
+                if (kr[v] == 0) {
+                    sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
+                }
+            }
+        }
 //        vertices.sort(Comparator
 //                .comparingInt((Integer v) -> -graphRead.degree(v))
 //                .thenComparing(v -> -v));
-
 //        int total = graphRead.getVertexCount();
 //        int cont = 0;
 //        int ret = total & cont;
@@ -506,7 +567,7 @@ public class GraphHNVOptm
             if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
                 continue;
             }
-            if (pularAvaliacao[i] >= sizeHs) {
+            if (pularAvaliacaoOffset && pularAvaliacao[i] >= sizeHs) {
                 continue;
             }
 
@@ -545,6 +606,9 @@ public class GraphHNVOptm
                         pularAvaliacao[vertn] = sizeHs;
                     }
                 }
+//                bonusHs += degree[verti] - kr[verti];
+//                dificuldadeHs += (kr[verti] - aux[verti]);
+//                pularAvaliacao[verti] = sizeHs;
                 grauContaminacao++;
             }
 
@@ -555,7 +619,7 @@ public class GraphHNVOptm
 //                        double bonus = kr[x] - dx;
                     double bonus = dx - kr[x];
                     bonusParcial += bonus;
-                    double dificuldade = (kr[x] - aux[x]);
+                    double dificuldade = (kr[x] - (aux[x] + mapCount.getCount(x)));
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
                     bonusParcialNormalizado += (bonus / dificuldade);
@@ -710,13 +774,64 @@ public class GraphHNVOptm
     }
 
     public static void main(String... args) throws IOException {
+
+        UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNVOptm op = new GraphHNVOptm();
+
+//        op.setParameter(GraphBigHNVOptm.paux, true);
+//        op.setParameter(GraphBigHNVOptm.pgrau, true);
+//        op.setParameter(GraphBigHNVOptm.pbonusTotal, true);
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
+////        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
+//
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+
+        System.out.println(graph.toResumedString());
+
+//        System.out.println("Conected componentes: ");
+//        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
+//        for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
+//            System.out.println("" + e.getKey() + ": " + e.getValue().size());
+//        }
+//        }
+        op.setR(10);
+        op.resetParameters();
+        op.setPularAvaliacaoOffset(true);
+//        op.decompor = true;
+//        op.setParameter(GraphBigHNVOptm.paux, true);
+//        op.setParameter(GraphBigHNVOptm.pgrau, true);
+        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
+        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+
+        UtilProccess.printStartTime();
+        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+
+        UtilProccess.printEndTime();
+
+        System.out.println(
+                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+
+//        op.checkIfHullSet(graph, buildOptimizedHullSet);
+        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+        if (!checkIfHullSet) {
+            System.err.println("FAIL: fail on check hull setg");
+        }
+
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
 
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
-        UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
         for (int r = 2; r <= 10; r++) {
             BufferedReader files = new BufferedReader(new FileReader(strFile));
@@ -876,5 +991,9 @@ public class GraphHNVOptm
 
     void setParameter(String p, boolean b) {
         this.parameters.put(p, b);
+    }
+
+    private void setPularAvaliacaoOffset(boolean b) {
+        this.pularAvaliacaoOffset = true;
     }
 }

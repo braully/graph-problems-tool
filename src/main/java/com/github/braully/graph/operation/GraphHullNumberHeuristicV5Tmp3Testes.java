@@ -1010,37 +1010,6 @@ public class GraphHullNumberHeuristicV5Tmp3Testes
         op.K = opref.K = 6;
         op.startVertice = false;
 
-        if (false) {
-            Map<Integer, Integer> numConnectedComponents = op.numConnectedComponents(graph);
-            Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-            for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
-                System.out.print("" + e.getKey() + ": \n -");
-                for (Integer vn : e.getValue()) {
-                    System.out.print(vn + ", ");
-                }
-                System.out.println();
-
-                System.out.println("H: ");
-                UndirectedSparseGraphTO subGraphInduced = opsubgraph.subGraphInduced(graph, e.getValue());
-                Set h1 = op.buildOptimizedHullSet(subGraphInduced);
-                System.out.println(" - hnv[" + h1.size() + "]:" + h1);
-//            if (e.getValue().size() >= 1000) {
-//            if (e.getValue().contains(1381)) {
-//                System.out.println("Dump: ");
-//                System.out.println(subGraphInduced.getEdgeString());
-//
-//            }
-//            Set<Integer> h2 = optss.tssCordasco(subGraphInduced);
-//            System.out.println(" - tss[" + h2.size() + "]:" + h2);
-                if (e.getValue().size() <= 100) {
-                    Set h3 = opref.buildOptimizedHullSet(subGraphInduced);
-                    System.out.println(" - ref[" + h3.size() + "]:" + h3);
-                    if (h1.size() != h3.size()) {
-                        System.out.println(" - DIVERGETNE: " + h1.size() + " " + h3.size());
-                    }
-                }
-            }
-        }
         if (true) {
 //            return;
         }

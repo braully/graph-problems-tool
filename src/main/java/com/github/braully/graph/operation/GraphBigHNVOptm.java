@@ -79,6 +79,9 @@ public class GraphBigHNVOptm
                 sb.append(par);
             }
         }
+        if (pularAvaliacaoOffset) {
+            sb.append(":pularAva");
+        }
         return sb.toString();
     }
 
@@ -341,7 +344,8 @@ public class GraphBigHNVOptm
 
         return countIncluded;
     }
-    int[] pularAvaliacao = null;
+    public boolean pularAvaliacaoOffset = true;
+    int[] ofssetPularAvaliacao = null;
     int[] scount = null;
     int[] degree = null;
 //    @Override
@@ -356,10 +360,10 @@ public class GraphBigHNVOptm
         int[] auxini = new int[vertexCount];
         scount = new int[vertexCount];
         degree = new int[vertexCount];
-        pularAvaliacao = new int[vertexCount];
+        ofssetPularAvaliacao = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
-            pularAvaliacao[i] = -1;
+            ofssetPularAvaliacao[i] = -1;
             scount[i] = 0;
 
         }
@@ -506,7 +510,8 @@ public class GraphBigHNVOptm
             if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
                 continue;
             }
-            if (pularAvaliacao[i] >= sizeHs) {
+            if (pularAvaliacaoOffset
+                    && ofssetPularAvaliacao[i] >= sizeHs) {
                 continue;
             }
 
@@ -542,7 +547,7 @@ public class GraphBigHNVOptm
                         mustBeIncluded.add(vertn);
                         bonusHs += degree[vertn] - kr[vertn];
                         dificuldadeHs += (kr[vertn] - aux[vertn]);
-                        pularAvaliacao[vertn] = sizeHs;
+                        ofssetPularAvaliacao[vertn] = sizeHs;
                     }
                 }
                 grauContaminacao++;
@@ -716,23 +721,22 @@ public class GraphBigHNVOptm
         int piorGlobal = 0;
 
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
-            "ca-CondMat", "ca-HepPh",
-            "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
-            //            "BlogCatalog2",
-            //            "Livemocha",
-            "BlogCatalog",
-            //            "BuzzNet",
-            "Last.fm", //             "YouTube2"
+            "ca-GrQc", "ca-HepTh", //            "ca-CondMat", "ca-HepPh",
+        //            "ca-AstroPh",
+        //            "Douban",
+        //            "Delicious",
+        //            "BlogCatalog3",
+        //            //            "BlogCatalog2",
+        //            //            "Livemocha",
+        //            "BlogCatalog",
+        //            //            "BuzzNet",
+        //            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
-        for (int r = 2; r <= 10; r++) {
+        for (int r = 3; r <= 7; r++) {
             int cont = 0;
             MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
             for (String s : dataSets) {
@@ -892,11 +896,11 @@ public class GraphBigHNVOptm
         return map.values();
     }
 
-    void resetParameters() {
+    public void resetParameters() {
         this.parameters.clear();
     }
 
-    void setParameter(String p, boolean b) {
+    public void setParameter(String p, boolean b) {
         this.parameters.put(p, b);
     }
 }
