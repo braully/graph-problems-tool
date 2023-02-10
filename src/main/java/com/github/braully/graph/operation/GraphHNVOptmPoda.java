@@ -870,11 +870,14 @@ public class GraphHNVOptmPoda
         parametros.addAll(List.of(pdeltaHsi, pbonusTotal,
                 pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
                 //                pbonusTotalNormalizado, pbonusParcialNormalizado,
-                pprofundidadeS, pgrau, paux));
+                pprofundidadeS
+        //        , pgrau, paux
+        ));
         System.out.println("otimização individualizada");
         for (int ciclo = 1; ciclo <= 3; ciclo++) {
             System.out.println("Ciclo: " + ciclo);
-            op.setPularAvaliacaoOffset(false);
+//            op.setPularAvaliacaoOffset(false);
+            op.setPularAvaliacaoOffset(true);
             op.realizarPoda = false;
             for (int r = 4; r <= 10; r++) {
                 String line = null;
@@ -949,13 +952,13 @@ public class GraphHNVOptmPoda
             if (melhor == null) {
                 melhor = res;
                 melhores1.add(currentSet);
-                System.out.println(" melhor otimizado");
-                System.out.println(out);
             } else if (melhor == res) {
                 melhores1.add(currentSet);
             } else if (melhor > res) {
                 melhores1.clear();
                 melhores1.add(currentSet);
+                System.out.println(" melhor otimizado ");
+                System.out.println(out);
             }
             int[] currentRerverse = currentSet.clone();
             for (int i = 0; i < currentSet.length; i++) {
@@ -984,6 +987,8 @@ public class GraphHNVOptmPoda
             } else if (melhor > res) {
                 melhores1.clear();
                 melhores1.add(currentRerverse);
+                System.out.println(" melhor otimizado ");
+                System.out.println(out);
             }
         }
         return melhor;
