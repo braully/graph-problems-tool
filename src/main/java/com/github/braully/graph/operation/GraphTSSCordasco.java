@@ -32,11 +32,6 @@ public class GraphTSSCordasco extends AbstractHeuristic implements IGraphOperati
         parameters.put(MINIMAL, null);
     }
 
-    protected boolean tryMiminal() {
-        Boolean get = parameters.get(MINIMAL);
-        return get != null && get;
-    }
-
     public String getName() {
         StringBuilder sb = new StringBuilder(description);
         for (String par : parameters.keySet()) {

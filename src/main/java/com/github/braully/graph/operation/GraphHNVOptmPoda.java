@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,7 +62,7 @@ public class GraphHNVOptmPoda
             pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
             pbonusTotalNormalizado, pbonusParcialNormalizado,
             pprofundidadeS, pgrau, paux);
-    public boolean decompor = false;
+    public boolean realizarPoda = true;
 
     {
 //        parameters.put(type, verbose)
@@ -80,6 +81,12 @@ public class GraphHNVOptmPoda
                 }
                 sb.append(par);
             }
+        }
+        if (realizarPoda) {
+            sb.append(":poda");
+        }
+        if (pularAvaliacaoOffset) {
+            sb.append(":pulaOff");
         }
         return sb.toString();
     }
@@ -118,6 +125,7 @@ public class GraphHNVOptmPoda
     int maiorGrauContaminacao = 0;
     int maiorDeltaHs = 0;
     int maiorContaminadoParcialmente = 0;
+    double maiorIndiceCentralidade = 0;
     double maiorBonusParcialNormalizado = 0.0;
     double maiorDificuldadeTotal = 0;
     double maiorBonusTotal = 0;
@@ -137,8 +145,8 @@ public class GraphHNVOptmPoda
 //        Set<Integer> s = new HashSet<>(sini);
 //        List<Integer> verticesInteresse = new ArrayList<>();
         Set<Integer> s = new LinkedHashSet<>(sini);
-        Collection<Integer> vertices = graph.getVertices();
-        int vertexCount = graph.getVertexCount();
+        Collection<Integer> vertices = verticesTrabalho;
+        int vertexCount = vertices.size();
         Integer maxVertex = graph.maxVertex();
         int[] aux = auxini.clone();
         int sizeHs = sizeHsini;
@@ -158,8 +166,8 @@ public class GraphHNVOptmPoda
             }
         }
 //        BFSDistanceLabeler<Integer, Integer> bdls = new BFSDistanceLabeler<>();
-        BFSDistanceLabeler<Integer, Integer> bdlhs = new BFSDistanceLabeler<>();
-        BFSUtil bdls = BFSUtil.newBfsUtilSimple(maxVertex + 1);
+        bdls = BFSUtil.newBfsUtilSimple(maxVertex + 1);
+
         bdls.labelDistances(graph, s);
         int commit = sini.size();
 
@@ -169,7 +177,7 @@ public class GraphHNVOptmPoda
 //        MapCountOpt mapCountS = new MapCountOpt(maxVertex + 1);
 
 //        for (Integer vt : sini) {
-//            Collection<Integer> ns = graph.getNeighborsUnprotected(vt);
+//            Collection<Integer> ns = getNeighborsNaoPodados(graph, vt);
 //            for (Integer vnn : ns) {
 //                mapCountS.inc(vnn);
 //            }
@@ -180,6 +188,7 @@ public class GraphHNVOptmPoda
             }
 
             bestVertice = -1;
+            maiorIndiceCentralidade = 0;
             maiorGrau = 0;
             maiorGrauContaminacao = 0;
             maiorDeltaHs = 0;
@@ -202,12 +211,12 @@ public class GraphHNVOptmPoda
             }
 //            void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
 //            int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) 
-            escolherMelhorVertice(graph, aux, vertices, bdls, sizeHs);
+            escolherMelhorVerticeAlvo(graph, aux, vertices, bdls, sizeHs);
             if (etapaVerbose == s.size()) {
                 System.out.println(" - " + bestVertice);
                 System.out.println(" - " + melhores);
                 for (Integer ml : melhores) {
-                    System.out.println("  -- " + ml + " [" + graph.getNeighborsUnprotected(ml).size() + "]: " + graph.getNeighborsUnprotected(ml));
+                    System.out.println("  -- " + ml + " [" + getNeighborsNaoPodados(graph, ml).size() + "]: " + getNeighborsNaoPodados(graph, ml));
                 }
 
             }
@@ -224,9 +233,10 @@ public class GraphHNVOptmPoda
 //                bdl.labelDistances(graph, s);
 //            }
         }
-
 //        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
-        s = tryMinimal(graph, s);
+        if (tryMiminal()) {
+            s = tryMinimal(graph, s);
+        }
 //        s = tryMinimal2(graph, s);
         return s;
     }
@@ -283,18 +293,18 @@ public class GraphHNVOptmPoda
         if (verti == null) {
             return countIncluded;
         }
-        if (kr[verti] > 0 && aux[verti] >= kr[verti]) {
+        if (krp[verti] > 0 && aux[verti] >= krp[verti]) {
             return countIncluded;
         }
 
-        aux[verti] = aux[verti] + kr[verti];
+        aux[verti] = aux[verti] + krp[verti];
         mustBeIncluded.clear();
         mustBeIncluded.add(verti);
         while (!mustBeIncluded.isEmpty()) {
             verti = mustBeIncluded.remove();
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            Collection<Integer> neighbors = getNeighborsNaoPodados(graph, verti);
             for (Integer vertn : neighbors) {
-                if ((++aux[vertn]) == kr[vertn]) {
+                if ((++aux[vertn]) == krp[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
@@ -311,30 +321,30 @@ public class GraphHNVOptmPoda
         if (verti == null) {
             return countIncluded;
         }
-        if (kr[verti] > 0 && aux[verti] >= kr[verti]) {
+        if (krp[verti] > 0 && aux[verti] >= krp[verti]) {
             return countIncluded;
         }
 
-        aux[verti] = aux[verti] + kr[verti];
+        aux[verti] = aux[verti] + krp[verti];
         if (s != null) {
             s.add(verti);
-//            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-//            for (Integer vertn : neighbors) {
-//                if ((++scount[vertn]) == kr[vertn] && s.contains(vertn)) {
-//                    if (verbose) {
-//                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
-//                    }
-//                    s.remove(vertn);
-//                }
-//            }
+            Collection<Integer> neighbors = getNeighborsNaoPodados(graph, verti);
+            for (Integer vertn : neighbors) {
+                if ((++scount[vertn]) == krp[vertn] && s.contains(vertn)) {
+                    if (verbose) {
+                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
+                    }
+                    s.remove(vertn);
+                }
+            }
         }
         mustBeIncluded.clear();
         mustBeIncluded.add(verti);
         while (!mustBeIncluded.isEmpty()) {
             verti = mustBeIncluded.remove();
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            Collection<Integer> neighbors = getNeighborsNaoPodados(graph, verti);
             for (Integer vertn : neighbors) {
-                if ((++aux[vertn]) == kr[vertn]) {
+                if ((++aux[vertn]) == krp[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
             }
@@ -347,57 +357,80 @@ public class GraphHNVOptmPoda
     int[] pularAvaliacao = null;
     int[] scount = null;
     int[] degree = null;
-//    @Override
+    Set<Integer> verticesTrabalho;
+    Set<Integer> podados;
+    int[] graup;
+    int[] krp;
+    BFSUtil bdlhs;
+    BFSUtil bdls;
 
-    public Set<Integer> tipDecomp(UndirectedSparseGraphTO graph) {
-        Set<Integer> S = new LinkedHashSet<>(graph.getVertices());
-//        initKr(graph);
+    Set<Integer> graphCenter;
+
+//    @Override
+    public Set<Integer> poda(UndirectedSparseGraphTO graph) {
+        podados = new LinkedHashSet<>();
+        Set<Integer> verticesTrabalhados = new LinkedHashSet<>(verticesTrabalho);
+        //        initKr(graph);
         int n = (Integer) graph.maxVertex() + 1;
 
-        int[] delta = new int[n];
-        int[] k = new int[n];
         int[] dist = new int[n];
 
         Set<Integer>[] N = new Set[n];
 
-        for (Integer v : S) {
-            delta[v] = graph.degree(v);
-            k[v] = kr[v];
-            N[v] = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
-            dist[v] = delta[v] - kr[v];
+        for (Integer v : verticesTrabalhados) {
+            N[v] = new LinkedHashSet<>(getNeighborsNaoPodados(graph, v));
+            dist[v] = graup[v] - krp[v];
         }
 
         boolean flag = true;
 
-        while (flag) {
+        while (!verticesTrabalhados.isEmpty() && flag) {
             Integer v = null;
-            for (var vi : S) {
+            Double maiorRanking = null;
+            for (var vi : verticesTrabalhados) {
+                double rankvi = (graup[vi] - krp[vi]) * (bdlhs.getDistance(graph, vi) + 1);
                 if (v == null) {
                     v = vi;
-                } else if (dist[v] > dist[vi]) {
+                    maiorRanking = rankvi;
+                } else if (rankvi > maiorRanking) {
                     v = vi;
+                    maiorRanking = rankvi;
                 }
             }
-            if (dist[v] == Integer.MAX_VALUE) {
+            if (v == null || maiorRanking <= 0
+                    || krp[v] == 0 || graup[v] <= krp[v]) {
                 flag = false;
+//                System.out.println("Poda encerrada no vertice v: " + v);
+                if (v != null) {
+//                    System.out.println("Poda encerrada no vertice v seu ranking é: " + maiorRanking);
+                }
             } else {
-                S.remove(v);
+                boolean podeSerPodado = true;
                 for (Integer u : N[v]) {
-                    if (dist[u] > 0) {
-                        dist[u]--;
-                    } else {
-                        dist[u] = Integer.MAX_VALUE;
+                    graup[u]--;
+                    if (krp[u] > graup[u]) {
+                        podeSerPodado = false;
                     }
                     N[u].remove(v);
                 }
+                if (!podeSerPodado) {
+                    for (Integer u : N[v]) {
+                        graup[u]++;
+                    }
+//                    flag = false;
+                } else {
+                    verticesTrabalho.remove(v);
+                    podados.add(v);
+                }
             }
+            verticesTrabalhados.remove(v);
         }
 //        S = tryMinimal(graph, S);
-        return S;
+        return verticesTrabalho;
     }
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
-        List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
+        verticesTrabalho = new LinkedHashSet<>((List<Integer>) graphRead.getVertices());
         Set<Integer> hullSet = null;
         Integer vl = null;
         Set<Integer> sini = new LinkedHashSet<>();
@@ -407,34 +440,48 @@ public class GraphHNVOptmPoda
         scount = new int[vertexCount];
         degree = new int[vertexCount];
         pularAvaliacao = new int[vertexCount];
+        graup = new int[vertexCount];
+        krp = new int[vertexCount];
+        graphCenter = new HashSet<>();
+        int menorGrau = 0;
+        int maiorGrau = 0;
+
         for (int i = 0; i < vertexCount; i++) {
             auxini[i] = 0;
             pularAvaliacao[i] = -1;
             scount[i] = 0;
-
         }
+//        bdlhs = BFSUtil.newBfsUtilSimple(vertexCount + 1);
         initKr(graphRead);
         int sizeHs = 0;
-        for (Integer v : vertices) {
+        for (Integer v : verticesTrabalho) {
             degree[v] = graphRead.degree(v);
-            if (degree[v] <= kr[v] - 1) {
+            graup[v] = degree[v];
+            krp[v] = kr[v];
+            if (degree[v] < degree[menorGrau]) {
+                menorGrau = v;
+            }
+            if (degree[v] > degree[maiorGrau]) {
+                maiorGrau = v;
+            }
+            if (graup[v] <= krp[v] - 1) {
                 sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
             }
-            if (kr[v] == 0) {
+            if (krp[v] == 0) {
                 sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
             }
         }
-        if (decompor) {
-            Set<Integer> tipDecomp = tipDecomp(graphRead);
-            for (Integer v : tipDecomp) {
-                degree[v] = graphRead.degree(v);
-                if (degree[v] <= kr[v] - 1) {
-                    sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
-                }
-                if (kr[v] == 0) {
-                    sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
-                }
-            }
+
+//        bdlhs.
+        for (int i = 0; i < vertexCount; i++) {
+            auxini[i] = 0;
+            pularAvaliacao[i] = -1;
+            scount[i] = 0;
+        }
+        if (realizarPoda) {
+            System.out.println("Realizando poda: " + verticesTrabalho.size());
+            Set<Integer> tipDecomp = poda(graphRead);
+            System.out.println("Poda realizada tfinal: " + verticesTrabalho.size());
         }
 //        vertices.sort(Comparator
 //                .comparingInt((Integer v) -> -graphRead.degree(v))
@@ -485,35 +532,7 @@ public class GraphHNVOptmPoda
 //
 //            }
         Integer v = null;
-        int degreev = -1;
-        if (startVertice) {
 
-            for (Integer vi : vertices) {
-                if (v == null) {
-                    v = vi;
-                    degreev = degree[vi];
-
-                } else {
-                    int degreeVi = degree[vi];
-                    if (degreeVi > degreev) {
-                        v = vi;
-                        degreev = degreeVi;
-                    } else if (degreeVi == degreev && vi > v) {
-                        v = vi;
-                        degreev = degreeVi;
-                    }
-                }
-            }
-            if (checkstartv) {
-                vertices.sort(Comparator
-                        .comparingInt((Integer vi) -> -graphRead.degree(vi))
-                        .thenComparing(vi -> -vi));
-                Integer vtmp = vertices.get(0);
-                if (!vtmp.equals(v)) {
-                    System.err.println("Start vertices diferetnes: " + v + " " + vtmp);
-                }
-            }
-        }
         Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs,
                 verticeStart);
 //        tmp = tryMinimal(graphRead, tmp);
@@ -556,11 +575,11 @@ public class GraphHNVOptmPoda
         UtilProccess.printArray(auxb);
     }
 
-    void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
+    void escolherMelhorVerticeAlvo(UndirectedSparseGraphTO<Integer, Integer> graph,
             int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) {
         for (Integer i : vertices) {
             //Se vertice já foi adicionado, ignorar
-            if (aux[i] >= kr[i]) {
+            if (aux[i] >= krp[i]) {
                 continue;
             }
             int profundidadeS = bdls.getDistanceSafe(graph, i);
@@ -570,7 +589,7 @@ public class GraphHNVOptmPoda
             if (pularAvaliacaoOffset && pularAvaliacao[i] >= sizeHs) {
                 continue;
             }
-
+            profundidadeS = bdlhs.getDistanceSafe(graph, i);
             int grauContaminacao = 0;
             int contaminadoParcialmente = 0;
             double bonusParcialNormalizado = 0;
@@ -580,57 +599,62 @@ public class GraphHNVOptmPoda
             double ddouble = 0;
             double bonusTotal = 0;
             double dificuldadeTotal = 0;
-            int grauI = degree[i];
+            double indiceCentralidade = 0;
+            int grauI = graup[i];
 
             double bonusHs = 0;
             double dificuldadeHs = 0;
             mustBeIncluded.clear();
             mapCount.clear();
             mustBeIncluded.add(i);
-            mapCount.setVal(i, kr[i]);
+            mapCount.setVal(i, krp[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
-                Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+                Collection<Integer> neighbors = getNeighborsNaoPodados(graph, verti);
                 for (Integer vertn : neighbors) {
                     if (vertn.equals(verti)
                             || vertn.equals(i)
-                            || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
+                            || (aux[vertn] + mapCount.getCount(vertn)) >= krp[vertn]) {
                         continue;
                     }
                     Integer inc = mapCount.inc(vertn);
-                    if ((inc + aux[vertn]) == kr[vertn]) {
+                    if ((inc + aux[vertn]) == krp[vertn]) {
                         mustBeIncluded.add(vertn);
-                        bonusHs += degree[vertn] - kr[vertn];
-                        dificuldadeHs += (kr[vertn] - aux[vertn]);
+                        bonusHs += graup[vertn] - krp[vertn];
+                        dificuldadeHs += (krp[vertn] - aux[vertn]);
                         pularAvaliacao[vertn] = sizeHs;
                     }
                 }
-//                bonusHs += degree[verti] - kr[verti];
-//                dificuldadeHs += (kr[verti] - aux[verti]);
+                double bonus = graup[verti] - krp[verti];
+                double dificuldade = (krp[verti] - aux[verti]);
+
+                bonusHs += bonus;
+                dificuldadeHs += (krp[verti] - aux[verti]);
+                bonusTotalNormalizado += (bonus / dificuldade);
 //                pularAvaliacao[verti] = sizeHs;
                 grauContaminacao++;
             }
 
             for (Integer x : mapCount.keySet()) {
-                if (mapCount.getCount(x) + aux[x] < kr[x]) {
-                    int dx = degree[x];
-//                        double bonus = Math.max(1, dx - kr[x]);
-//                        double bonus = kr[x] - dx;
-                    double bonus = dx - kr[x];
+                if (mapCount.getCount(x) + aux[x] < krp[x]) {
+                    int dx = graup[x];
+//                        double bonus = Math.max(1, dx - krp[x]);
+//                        double bonus = krp[x] - dx;
+                    double bonus = dx - krp[x];
                     bonusParcial += bonus;
-                    double dificuldade = (kr[x] - (aux[x] + mapCount.getCount(x)));
+                    double dificuldade = (krp[x] - (aux[x]));
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
                     bonusParcialNormalizado += (bonus / dificuldade);
                 }
             }
 
-//                dificuldadeTotal = kr[i] - aux[i];
-//                bonusTotal = grauI - kr[i];
+//                dificuldadeTotal = krp[i] - aux[i];
+//                bonusTotal = grauI - krp[i];
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
-            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
+//            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
             int deltaHsi = grauContaminacao;
 
             if (checkDeltaHsi) {
@@ -649,10 +673,10 @@ public class GraphHNVOptmPoda
 //                        contaminadoParcialmente++;
 //                    }
 //                }
-            int di = degree[i];
+            int di = graup[i];
             int deltadei = di - aux[i];
 
-            ddouble = contaminadoParcialmente / degree[i];
+            ddouble = contaminadoParcialmente / graup[i];
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
 
 //                if (etapaVerbose == s.size()) {
@@ -666,6 +690,7 @@ public class GraphHNVOptmPoda
                 melhores.clear();
                 melhores.add(i);
                 maiorDeltaHs = deltaHsi;
+                maiorIndiceCentralidade = indiceCentralidade;
                 maiorGrauContaminacao = grauContaminacao;
                 maiorContaminadoParcialmente = contaminadoParcialmente;
                 maiorBonusParcialNormalizado = bonusParcialNormalizado;
@@ -758,6 +783,7 @@ public class GraphHNVOptmPoda
                     maiorGrauContaminacao = grauContaminacao;
                     maiorContaminadoParcialmente = contaminadoParcialmente;
                     maiorBonusParcialNormalizado = bonusParcialNormalizado;
+                    maiorIndiceCentralidade = indiceCentralidade;
                     bestVertice = i;
                     maiorProfundidadeS = profundidadeS;
                     maiorBonusTotal = bonusTotal;
@@ -797,6 +823,13 @@ public class GraphHNVOptmPoda
                 new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 
         System.out.println(graph.toResumedString());
+        System.out.println();
+        op.findCenterOfGraph(graph);
+//        op.setVerbose(true);
+
+        if (true) {
+//            return;
+        }
 
 //        System.out.println("Conected componentes: ");
 //        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
@@ -804,142 +837,156 @@ public class GraphHNVOptmPoda
 //            System.out.println("" + e.getKey() + ": " + e.getValue().size());
 //        }
 //        }
-        op.setR(10);
-        op.resetParameters();
-        op.setPularAvaliacaoOffset(true);
-//        op.decompor = true;
-//        op.setParameter(GraphBigHNVOptm.paux, true);
-//        op.setParameter(GraphBigHNVOptm.pgrau, true);
-        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
-
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-
-        UtilProccess.printEndTime();
-
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
+//        op.setR(10);
+//        op.resetParameters();
+//        op.setPularAvaliacaoOffset(true);
+////        op.decompor = true;
+////        op.setParameter(GraphBigHNVOptm.paux, true);
+////        op.setParameter(GraphBigHNVOptm.pgrau, true);
+////        op.realizarPoda = true;
+//        op.realizarPoda = false;
+////        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+//        op.setParameter(GraphBigHNVOptm.pbonusTotal, true);
+////        op.setParameter(GraphBigHNVOptm.pbonusTotalNormalizado, true);
+////        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
+//        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+////        op.setParameter(GraphBigHNVOptm.paux, false);
+////        op.setParameter(GraphBigHNVOptm.pprofundidadeS, false);
+//        op.setTryMinimal();
+//        UtilProccess.printStartTime();
+//        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+//
+//        UtilProccess.printEndTime();
+//        System.out.println(op.getName());
+//
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: ");// + buildOptimizedHullSet);
 //        op.checkIfHullSet(graph, buildOptimizedHullSet);
-        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-        if (!checkIfHullSet) {
-            System.err.println("FAIL: fail on check hull setg");
-        }
-
-        int totalGlobal = 0;
-        int melhorGlobal = 0;
-        int piorGlobal = 0;
-
-        String strFile = "hog-graphs-ge20-le50-ordered.g6";
-        //
-        for (int r = 2; r <= 10; r++) {
-            BufferedReader files = new BufferedReader(new FileReader(strFile));
-            String line = null;
-            int cont = 0;
-            MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
-            while (null != (line = files.readLine())) {
-                graph = UtilGraph.loadGraphG6(line);
+//        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        if (!checkIfHullSet) {
+//            System.err.println("FAIL: fail on check hull setg");
+//        }
+        List<String> parametros = new ArrayList<>();
+        parametros.addAll(List.of(pdeltaHsi, pbonusTotal,
+                pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
+                //                pbonusTotalNormalizado, pbonusParcialNormalizado,
+                pprofundidadeS, pgrau, paux));
+        System.out.println("otimização individualizada");
+        for (int ciclo = 1; ciclo <= 3; ciclo++) {
+            System.out.println("Ciclo: " + ciclo);
+            op.setPularAvaliacaoOffset(false);
+            op.realizarPoda = false;
+            for (int r = 4; r <= 10; r++) {
+                String line = null;
+                int cont = 0;
+                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
                 op.setR(r);
-                Integer melhor = null;
                 List<int[]> melhores = new ArrayList<>();
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
 
-                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), 2);
-                while (combinationsIterator.hasNext()) {
-
-                    int[] currentSet = combinationsIterator.next();
-
-                    op.resetParameters();
-                    for (int ip : currentSet) {
-                        String p = allParameters.get(ip);
-                        op.setParameter(p, true);
-                    }
-                    Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
-                    String name = op.getName();
-                    int res = optmHullSet.size();
-                    String out = "R\t g" + cont++ + "\t r"
-                            + r + "\t" + name
-                            + "\t" + res + "\n";
-                    if (melhor == null) {
-                        melhor = res;
-                        melhores.add(currentSet);
-                    } else if (melhor == res) {
-                        melhores.add(currentSet);
-                    } else if (melhor > res) {
-                        melhores.clear();
-                        melhores.add(currentSet);
-                    }
-
-                    int[] currentRerverse = currentSet.clone();
-                    for (int i = 0; i < currentSet.length; i++) {
-                        currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-                    }
-
-                    op.resetParameters();
-                    for (int ip : currentRerverse) {
-                        String p = allParameters.get(ip);
-                        op.setParameter(p, true);
-                    }
-                    optmHullSet = op.buildOptimizedHullSet(graph);
-                    name = op.getName();
-                    res = optmHullSet.size();
-                    out = "R\t g" + cont++ + "\t r"
-                            + r + "\t" + name
-                            + "\t" + res + "\n";
-                    if (melhor == null) {
-                        melhor = res;
-                        melhores.add(currentRerverse);
-                    } else if (melhor == res) {
-                        melhores.add(currentRerverse);
-                    } else if (melhor > res) {
-                        melhores.clear();
-                        melhores.add(currentRerverse);
-                    }
-                }
+                int melhor = otimizarParametros(op, parametros, ciclo, graph, cont, r, melhores);
 //                for (Integer i : melhores) {
                 for (int[] ip : melhores) {
                     int i = array2idx(ip);
                     contMelhor.inc(i);
                 }
                 cont++;
-            }
-            files.close();
-            System.out.println("\n---------------");
-            System.out.println("Resumo r:" + r);
 
-            Map<String, Integer> map = new HashMap<>();
+                System.out.println("\n---------------");
+                System.out.println("Resumo r:" + r + " melhor: " + melhor);
+
+                Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-            for (int[] i : allarrays()) {
-                StringBuilder sb = new StringBuilder();
-                for (int ip : i) {
-                    sb.append(allParameters.get(ip));
+                for (int[] i : allarrays()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int ip : i) {
+                        sb.append(parametros.get(ip));
 //                    String p = allParameters.get(ip);
-                    sb.append("-");
+                        sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
+                    }
+                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
                 }
-                map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
-            }
-            List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-            entrySet.sort(
-                    Comparator.comparingInt(
-                            (Entry<String, Integer> v) -> -v.getValue()
-                    )
-                            .thenComparing(v -> v.getKey())
-            );
-            for (Entry<String, Integer> e : entrySet) {
-                String p = e.getKey();
-                System.out.println(p + ": " + e.getValue());
-            }
+                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+                entrySet.sort(
+                        Comparator.comparingInt(
+                                (Entry<String, Integer> v) -> -v.getValue()
+                        )
+                                .thenComparing(v -> v.getKey())
+                );
+                for (Entry<String, Integer> e : entrySet) {
+                    String p = e.getKey();
+                    System.out.println(p + ": " + e.getValue());
+                }
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
 //            }
+            }
         }
+    }
+
+    protected static int otimizarParametros(GraphHNVOptmPoda op, List<String> parametros, int k, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, List<int[]> melhores1) {
+        Integer melhor = null;
+        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), k);
+        while (combinationsIterator.hasNext()) {
+            int[] currentSet = combinationsIterator.next();
+            op.resetParameters();
+            for (int ip : currentSet) {
+                String p = parametros.get(ip);
+                op.setParameter(p, true);
+            }
+            Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
+            String name = op.getName();
+            int res = optmHullSet.size();
+            String out = "R\t g" + cont++ + "\t r"
+                    + r + "\t" + name
+                    + "\t" + res + "\n";
+            if (melhor == null) {
+                melhor = res;
+                melhores1.add(currentSet);
+                System.out.println(" melhor otimizado");
+                System.out.println(out);
+            } else if (melhor == res) {
+                melhores1.add(currentSet);
+            } else if (melhor > res) {
+                melhores1.clear();
+                melhores1.add(currentSet);
+            }
+            int[] currentRerverse = currentSet.clone();
+            for (int i = 0; i < currentSet.length; i++) {
+                currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
+            }
+            op.resetParameters();
+            for (int ip : currentRerverse) {
+                String p = parametros.get(ip);
+                if (k == 1) {
+                    op.setParameter(p, false);
+                } else {
+                    op.setParameter(p, true);
+                }
+            }
+            optmHullSet = op.buildOptimizedHullSet(graph);
+            name = op.getName();
+            res = optmHullSet.size();
+            out = "R\t g" + cont++ + "\t r"
+                    + r + "\t" + name
+                    + "\t" + res + "\n";
+            if (melhor == null) {
+                melhor = res;
+                melhores1.add(currentRerverse);
+            } else if (melhor == res) {
+                melhores1.add(currentRerverse);
+            } else if (melhor > res) {
+                melhores1.clear();
+                melhores1.add(currentRerverse);
+            }
+        }
+        return melhor;
     }
 
     private static int apply(GraphHNVOptmPoda op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {
@@ -994,6 +1041,67 @@ public class GraphHNVOptmPoda
     }
 
     private void setPularAvaliacaoOffset(boolean b) {
-        this.pularAvaliacaoOffset = true;
+        this.pularAvaliacaoOffset = b;
+    }
+
+    private Collection<Integer> getNeighborsNaoPodados(UndirectedSparseGraphTO<Integer, Integer> graph, Integer v) {
+        Collection<Integer> nvs = new LinkedHashSet<>(graph.getNeighborsUnprotected(v));
+        if (podados != null) {
+            nvs.removeAll(podados);
+        }
+        return nvs;
+    }
+
+    private void findCenterOfGraph(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        Collection<Integer> vertices = graph.getVertices();
+        int vertexCount = (Integer) graph.maxVertex() + 1;
+        bdlhs = BFSUtil.newBfsUtilSimple(vertexCount + 1);
+        bdls = BFSUtil.newBfsUtilSimple(vertexCount + 1);
+
+        Integer maior = null;
+        Integer menor = null;
+        for (Integer v : vertices) {
+            if (maior == null) {
+                maior = v;
+                menor = v;
+            } else {
+                int dv = graph.degree(v);
+                if (dv > graph.degree(maior)) {
+                    maior = v;
+                }
+                if (dv < graph.degree(menor)) {
+                    menor = v;
+                }
+            }
+        }
+        bdlhs.labelDistances(graph, maior);
+        bdls.labelDistances(graph, menor);
+        Integer maiorDistanciaDoMenor = 0;
+        Integer vMaiorDistanciaDoMenor = null;
+        Integer maiorDistanciaDoMaior = 0;
+        Integer vMaiorDistanciaDoMaior = null;
+        for (Integer v : vertices) {
+            if (vMaiorDistanciaDoMenor == null) {
+                vMaiorDistanciaDoMenor = v;
+                maiorDistanciaDoMenor = bdls.getDistance(graph, v);
+                vMaiorDistanciaDoMaior = v;
+                maiorDistanciaDoMaior = bdlhs.getDistance(graph, v);
+            } else {
+                Integer distV = bdls.getDistance(graph, v);
+                if (distV > maiorDistanciaDoMenor) {
+                    maiorDistanciaDoMenor = distV;
+                    vMaiorDistanciaDoMenor = v;
+                }
+                Integer distV1 = bdlhs.getDistance(graph, v);
+                if (distV1 > vMaiorDistanciaDoMaior) {
+                    maiorDistanciaDoMaior = distV1;
+                    vMaiorDistanciaDoMaior = v;
+                }
+            }
+        }
+
+        System.out.println("Maior distancia de " + menor + ": " + maiorDistanciaDoMenor);
+        System.out.println("Maior distancia de " + maior + ": " + maiorDistanciaDoMaior);
+
     }
 }

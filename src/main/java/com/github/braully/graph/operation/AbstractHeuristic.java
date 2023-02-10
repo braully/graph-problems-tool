@@ -364,7 +364,8 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         }
         return fecho.size() == graph.getVertexCount();
     }
-public Map<Integer, Set<Integer>> connectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {
+
+    public Map<Integer, Set<Integer>> connectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {
         int ret = 0;
         Map<Integer, Set<Integer>> map = new TreeMap<>();
         BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
@@ -394,4 +395,10 @@ public Map<Integer, Set<Integer>> connectedComponents(UndirectedSparseGraphTO<In
     protected void setTryMinimal() {
         parameters.put(MINIMAL, true);
     }
+
+    protected boolean tryMiminal() {
+        Boolean get = parameters.get(MINIMAL);
+        return get != null && get;
+    }
+
 }

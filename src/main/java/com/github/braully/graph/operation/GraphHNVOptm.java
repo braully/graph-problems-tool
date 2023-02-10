@@ -833,7 +833,7 @@ public class GraphHNVOptm
 
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         //
-        for (int r = 2; r <= 10; r++) {
+        for (int r = 4; r <= 10; r++) {
             BufferedReader files = new BufferedReader(new FileReader(strFile));
             String line = null;
             int cont = 0;
