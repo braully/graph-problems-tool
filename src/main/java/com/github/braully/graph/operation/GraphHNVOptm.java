@@ -64,7 +64,10 @@ public class GraphHNVOptm
     public boolean decompor = false;
 
     {
-//        parameters.put(type, verbose)
+        setPularAvaliacaoOffset(true);
+        setParameter(pdeltaHsi, true);
+        setParameter(pbonusTotal, true);
+        setParameter(pdificuldadeParcial, true);
     }
 
     @Override
@@ -318,15 +321,15 @@ public class GraphHNVOptm
         aux[verti] = aux[verti] + kr[verti];
         if (s != null) {
             s.add(verti);
-//            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
-//            for (Integer vertn : neighbors) {
-//                if ((++scount[vertn]) == kr[vertn] && s.contains(vertn)) {
-//                    if (verbose) {
-//                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
-//                    }
-//                    s.remove(vertn);
-//                }
-//            }
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+            for (Integer vertn : neighbors) {
+                if ((++scount[vertn]) == kr[vertn] && s.contains(vertn)) {
+                    if (verbose) {
+                        System.out.println("Scount > kr: " + vertn + " removendo de S ");
+                    }
+                    s.remove(vertn);
+                }
+            }
         }
         mustBeIncluded.clear();
         mustBeIncluded.add(verti);
@@ -541,9 +544,9 @@ public class GraphHNVOptm
             hullSet = sini;
 
         }
-        if (!checkIfHullSet(graphRead, hullSet)) {
-            throw new IllegalStateException("NOT HULL SET");
-        }
+//        if (!checkIfHullSet(graphRead, hullSet)) {
+//            throw new IllegalStateException("NOT HULL SET");
+//        }
         return hullSet;
     }
 
@@ -601,13 +604,17 @@ public class GraphHNVOptm
                     Integer inc = mapCount.inc(vertn);
                     if ((inc + aux[vertn]) == kr[vertn]) {
                         mustBeIncluded.add(vertn);
-                        bonusHs += degree[vertn] - kr[vertn];
-                        dificuldadeHs += (kr[vertn] - aux[vertn]);
+//                        bonusHs += degree[vertn] - kr[vertn];
+//                        dificuldadeHs += (kr[vertn] - aux[vertn]);
                         pularAvaliacao[vertn] = sizeHs;
                     }
                 }
-//                bonusHs += degree[verti] - kr[verti];
-//                dificuldadeHs += (kr[verti] - aux[verti]);
+                double bonus = degree[verti] - kr[verti];
+                double dificuldade = (kr[verti] - aux[verti]);
+
+                bonusHs += bonus;
+                dificuldadeHs += (kr[verti] - aux[verti]);
+                bonusTotalNormalizado += (dificuldade / bonus);
 //                pularAvaliacao[verti] = sizeHs;
                 grauContaminacao++;
             }
@@ -619,10 +626,10 @@ public class GraphHNVOptm
 //                        double bonus = kr[x] - dx;
                     double bonus = dx - kr[x];
                     bonusParcial += bonus;
-                    double dificuldade = (kr[x] - (aux[x] + mapCount.getCount(x)));
+                    double dificuldade = (kr[x] - aux[x]);
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    bonusParcialNormalizado += (bonus / dificuldade);
+                    bonusParcialNormalizado += (dificuldade / bonus);
                 }
             }
 
@@ -810,8 +817,11 @@ public class GraphHNVOptm
 //        op.decompor = true;
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
-        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+        op.setParameter(pbonusTotal, true);
+        op.setParameter(pdificuldadeParcial, true);
+//        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
+//        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
 
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);

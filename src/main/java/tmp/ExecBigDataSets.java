@@ -334,16 +334,17 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh", //            "ca-CondMat", "ca-HepPh",
-        //            "ca-AstroPh",
-        //            "Douban",
-        //            "Delicious",
-        //            "BlogCatalog3",
-        //            //            "BlogCatalog2",
-        //            //            "Livemocha",
-        //            "BlogCatalog",
-        //            //            "BuzzNet",
-        //            "Last.fm", //             "YouTube2"
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat", "ca-HepPh",
+            "ca-AstroPh",
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
+            "BlogCatalog2",
+            "Livemocha",
+            "BlogCatalog",
+            "BuzzNet",
+            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -366,13 +367,15 @@ public class ExecBigDataSets {
 
         heur5t2.setVerbose(false);
         heur5t2.startVertice = false;
-        optm.pularAvaliacaoOffset = false;
+
+        optm.pularAvaliacaoOffset = true;
         optm.resetParameters();
-        optm.setParameter(GraphBigHNVOptm.paux, true);
-        optm.setParameter(GraphBigHNVOptm.pgrau, true);
-        optm.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
-        optm.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-        
+
+        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+//        optm.setParameter(GraphBigHNVOptm.pgrau, true);
+        optm.setParameter(GraphBigHNVOptm.pbonusTotal, true);
+        optm.setParameter(GraphBigHNVOptm.pdificuldadeParcial, true);
+
 //        optm.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
 //        optm.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
 //        optm.setParameter(GraphBigHNVOptm.pdificuldadeParcial, false);
@@ -381,7 +384,7 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
+            //            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,

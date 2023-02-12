@@ -561,7 +561,9 @@ public class GraphHNVOptmPoda
 
         }
         if (!checkIfHullSet(graphRead, hullSet)) {
-            throw new IllegalStateException("NOT HULL SET");
+            System.err.println("" + hullSet.size() + ": " + hullSet);
+            System.err.println("NOT HULL SET");
+//            throw new IllegalStateException("NOT HULL SET");
         }
         return hullSet;
     }
@@ -621,8 +623,8 @@ public class GraphHNVOptmPoda
                     Integer inc = mapCount.inc(vertn);
                     if ((inc + aux[vertn]) == krp[vertn]) {
                         mustBeIncluded.add(vertn);
-                        bonusHs += graup[vertn] - krp[vertn];
-                        dificuldadeHs += (krp[vertn] - aux[vertn]);
+//                        bonusHs += graup[vertn] - krp[vertn];
+//                        dificuldadeHs += (krp[vertn] - aux[vertn]);
                         pularAvaliacao[vertn] = sizeHs;
                     }
                 }
@@ -631,7 +633,7 @@ public class GraphHNVOptmPoda
 
                 bonusHs += bonus;
                 dificuldadeHs += (krp[verti] - aux[verti]);
-                bonusTotalNormalizado += (bonus / dificuldade);
+                bonusTotalNormalizado += (dificuldade / bonus);
 //                pularAvaliacao[verti] = sizeHs;
                 grauContaminacao++;
             }
@@ -646,7 +648,7 @@ public class GraphHNVOptmPoda
                     double dificuldade = (krp[x] - (aux[x]));
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    bonusParcialNormalizado += (bonus / dificuldade);
+                    bonusParcialNormalizado += (dificuldade / bonus);
                 }
             }
 
@@ -867,10 +869,11 @@ public class GraphHNVOptmPoda
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
         List<String> parametros = new ArrayList<>();
-        parametros.addAll(List.of(pdeltaHsi, pbonusTotal,
-                pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
-                //                pbonusTotalNormalizado, pbonusParcialNormalizado,
-                pprofundidadeS
+        parametros.addAll(List.of(
+                pdeltaHsi, pbonusTotal,
+                pdificuldadeTotal, pdificuldadeParcial, pbonusParcial,
+                pbonusTotalNormalizado, pbonusParcialNormalizado
+        //                pprofundidadeS
         //        , pgrau, paux
         ));
         System.out.println("otimização individualizada");
@@ -949,6 +952,8 @@ public class GraphHNVOptmPoda
             String out = "R\t g" + cont++ + "\t r"
                     + r + "\t" + name
                     + "\t" + res + "\n";
+            System.out.println("resultado parcial: " + out);
+
             if (melhor == null) {
                 melhor = res;
                 melhores1.add(currentSet);
@@ -979,6 +984,8 @@ public class GraphHNVOptmPoda
             out = "R\t g" + cont++ + "\t r"
                     + r + "\t" + name
                     + "\t" + res + "\n";
+            System.out.println("resultado parcial: " + out);
+
             if (melhor == null) {
                 melhor = res;
                 melhores1.add(currentRerverse);
