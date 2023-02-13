@@ -30,7 +30,7 @@ import util.BFSUtil;
 import util.MapCountOpt;
 import util.UtilProccess;
 
-public class GraphHNVOptmPoda
+public class GraphHNVOptmPoda2
         extends AbstractHeuristic implements IGraphOperation {
 
     public boolean startVertice = true;
@@ -40,7 +40,7 @@ public class GraphHNVOptmPoda
     public boolean checkstartv = false;
     public boolean checkDeltaHsi = false;
 
-    private static final Logger log = Logger.getLogger(GraphHNVOptmPoda.class);
+    private static final Logger log = Logger.getLogger(GraphHNVOptmPoda2.class);
 
     static final String description = "HHnV2";
     int etapaVerbose = -1;
@@ -91,7 +91,7 @@ public class GraphHNVOptmPoda
         return sb.toString();
     }
 
-    public GraphHNVOptmPoda() {
+    public GraphHNVOptmPoda2() {
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -807,10 +807,12 @@ public class GraphHNVOptmPoda
         }
     }
 
+    static String gatual;
+
     public static void main(String... args) throws IOException {
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        GraphHNVOptmPoda op = new GraphHNVOptmPoda();
+        GraphHNVOptmPoda2 op = new GraphHNVOptmPoda2();
 
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -826,18 +828,22 @@ public class GraphHNVOptmPoda
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+        String[] grafosDificeies = new String[]{"BlogCatalog", "Delicious", "Douban"};
 
-        System.out.println(graph.toResumedString());
-        System.out.println();
-        op.findCenterOfGraph(graph);
+        for (String g : grafosDificeies) {
+            gatual = g;
+            graph = UtilGraph.loadBigDataset(
+                    new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + g + "/nodes.csv"),
+                    new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + g + "/edges.csv"));
+            System.out.println(g);
+
+            System.out.println(graph.toResumedString());
+            op.findCenterOfGraph(graph);
 //        op.setVerbose(true);
 
-        if (true) {
+            if (true) {
 //            return;
-        }
+            }
 
 //        System.out.println("Conected componentes: ");
 //        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
@@ -874,75 +880,76 @@ public class GraphHNVOptmPoda
 //        if (!checkIfHullSet) {
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
-        List<String> parametros = new ArrayList<>();
-        parametros.addAll(List.of(
-                pdeltaHsi, pdificuldadeTotal,
-                pbonusTotal, pbonusParcial, pdificuldadeParcial,
-                pbonusTotalNormalizado, pbonusParcialNormalizado,
-                pprofundidadeS
-        //        , pgrau, paux
-        ));
-        System.out.println("otimização individualizada");
-        for (int ciclo = 1; ciclo <= 3; ciclo++) {
-            System.out.println("Ciclo: " + ciclo);
+            List<String> parametros = new ArrayList<>();
+            parametros.addAll(List.of(
+                    pdeltaHsi, pdificuldadeTotal,
+                    pbonusTotal, pbonusParcial, pdificuldadeParcial,
+                    pbonusTotalNormalizado, pbonusParcialNormalizado,
+                    pprofundidadeS
+            //        , pgrau, paux
+            ));
+            System.out.println("otimização individualizada");
+            for (int ciclo = 1; ciclo <= 3; ciclo++) {
+                System.out.println("Ciclo: " + ciclo + " grafo " + g);
 //            op.setPularAvaliacaoOffset(false);
-            op.setPularAvaliacaoOffset(true);
-            op.realizarPoda = false;
-            for (int r = 4; r <= 10; r++) {
-                String line = null;
-                int cont = 0;
-                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
-                op.setR(r);
-                List<int[]> melhores = new ArrayList<>();
+                op.setPularAvaliacaoOffset(true);
+                op.realizarPoda = false;
+                for (int r = 4; r <= 10; r++) {
+                    String line = null;
+                    int cont = 0;
+                    MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+                    op.setR(r);
+                    List<int[]> melhores = new ArrayList<>();
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
 
-                int melhor = otimizarParametros(op, parametros, ciclo, graph, cont, r, melhores);
+                    int melhor = otimizarParametros(op, parametros, ciclo, graph, cont, r, melhores);
 //                for (Integer i : melhores) {
-                for (int[] ip : melhores) {
-                    int i = array2idx(ip);
-                    contMelhor.inc(i);
-                }
-                cont++;
+                    for (int[] ip : melhores) {
+                        int i = array2idx(ip);
+                        contMelhor.inc(i);
+                    }
+                    cont++;
 
-                System.out.println("\n---------------");
-                System.out.println("Resumo r:" + r + " melhor: " + melhor);
+                    System.out.println("\n---------------");
+                    System.out.println("Resumo r:" + r + " melhor: " + melhor);
 
-                Map<String, Integer> map = new HashMap<>();
+                    Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-                for (int[] i : allarrays()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int ip : i) {
-                        sb.append(parametros.get(ip));
+                    for (int[] i : allarrays()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (int ip : i) {
+                            sb.append(parametros.get(ip));
 //                    String p = allParameters.get(ip);
-                        sb.append("-");
+                            sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
+                        }
+                        map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
                     }
-                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
-                }
-                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-                entrySet.sort(
-                        Comparator.comparingInt(
-                                (Entry<String, Integer> v) -> -v.getValue()
-                        )
-                                .thenComparing(v -> v.getKey())
-                );
-                for (Entry<String, Integer> e : entrySet) {
-                    String p = e.getKey();
-                    System.out.println(p + ": " + e.getValue());
-                }
+                    List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+                    entrySet.sort(
+                            Comparator.comparingInt(
+                                    (Entry<String, Integer> v) -> -v.getValue()
+                            )
+                                    .thenComparing(v -> v.getKey())
+                    );
+                    for (Entry<String, Integer> e : entrySet) {
+                        String p = e.getKey();
+                        System.out.println(p + ": " + e.getValue());
+                    }
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
 //            }
+                }
             }
         }
     }
 
-    protected static int otimizarParametros(GraphHNVOptmPoda op, List<String> parametros, int k, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, List<int[]> melhores1) {
+    protected static int otimizarParametros(GraphHNVOptmPoda2 op, List<String> parametros, int k, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, List<int[]> melhores1) {
         Integer melhor = null;
         Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), k);
         while (combinationsIterator.hasNext()) {
@@ -957,7 +964,7 @@ public class GraphHNVOptmPoda
             Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
             String name = op.getName();
             int res = optmHullSet.size();
-            String out = "R\t g" + cont++ + "\t r"
+            String out = "R\t g" + gatual + "\t r"
                     + r + "\t" + name
                     + "\t" + res + "\n";
             System.out.println("resultado parcial: " + out);
@@ -991,7 +998,7 @@ public class GraphHNVOptmPoda
             optmHullSet = op.buildOptimizedHullSet(graph);
             name = op.getName();
             res = optmHullSet.size();
-            out = "R\t g" + cont++ + "\t r"
+            out = "R\t g" + gatual + "\t r"
                     + r + "\t" + name
                     + "\t" + res + "\n";
             System.out.println("resultado parcial: " + out);
@@ -1013,7 +1020,7 @@ public class GraphHNVOptmPoda
         return melhor;
     }
 
-    private static int apply(GraphHNVOptmPoda op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {
+    private static int apply(GraphHNVOptmPoda2 op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {
         op.resetParameters();
         for (int ip : currentSet) {
             String p = allParameters.get(ip);

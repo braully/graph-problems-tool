@@ -50,6 +50,8 @@ public class BFSUtil {
         return bfsUtil;
     }
 
+    public int discored = 0;
+
     private BFSUtil(int size) {
         bfs = new Integer[size];
         vertexCount = size;
@@ -91,6 +93,8 @@ public class BFSUtil {
         for (int i = 0; i < bfs.length; i++) {
             bfs[i] = null;
         }
+        discored = 1;
+
         clearRanking();
         queue.clear();
         queue.add(v);
@@ -120,6 +124,7 @@ public class BFSUtil {
                     getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
                 if (bfs[nv] == null) {
+                    discored++;
                     bfs[nv] = depth;
                     queue.add(nv);
                 }
@@ -136,6 +141,7 @@ public class BFSUtil {
                     getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
                 if (bfs[nv] > depth) {
+                    discored++;
                     depthcount[bfs[nv]]--;
                     bfs[nv] = depth;
                     queue.add(nv);
@@ -172,7 +178,9 @@ public class BFSUtil {
             Collection<Integer> ns = (Collection<Integer>) subgraph1.
                     getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
-                if (bfs[nv] == null || bfs[nv] > depth) {
+                if (bfs[nv] == null) {
+                    discored++;
+                } else if (bfs[nv] > depth) {
                     bfs[nv] = depth;
                     queue.add(nv);
                 }
@@ -214,6 +222,9 @@ public class BFSUtil {
     }
 
     public void incBfs(UndirectedSparseGraphTO graph, Integer newroowt) {
+        if (bfs[newroowt] == null) {
+            discored++;
+        }
         bfs[newroowt] = 0;
         queue.add(newroowt);
         revisitVertex(graph, newroowt);
