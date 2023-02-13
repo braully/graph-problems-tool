@@ -947,9 +947,9 @@ public class GraphHNVOptmPoda
         Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), k);
         while (combinationsIterator.hasNext()) {
             int[] currentSet = combinationsIterator.next();
-//            for (String p1 : new String[]{pdeltaHsi, pdificuldadeTotal}) {
+            for (String p1 : new String[]{pdeltaHsi, pdificuldadeTotal}) {
             op.resetParameters();
-//                op.setParameter(p1, true);
+                op.setParameter(p1, true);
             for (int ip : currentSet) {
                 String p = parametros.get(ip);
                 op.setParameter(p, true);
@@ -979,7 +979,7 @@ public class GraphHNVOptmPoda
                 currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
             }
             op.resetParameters();
-//                op.setParameter(p1, true);
+                op.setParameter(p1, true);
             for (int ip : currentRerverse) {
                 String p = parametros.get(ip);
                 if (k == 1) {
@@ -1009,7 +1009,7 @@ public class GraphHNVOptmPoda
                 System.out.println(out);
             }
         }
-//        }
+        }
         return melhor;
     }
 
