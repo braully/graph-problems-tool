@@ -948,67 +948,67 @@ public class GraphHNVOptmPoda
         while (combinationsIterator.hasNext()) {
             int[] currentSet = combinationsIterator.next();
             for (String p1 : new String[]{pdeltaHsi, pdificuldadeTotal}) {
-            op.resetParameters();
+                op.resetParameters();
                 op.setParameter(p1, true);
-            for (int ip : currentSet) {
-                String p = parametros.get(ip);
-                op.setParameter(p, true);
-            }
-            Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
-            String name = op.getName();
-            int res = optmHullSet.size();
-            String out = "R\t g" + cont++ + "\t r"
-                    + r + "\t" + name
-                    + "\t" + res + "\n";
-            System.out.println("resultado parcial: " + out);
-
-            if (melhor == null) {
-                melhor = res;
-                melhores1.add(currentSet);
-            } else if (melhor == res) {
-                melhores1.add(currentSet);
-            } else if (melhor > res) {
-                melhor = res;
-                melhores1.clear();
-                melhores1.add(currentSet);
-                System.out.println(" melhor otimizado ");
-                System.out.println(out);
-            }
-            int[] currentRerverse = currentSet.clone();
-            for (int i = 0; i < currentSet.length; i++) {
-                currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-            }
-            op.resetParameters();
-                op.setParameter(p1, true);
-            for (int ip : currentRerverse) {
-                String p = parametros.get(ip);
-                if (k == 1) {
-                    op.setParameter(p, false);
-                } else {
+                for (int ip : currentSet) {
+                    String p = parametros.get(ip);
                     op.setParameter(p, true);
                 }
-            }
-            optmHullSet = op.buildOptimizedHullSet(graph);
-            name = op.getName();
-            res = optmHullSet.size();
-            out = "R\t g" + cont++ + "\t r"
-                    + r + "\t" + name
-                    + "\t" + res + "\n";
-            System.out.println("resultado parcial: " + out);
+                Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
+                String name = op.getName();
+                int res = optmHullSet.size();
+                String out = "R\t g" + cont++ + "\t r"
+                        + r + "\t" + name
+                        + "\t" + res + "\n";
+                System.out.println("resultado parcial: " + out);
 
-            if (melhor == null) {
-                melhor = res;
-                melhores1.add(currentRerverse);
-            } else if (melhor == res) {
-                melhores1.add(currentRerverse);
-            } else if (melhor > res) {
-                melhores1.clear();
-                melhores1.add(currentRerverse);
-                melhor = res;
-                System.out.println(" melhor otimizado ");
-                System.out.println(out);
+                if (melhor == null) {
+                    melhor = res;
+                    melhores1.add(currentSet);
+                } else if (melhor == res) {
+                    melhores1.add(currentSet);
+                } else if (melhor > res) {
+                    melhor = res;
+                    melhores1.clear();
+                    melhores1.add(currentSet);
+                    System.out.println(" melhor otimizado ");
+                    System.out.println(out);
+                }
+                int[] currentRerverse = currentSet.clone();
+                for (int i = 0; i < currentSet.length; i++) {
+                    currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
+                }
+                op.resetParameters();
+                op.setParameter(p1, true);
+                for (int ip : currentRerverse) {
+                    String p = parametros.get(ip);
+                    if (k == 1) {
+                        op.setParameter(p, false);
+                    } else {
+                        op.setParameter(p, true);
+                    }
+                }
+                optmHullSet = op.buildOptimizedHullSet(graph);
+                name = op.getName();
+                res = optmHullSet.size();
+                out = "R\t g" + cont++ + "\t r"
+                        + r + "\t" + name
+                        + "\t" + res + "\n";
+                System.out.println("resultado parcial: " + out);
+
+                if (melhor == null) {
+                    melhor = res;
+                    melhores1.add(currentRerverse);
+                } else if (melhor == res) {
+                    melhores1.add(currentRerverse);
+                } else if (melhor > res) {
+                    melhores1.clear();
+                    melhores1.add(currentRerverse);
+                    melhor = res;
+                    System.out.println(" melhor otimizado ");
+                    System.out.println(out);
+                }
             }
-        }
         }
         return melhor;
     }

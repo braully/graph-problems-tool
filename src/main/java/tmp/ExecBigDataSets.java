@@ -384,7 +384,7 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-                        tss, //            heur1,
+//                        tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -415,7 +415,7 @@ public class ExecBigDataSets {
 //            tss.setR(k);
             heur5t2.setR(k);
             tssg.setR(k);
-            optm.setR(k);
+            optm.setK(k);
             System.out.println("-------------\n\nK: " + k);
 
             for (String s : dataSets) {

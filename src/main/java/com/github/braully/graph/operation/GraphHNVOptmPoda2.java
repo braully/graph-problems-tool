@@ -894,7 +894,7 @@ public class GraphHNVOptmPoda2
 //            op.setPularAvaliacaoOffset(false);
                 op.setPularAvaliacaoOffset(true);
                 op.realizarPoda = false;
-                for (int r = 4; r <= 10; r++) {
+                for (int r = 6; r <= 10; r++) {
                     String line = null;
                     int cont = 0;
                     MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
