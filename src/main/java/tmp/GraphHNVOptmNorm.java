@@ -694,40 +694,38 @@ public class GraphHNVOptmNorm
                 int cont = 0;
                 for (String p : parameters.keySet()) {
                     Boolean get = parameters.get(p);
-                    double p1 = 0, p2 = 0;
+                    double p1 = bonusTotal, p2 = bonusTotal;
                     if (get != null) {
                         switch (p) {
                             case pdeltaHsi:
-                                p1 = deltaHsi;
-                                p2 = maiorDeltaHs;
+                                p1 = p1 / deltaHsi;
+                                p2 = p2 / maiorDeltaHs;
                                 break;
                             case pbonusTotal:
-                                p1 = bonusTotal;
-                                p2 = maiorBonusTotal;
                                 break;
                             case pbonusParcial:
-                                p1 = bonusParcial;
-                                p2 = maiorBonusParcial;
+                                p1 = p1 / bonusParcial;
+                                p2 = p2 / maiorBonusParcial;
                                 break;
                             case pbonusTotalNormalizado:
-                                p1 = bonusParcialNormalizado;
-                                p2 = maiorBonusTotalNormalizado;
+                                p1 = p1 / bonusParcialNormalizado;
+                                p2 = p2 / maiorBonusTotalNormalizado;
                                 break;
                             case pdificuldadeTotal:
-                                p1 = dificuldadeTotal;
-                                p2 = maiorDificuldadeTotal;
+                                p1 = p1 / dificuldadeTotal;
+                                p2 = p2 / maiorDificuldadeTotal;
                                 break;
                             case pdificuldadeParcial:
-                                p1 = dificuldadeParcial;
-                                p2 = maiorDificuldadeParcial;
+                                p1 = p1 / dificuldadeParcial;
+                                p2 = p2 / maiorDificuldadeParcial;
                                 break;
                             case pprofundidadeS:
-                                p1 = profundidadeS;
-                                p2 = maiorProfundidadeS;
+                                p1 = p1 / (profundidadeS + 1);
+                                p2 = p2 / (maiorProfundidadeS + 1);
                                 break;
                             case paux:
-                                p1 = aux[i];
-                                p2 = maiorAux;
+                                p1 = p1 / (aux[i] + 1);
+                                p2 = p2 / (maiorAux + 1);
                                 break;
                             default:
                                 break;
@@ -735,9 +733,6 @@ public class GraphHNVOptmNorm
                         if (get) {
                             list[cont++] = p1;
                             list[cont++] = p2;
-                        } else {
-                            list[cont++] = -p1;
-                            list[cont++] = -p2;
                         }
                     }
                 }
