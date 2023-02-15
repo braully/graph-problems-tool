@@ -651,6 +651,10 @@ public class GraphBigHNVOptm
                                 p1 = bonusParcial;
                                 p2 = maiorBonusParcial;
                                 break;
+                            case pbonusParcialNormalizado:
+                                p1 = bonusParcialNormalizado;
+                                p2 = maiorBonusParcialNormalizado;
+                                break;
                             case pbonusTotalNormalizado:
                                 p1 = bonusParcialNormalizado;
                                 p2 = maiorBonusTotalNormalizado;
@@ -667,9 +671,9 @@ public class GraphBigHNVOptm
                                 p1 = profundidadeS;
                                 p2 = maiorProfundidadeS;
                                 break;
-                            case paux:
-                                p1 = aux[i];
-                                p2 = maiorAux;
+                            case pgrau:
+                                p1 = di;
+                                p2 = maiorGrau;
                                 break;
                             default:
                                 break;
@@ -745,9 +749,10 @@ public class GraphBigHNVOptm
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
+        MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+
         for (int r = 3; r <= 7; r++) {
             int cont = 0;
-            MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
             for (String s : dataSets) {
                 System.out.println("\n-DATASET: " + s);
 
@@ -882,6 +887,7 @@ public class GraphBigHNVOptm
         } else if (melhor == res) {
             melhores1.add(currentSet);
         } else if (melhor > res) {
+            melhor = res;
             melhores1.clear();
             melhores1.add(currentSet);
         }
