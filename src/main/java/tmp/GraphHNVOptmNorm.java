@@ -601,6 +601,7 @@ public class GraphHNVOptmNorm
             mapCount.setVal(i, kr[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
             profundidadeS = 0;
+            int di = 0;
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
                 Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -623,10 +624,11 @@ public class GraphHNVOptmNorm
 
                 bonusHs += bonus;
                 dificuldadeHs += (kr[verti] - aux[verti]);
-                bonusTotalNormalizado += (dificuldade / bonus);
 //                pularAvaliacao[verti] = sizeHs;
                 profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
+                bonusTotalNormalizado += (bonus / grauContaminacao);
+                di += degree[verti];
             }
 
             for (Integer x : mapCount.keySet()) {
@@ -639,15 +641,16 @@ public class GraphHNVOptmNorm
                     double dificuldade = (kr[x] - aux[x]);
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    bonusParcialNormalizado += (dificuldade / bonus);
                 }
             }
 
 //                dificuldadeTotal = kr[i] - aux[i];
 //                bonusTotal = grauI - kr[i];
+            grauI = di;
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
-            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
+            bonusTotalNormalizado = bonusTotal / grauContaminacao;
+            bonusParcialNormalizado = bonusParcial / contaminadoParcialmente;
             int deltaHsi = grauContaminacao;
 
             if (checkDeltaHsi) {
@@ -666,8 +669,6 @@ public class GraphHNVOptmNorm
 //                        contaminadoParcialmente++;
 //                    }
 //                }
-            int di = degree[i];
-            int deltadei = di - aux[i];
 
             ddouble = contaminadoParcialmente / degree[i];
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
@@ -719,7 +720,7 @@ public class GraphHNVOptmNorm
                                 p2 = p2 / maiorBonusParcial;
                                 break;
                             case pbonusTotalNormalizado:
-                                p1 = p1 / bonusParcialNormalizado;
+                                p1 = p1 / bonusTotalNormalizado;
                                 p2 = p2 / maiorBonusTotalNormalizado;
                                 break;
                             case pdificuldadeTotal:
@@ -739,7 +740,7 @@ public class GraphHNVOptmNorm
                                 p2 = p2 / (maiorAux + 1);
                                 break;
                             case pgrau:
-                                p1 = p1 / (grauI + 1);
+                                p1 = p1 / (di + 1);
                                 p2 = p2 / (maiorGrau + 1);
                                 break;
                             default:
@@ -775,13 +776,14 @@ public class GraphHNVOptmNorm
                     maiorGrauContaminacao = grauContaminacao;
                     maiorContaminadoParcialmente = contaminadoParcialmente;
                     maiorBonusParcialNormalizado = bonusParcialNormalizado;
-                    bestVertice = i;
-                    maiorProfundidadeS = profundidadeS;
                     maiorBonusTotal = bonusTotal;
                     maiorDificuldadeTotal = dificuldadeTotal;
-                    maiorGrau = di;
+                    bestVertice = i;
+                    maiorProfundidadeS = profundidadeS;
+//                    maiorProfundidade = bdl.getDistance(graph, i);
                     maiorDouble = ddouble;
                     maiorAux = aux[i];
+                    maiorGrau = di;
                     maiorBonusTotalNormalizado = bonusTotalNormalizado;
                     maiorBonusParcial = bonusParcial;
                     maiorDificuldadeParcial = dificuldadeParcial;
@@ -844,6 +846,14 @@ public class GraphHNVOptmNorm
 //        if (!checkIfHullSet) {
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
+        List<String> parametros = new ArrayList<>();
+        parametros.addAll(List.of(
+                pdeltaHsi, pdificuldadeTotal,
+                pbonusTotal, pbonusParcial, pdificuldadeParcial,
+                pbonusTotalNormalizado, pbonusParcialNormalizado,
+                pprofundidadeS, pgrau
+        //        , pgrau, paux
+        ));
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;

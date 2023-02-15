@@ -799,44 +799,50 @@ public class GraphHNVOptm
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
-
-        System.out.println(graph.toResumedString());
-
-//        System.out.println("Conected componentes: ");
-//        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-//        for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
-//            System.out.println("" + e.getKey() + ": " + e.getValue().size());
-//        }
-//        }
-        op.setR(10);
-        op.resetParameters();
-        op.setPularAvaliacaoOffset(true);
-//        op.decompor = true;
-//        op.setParameter(GraphBigHNVOptm.paux, true);
-//        op.setParameter(GraphBigHNVOptm.pgrau, true);
-        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
-        op.setParameter(pbonusTotal, true);
-        op.setParameter(pdificuldadeParcial, true);
-//        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-//        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
-
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-
-        UtilProccess.printEndTime();
-
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//
+//        System.out.println(graph.toResumedString());
+//
+////        System.out.println("Conected componentes: ");
+////        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
+////        for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
+////            System.out.println("" + e.getKey() + ": " + e.getValue().size());
+////        }
+////        }
+//        op.setR(10);
+//        op.resetParameters();
+//        op.setPularAvaliacaoOffset(true);
+////        op.decompor = true;
+////        op.setParameter(GraphBigHNVOptm.paux, true);
+////        op.setParameter(GraphBigHNVOptm.pgrau, true);
+//        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+//        op.setParameter(pbonusTotal, true);
+//        op.setParameter(pdificuldadeParcial, true);
+////        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
+////        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+//
+//        UtilProccess.printStartTime();
+//        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+//
+//        UtilProccess.printEndTime();
+//
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 //        op.checkIfHullSet(graph, buildOptimizedHullSet);
-        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-        if (!checkIfHullSet) {
-            System.err.println("FAIL: fail on check hull setg");
-        }
-
+//        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        if (!checkIfHullSet) {
+//            System.err.println("FAIL: fail on check hull setg");
+//        }
+        List<String> parametros = new ArrayList<>();
+        parametros.addAll(List.of(
+                pdeltaHsi, pdificuldadeTotal,
+                pbonusTotal, pbonusParcial, pdificuldadeParcial,
+                pbonusTotalNormalizado, pbonusParcialNormalizado,
+                pprofundidadeS
+        //        , pgrau, paux
+        ));
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
@@ -855,11 +861,11 @@ public class GraphHNVOptm
                 List<int[]> melhores = new ArrayList<>();
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
 
-                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), 2);
+                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), 1);
                 while (combinationsIterator.hasNext()) {
 
                     int[] currentSet = combinationsIterator.next();
-
+                    op.setPularAvaliacaoOffset(true);
                     op.resetParameters();
                     for (int ip : currentSet) {
                         String p = allParameters.get(ip);
@@ -886,6 +892,7 @@ public class GraphHNVOptm
                         currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
                     }
 
+                    op.setPularAvaliacaoOffset(false);
                     op.resetParameters();
                     for (int ip : currentRerverse) {
                         String p = allParameters.get(ip);
@@ -893,18 +900,27 @@ public class GraphHNVOptm
                     }
                     optmHullSet = op.buildOptimizedHullSet(graph);
                     name = op.getName();
-                    res = optmHullSet.size();
+                    int res2 = optmHullSet.size();
                     out = "R\t g" + cont++ + "\t r"
                             + r + "\t" + name
-                            + "\t" + res + "\n";
+                            + "\t" + res2 + "\n";
                     if (melhor == null) {
-                        melhor = res;
+                        melhor = res2;
                         melhores.add(currentRerverse);
-                    } else if (melhor == res) {
+                    } else if (melhor == res2) {
                         melhores.add(currentRerverse);
-                    } else if (melhor > res) {
+                    } else if (melhor > res2) {
+                        melhor = res2;
                         melhores.clear();
                         melhores.add(currentRerverse);
+                    }
+                    if (res != res2) {
+                        System.out.print("Diferença nos resultados pra o parametro: ");
+                        for (int s : currentSet) {
+                            System.out.print(parametros.get(s));
+                        }
+                        System.out.println();
+                        System.out.println(res + "!=" + res2);
                     }
                 }
 //                for (Integer i : melhores) {
@@ -913,6 +929,7 @@ public class GraphHNVOptm
                     contMelhor.inc(i);
                 }
                 cont++;
+
             }
             files.close();
             System.out.println("\n---------------");

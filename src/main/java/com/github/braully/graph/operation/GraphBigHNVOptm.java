@@ -533,6 +533,7 @@ public class GraphBigHNVOptm
             mustBeIncluded.add(i);
             mapCount.setVal(i, kr[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
+            int di = 0;
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
                 Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -545,12 +546,21 @@ public class GraphBigHNVOptm
                     Integer inc = mapCount.inc(vertn);
                     if ((inc + aux[vertn]) == kr[vertn]) {
                         mustBeIncluded.add(vertn);
-                        bonusHs += degree[vertn] - kr[vertn];
-                        dificuldadeHs += (kr[vertn] - aux[vertn]);
+//                        bonusHs += degree[vertn] - kr[vertn];
+//                        dificuldadeHs += (kr[vertn] - aux[vertn]);
                         ofssetPularAvaliacao[vertn] = sizeHs;
                     }
                 }
+                double bonus = degree[verti] - kr[verti];
+                double dificuldade = (kr[verti] - aux[verti]);
+
+                bonusHs += bonus;
+                dificuldadeHs += (kr[verti] - aux[verti]);
+//                pularAvaliacao[verti] = sizeHs;
+                profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
+                bonusTotalNormalizado += (bonus / grauContaminacao);
+                di += degree[verti];
             }
 
             for (Integer x : mapCount.keySet()) {
@@ -563,15 +573,16 @@ public class GraphBigHNVOptm
                     double dificuldade = (kr[x] - aux[x]);
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    bonusParcialNormalizado += (bonus / dificuldade);
                 }
             }
 
 //                dificuldadeTotal = kr[i] - aux[i];
 //                bonusTotal = grauI - kr[i];
+            grauI = di;
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
-            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
+            bonusTotalNormalizado = bonusTotal / grauContaminacao;
+            bonusParcialNormalizado = bonusParcial / contaminadoParcialmente;
             int deltaHsi = grauContaminacao;
 
             if (checkDeltaHsi) {
@@ -590,8 +601,6 @@ public class GraphBigHNVOptm
 //                        contaminadoParcialmente++;
 //                    }
 //                }
-            int di = degree[i];
-            int deltadei = di - aux[i];
 
             ddouble = contaminadoParcialmente / degree[i];
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
@@ -778,6 +787,7 @@ public class GraphBigHNVOptm
                     } else if (melhor == res) {
                         melhores.add(currentSet);
                     } else if (melhor > res) {
+                        melhor = res;
                         melhores.clear();
                         melhores.add(currentSet);
                     }
@@ -804,6 +814,7 @@ public class GraphBigHNVOptm
                     } else if (melhor == res) {
                         melhores.add(currentRerverse);
                     } else if (melhor > res) {
+                        melhor = res;
                         melhores.clear();
                         melhores.add(currentRerverse);
                     }
