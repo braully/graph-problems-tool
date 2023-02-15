@@ -74,13 +74,12 @@ public class GraphHNVOptmNorm
     @Override
     public String getName() {
         StringBuilder sb = new StringBuilder(description);
+        sb.append(pbonusTotal);
         for (String par : parameters.keySet()) {
             Boolean get = parameters.get(par);
             if (get != null) {
                 if (get) {
-                    sb.append("+");
-                } else {
-                    sb.append("-");
+                    sb.append("/");
                 }
                 sb.append(par);
             }
@@ -691,10 +690,10 @@ public class GraphHNVOptmNorm
             } else {
 
                 double[] list = new double[parameters.size() * 2];
-                int cont = 0;
+                double p1 = bonusTotal, p2 = maiorBonusTotal;
+
                 for (String p : parameters.keySet()) {
                     Boolean get = parameters.get(p);
-                    double p1 = bonusTotal, p2 = bonusTotal;
                     if (get != null) {
                         switch (p) {
                             case pdeltaHsi:
@@ -727,15 +726,18 @@ public class GraphHNVOptmNorm
                                 p1 = p1 / (aux[i] + 1);
                                 p2 = p2 / (maiorAux + 1);
                                 break;
+                            case pgrau:
+                                p1 = p1 / (grauI + 1);
+                                p2 = p2 / (maiorGrau + 1);
+                                break;
                             default:
                                 break;
                         }
-                        if (get) {
-                            list[cont++] = p1;
-                            list[cont++] = p2;
-                        }
+
                     }
                 }
+                list[0] = p1;
+                list[1] = p2;
                 Boolean greater = isGreater(list);
 //                Boolean greater = isGreater(deltaHsi, maiorDeltaHs,
 //                        // bonusTotal, maiorBonusTotal,
@@ -784,7 +786,7 @@ public class GraphHNVOptmNorm
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
 //        op.setParameter(GraphBigHNVOptm.pbonusTotal, true);
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -795,9 +797,9 @@ public class GraphHNVOptmNorm
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 
         System.out.println(graph.toResumedString());
 
@@ -807,51 +809,51 @@ public class GraphHNVOptmNorm
 //            System.out.println("" + e.getKey() + ": " + e.getValue().size());
 //        }
 //        }
-        op.setR(10);
-        op.resetParameters();
-        op.setPularAvaliacaoOffset(true);
+//        op.setR(10);
+//        op.resetParameters();
+//        op.setPularAvaliacaoOffset(true);
 //        op.decompor = true;
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
-        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
-        op.setParameter(pbonusTotal, true);
-        op.setParameter(pdificuldadeParcial, true);
+//        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+//        op.setParameter(pbonusTotal, true);
+//        op.setParameter(pdificuldadeParcial, true);
 //        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
 //        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
-
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-
-        UtilProccess.printEndTime();
-
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
-//        op.checkIfHullSet(graph, buildOptimizedHullSet);
-        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-        if (!checkIfHullSet) {
-            System.err.println("FAIL: fail on check hull setg");
-        }
-
+//        UtilProccess.printStartTime();
+//        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+//
+//        UtilProccess.printEndTime();
+//
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+//
+////        op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        if (!checkIfHullSet) {
+//            System.err.println("FAIL: fail on check hull setg");
+//        }
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
-
+//
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         //
-        for (int r = 4; r <= 10; r++) {
-            BufferedReader files = new BufferedReader(new FileReader(strFile));
-            String line = null;
-            int cont = 0;
-            MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
-            while (null != (line = files.readLine())) {
-                graph = UtilGraph.loadGraphG6(line);
+        for (int t = 1; t <= 2; t++) {
+            System.out.println("Ciclo t:" + t);
+            for (int r = 2; r <= 7; r++) {
+//            BufferedReader files = new BufferedReader(new FileReader(strFile));
+//            String line = null;
+                int cont = 0;
+                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+//            while (null != (line = files.readLine())) {
+//                graph = UtilGraph.loadGraphG6(line);
                 op.setR(r);
                 Integer melhor = null;
                 List<int[]> melhores = new ArrayList<>();
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
 
-                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), 2);
+                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), t);
                 while (combinationsIterator.hasNext()) {
 
                     int[] currentSet = combinationsIterator.next();
@@ -864,7 +866,7 @@ public class GraphHNVOptmNorm
                     Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
                     String name = op.getName();
                     int res = optmHullSet.size();
-                    String out = "R\t g" + cont++ + "\t r"
+                    String out = "R\t g" + graph.getName() + "\t r"
                             + r + "\t" + name
                             + "\t" + res + "\n";
                     if (melhor == null) {
@@ -874,8 +876,11 @@ public class GraphHNVOptmNorm
                         melhores.add(currentSet);
                     } else if (melhor > res) {
                         melhores.clear();
+                        melhor = res;
                         melhores.add(currentSet);
                     }
+
+                    System.out.println(out);
 
                     int[] currentRerverse = currentSet.clone();
                     for (int i = 0; i < currentSet.length; i++) {
@@ -900,8 +905,10 @@ public class GraphHNVOptmNorm
                         melhores.add(currentRerverse);
                     } else if (melhor > res) {
                         melhores.clear();
+                        melhor = res;
                         melhores.add(currentRerverse);
                     }
+                    System.out.println(out);
                 }
 //                for (Integer i : melhores) {
                 for (int[] ip : melhores) {
@@ -909,42 +916,43 @@ public class GraphHNVOptmNorm
                     contMelhor.inc(i);
                 }
                 cont++;
-            }
-            files.close();
-            System.out.println("\n---------------");
-            System.out.println("Resumo r:" + r);
+//            }
+//            files.close();
+                System.out.println("\n---------------");
+                System.out.println("Resumo r:" + r);
 
-            Map<String, Integer> map = new HashMap<>();
+                Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-            for (int[] i : allarrays()) {
-                StringBuilder sb = new StringBuilder();
-                for (int ip : i) {
-                    sb.append(allParameters.get(ip));
+                for (int[] i : allarrays()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int ip : i) {
+                        sb.append(allParameters.get(ip));
 //                    String p = allParameters.get(ip);
-                    sb.append("-");
+                        sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
+                    }
+                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
                 }
-                map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
-            }
-            List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-            entrySet.sort(
-                    Comparator.comparingInt(
-                            (Entry<String, Integer> v) -> -v.getValue()
-                    )
-                            .thenComparing(v -> v.getKey())
-            );
-            for (Entry<String, Integer> e : entrySet) {
-                String p = e.getKey();
-                System.out.println(p + ": " + e.getValue());
-            }
+                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+                entrySet.sort(
+                        Comparator.comparingInt(
+                                (Entry<String, Integer> v) -> -v.getValue()
+                        )
+                                .thenComparing(v -> v.getKey())
+                );
+                for (Entry<String, Integer> e : entrySet) {
+                    String p = e.getKey();
+                    System.out.println(p + ": " + e.getValue());
+                }
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
 //            }
+            }
         }
     }
 
