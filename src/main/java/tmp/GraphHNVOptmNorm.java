@@ -75,7 +75,7 @@ public class GraphHNVOptmNorm
     public String getName() {
         StringBuilder sb = new StringBuilder(description);
         sb.append("+");
-        sb.append(pbonusTotal);
+        sb.append(pdificuldadeTotal);
         for (String par : parameters.keySet()) {
             Boolean get = parameters.get(par);
             if (get != null) {
@@ -700,7 +700,7 @@ public class GraphHNVOptmNorm
             } else {
 
                 double[] list = new double[parameters.size() * 2];
-                double p1 = bonusTotal, p2 = maiorBonusTotal;
+                double p1 = dificuldadeTotal, p2 = maiorDificuldadeTotal;
 
                 for (String p : parameters.keySet()) {
                     Boolean get = parameters.get(p);
@@ -711,6 +711,8 @@ public class GraphHNVOptmNorm
                                 p2 = p2 / maiorDeltaHs;
                                 break;
                             case pbonusTotal:
+                                p1 = p1 / bonusTotal;
+                                p2 = p2 / maiorBonusTotal;
                                 break;
                             case pbonusParcial:
                                 p1 = p1 / bonusParcial;
@@ -721,8 +723,8 @@ public class GraphHNVOptmNorm
                                 p2 = p2 / maiorBonusTotalNormalizado;
                                 break;
                             case pdificuldadeTotal:
-                                p1 = p1 / dificuldadeTotal;
-                                p2 = p2 / maiorDificuldadeTotal;
+//                                p1 = p1 / dificuldadeTotal;
+//                                p2 = p2 / maiorDificuldadeTotal;
                                 break;
                             case pdificuldadeParcial:
                                 p1 = p1 / dificuldadeParcial;
@@ -821,7 +823,6 @@ public class GraphHNVOptmNorm
 //        }
 //        op.setR(10);
 //        op.resetParameters();
-        op.setPularAvaliacaoOffset(true);
 //        op.decompor = true;
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -848,6 +849,7 @@ public class GraphHNVOptmNorm
         int piorGlobal = 0;
 //
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
+        op.setPularAvaliacaoOffset(true);
         //
         for (int t = 1; t <= 2; t++) {
             System.out.println("Ciclo t:" + t);
