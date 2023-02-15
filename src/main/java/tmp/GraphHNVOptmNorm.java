@@ -74,6 +74,7 @@ public class GraphHNVOptmNorm
     @Override
     public String getName() {
         StringBuilder sb = new StringBuilder(description);
+        sb.append("+");
         sb.append(pbonusTotal);
         for (String par : parameters.keySet()) {
             Boolean get = parameters.get(par);
@@ -84,6 +85,13 @@ public class GraphHNVOptmNorm
                 sb.append(par);
             }
         }
+        if (tryMiminal()) {
+            sb.append(":tryMinimal");
+        }
+        if (pularAvaliacaoOffset) {
+            sb.append(":pulaOff");
+        }
+
         return sb.toString();
     }
 
@@ -592,6 +600,7 @@ public class GraphHNVOptmNorm
             mustBeIncluded.add(i);
             mapCount.setVal(i, kr[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
+            profundidadeS = 0;
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
                 Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -616,6 +625,7 @@ public class GraphHNVOptmNorm
                 dificuldadeHs += (kr[verti] - aux[verti]);
                 bonusTotalNormalizado += (dificuldade / bonus);
 //                pularAvaliacao[verti] = sizeHs;
+                profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
             }
 
@@ -811,7 +821,7 @@ public class GraphHNVOptmNorm
 //        }
 //        op.setR(10);
 //        op.resetParameters();
-//        op.setPularAvaliacaoOffset(true);
+        op.setPularAvaliacaoOffset(true);
 //        op.decompor = true;
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -882,33 +892,6 @@ public class GraphHNVOptmNorm
 
                     System.out.println(out);
 
-                    int[] currentRerverse = currentSet.clone();
-                    for (int i = 0; i < currentSet.length; i++) {
-                        currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-                    }
-
-                    op.resetParameters();
-                    for (int ip : currentRerverse) {
-                        String p = allParameters.get(ip);
-                        op.setParameter(p, true);
-                    }
-                    optmHullSet = op.buildOptimizedHullSet(graph);
-                    name = op.getName();
-                    res = optmHullSet.size();
-                    out = "R\t g" + cont++ + "\t r"
-                            + r + "\t" + name
-                            + "\t" + res + "\n";
-                    if (melhor == null) {
-                        melhor = res;
-                        melhores.add(currentRerverse);
-                    } else if (melhor == res) {
-                        melhores.add(currentRerverse);
-                    } else if (melhor > res) {
-                        melhores.clear();
-                        melhor = res;
-                        melhores.add(currentRerverse);
-                    }
-                    System.out.println(out);
                 }
 //                for (Integer i : melhores) {
                 for (int[] ip : melhores) {
@@ -919,7 +902,7 @@ public class GraphHNVOptmNorm
 //            }
 //            files.close();
                 System.out.println("\n---------------");
-                System.out.println("Resumo r:" + r);
+                System.out.println("Resumo r: " + r + " melhor: " + melhor);
 
                 Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
