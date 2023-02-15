@@ -749,123 +749,127 @@ public class GraphBigHNVOptm
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
-        MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
 
-        for (int r = 3; r <= 7; r++) {
-            int cont = 0;
-            for (String s : dataSets) {
-                System.out.println("\n-DATASET: " + s);
+        for (int t = 1; t <= 3; t++) {
+            for (int r = 3; r <= 7; r++) {
+                int cont = 0;
+                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
 
-                try {
-                    graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/nodes.csv"),
-                            new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/edges.csv"));
-                } catch (FileNotFoundException e) {
-                    graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/" + s + ".txt"));
-                }
-                if (graph == null) {
-                    System.out.println("Fail to Load GRAPH: " + s);
-                }
-                op.setR(r);
-                Integer melhor = null;
-                List<int[]> melhores = new ArrayList<>();
+                for (String s : dataSets) {
+                    System.out.println("\n-DATASET: " + s);
+
+                    try {
+                        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/nodes.csv"),
+                                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/edges.csv"));
+                    } catch (FileNotFoundException e) {
+                        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/" + s + "/" + s + ".txt"));
+                    }
+                    if (graph == null) {
+                        System.out.println("Fail to Load GRAPH: " + s);
+                    }
+                    op.setR(r);
+                    Integer melhor = null;
+                    List<int[]> melhores = new ArrayList<>();
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
+                    op.pularAvaliacaoOffset = true;
+                    Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), t);
+                    while (combinationsIterator.hasNext()) {
 
-                Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(allParameters.size(), 2);
-                while (combinationsIterator.hasNext()) {
+                        int[] currentSet = combinationsIterator.next();
 
-                    int[] currentSet = combinationsIterator.next();
+                        op.resetParameters();
+                        for (int ip : currentSet) {
+                            String p = allParameters.get(ip);
+                            op.setParameter(p, true);
+                        }
+                        Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
+                        String name = op.getName();
+                        int res = optmHullSet.size();
+                        String out = "R\t g" + cont++ + "\t r"
+                                + r + "\t" + name
+                                + "\t" + res + "\n";
+                        if (melhor == null) {
+                            melhor = res;
+                            melhores.add(currentSet);
+                        } else if (melhor == res) {
+                            melhores.add(currentSet);
+                        } else if (melhor > res) {
+                            melhor = res;
+                            melhores.clear();
+                            melhores.add(currentSet);
+                        }
+                        if (t > 1) {
+                            int[] currentRerverse = currentSet.clone();
+                            for (int i = 0; i < currentSet.length; i++) {
+                                currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
+                            }
 
-                    op.resetParameters();
-                    for (int ip : currentSet) {
-                        String p = allParameters.get(ip);
-                        op.setParameter(p, true);
+                            op.resetParameters();
+                            for (int ip : currentRerverse) {
+                                String p = allParameters.get(ip);
+                                op.setParameter(p, true);
+                            }
+                            optmHullSet = op.buildOptimizedHullSet(graph);
+                            name = op.getName();
+                            res = optmHullSet.size();
+                            out = "R\t g" + cont++ + "\t r"
+                                    + r + "\t" + name
+                                    + "\t" + res + "\n";
+                            if (melhor == null) {
+                                melhor = res;
+                                melhores.add(currentRerverse);
+                            } else if (melhor == res) {
+                                melhores.add(currentRerverse);
+                            } else if (melhor > res) {
+                                melhor = res;
+                                melhores.clear();
+                                melhores.add(currentRerverse);
+                            }
+                        }
                     }
-                    Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
-                    String name = op.getName();
-                    int res = optmHullSet.size();
-                    String out = "R\t g" + cont++ + "\t r"
-                            + r + "\t" + name
-                            + "\t" + res + "\n";
-                    if (melhor == null) {
-                        melhor = res;
-                        melhores.add(currentSet);
-                    } else if (melhor == res) {
-                        melhores.add(currentSet);
-                    } else if (melhor > res) {
-                        melhor = res;
-                        melhores.clear();
-                        melhores.add(currentSet);
-                    }
-
-                    int[] currentRerverse = currentSet.clone();
-                    for (int i = 0; i < currentSet.length; i++) {
-                        currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-                    }
-
-                    op.resetParameters();
-                    for (int ip : currentRerverse) {
-                        String p = allParameters.get(ip);
-                        op.setParameter(p, true);
-                    }
-                    optmHullSet = op.buildOptimizedHullSet(graph);
-                    name = op.getName();
-                    res = optmHullSet.size();
-                    out = "R\t g" + cont++ + "\t r"
-                            + r + "\t" + name
-                            + "\t" + res + "\n";
-                    if (melhor == null) {
-                        melhor = res;
-                        melhores.add(currentRerverse);
-                    } else if (melhor == res) {
-                        melhores.add(currentRerverse);
-                    } else if (melhor > res) {
-                        melhor = res;
-                        melhores.clear();
-                        melhores.add(currentRerverse);
-                    }
-                }
 //                for (Integer i : melhores) {
-                for (int[] ip : melhores) {
-                    int i = array2idx(ip);
-                    contMelhor.inc(i);
-                }
-                cont++;
-                System.out.println("\n---------------");
-                System.out.println("Melhor parcial r: " + r + " dataset: " + s + " melhor: " + melhor);
+                    for (int[] ip : melhores) {
+                        int i = array2idx(ip);
+                        contMelhor.inc(i);
+                    }
+                    cont++;
+                    System.out.println("\n---------------");
+                    System.out.println("Melhor parcial r: " + r + " dataset: " + s + " melhor: " + melhor);
 
-                Map<String, Integer> map = new HashMap<>();
+                    Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-                for (int[] i : allarrays()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int ip : i) {
-                        sb.append(allParameters.get(ip));
+                    for (int[] i : allarrays()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (int ip : i) {
+                            sb.append(allParameters.get(ip));
 //                    String p = allParameters.get(ip);
-                        sb.append("-");
+                            sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
+                        }
+                        map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
                     }
-                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
+                    List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
+                    entrySet.sort(
+                            Comparator.comparingInt(
+                                    (Entry<String, Integer> v) -> -v.getValue()
+                            )
+                                    .thenComparing(v -> v.getKey())
+                    );
+                    for (Entry<String, Integer> e : entrySet) {
+                        String p = e.getKey();
+                        System.out.println(p + ": " + e.getValue());
+                    }
                 }
-                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-                entrySet.sort(
-                        Comparator.comparingInt(
-                                (Entry<String, Integer> v) -> -v.getValue()
-                        )
-                                .thenComparing(v -> v.getKey())
-                );
-                for (Entry<String, Integer> e : entrySet) {
-                    String p = e.getKey();
-                    System.out.println(p + ": " + e.getValue());
-                }
-            }
 
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
 //            }
+            }
         }
     }
 
