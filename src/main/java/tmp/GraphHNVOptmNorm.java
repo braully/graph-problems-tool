@@ -853,11 +853,12 @@ public class GraphHNVOptmNorm
         //
         for (int t = 1; t <= 2; t++) {
             System.out.println("Ciclo t:" + t);
+            MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+
             for (int r = 2; r <= 7; r++) {
 //            BufferedReader files = new BufferedReader(new FileReader(strFile));
 //            String line = null;
                 int cont = 0;
-                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
 //            while (null != (line = files.readLine())) {
 //                graph = UtilGraph.loadGraphG6(line);
                 op.setR(r);
