@@ -84,6 +84,12 @@ public class GraphHNVOptm
                 sb.append(par);
             }
         }
+        if (tryMiminal()) {
+            sb.append(":tryMinimal");
+        }
+        if (pularAvaliacaoOffset) {
+            sb.append(":pularAva");
+        }
         return sb.toString();
     }
 
@@ -229,7 +235,9 @@ public class GraphHNVOptm
         }
 
 //        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
-        s = tryMinimal(graph, s);
+        if (tryMiminal()) {
+            s = tryMinimal(graph, s);
+        }
 //        s = tryMinimal2(graph, s);
         return s;
     }
@@ -592,6 +600,8 @@ public class GraphHNVOptm
             mustBeIncluded.add(i);
             mapCount.setVal(i, kr[i]);
 //                System.out.println(s.size() + "-avaliando: " + i);
+            profundidadeS = 0;
+            int di = 0;
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
                 Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -614,9 +624,10 @@ public class GraphHNVOptm
 
                 bonusHs += bonus;
                 dificuldadeHs += (kr[verti] - aux[verti]);
-                bonusTotalNormalizado += (dificuldade / bonus);
 //                pularAvaliacao[verti] = sizeHs;
+                profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
+                di += degree[verti];
             }
 
             for (Integer x : mapCount.keySet()) {
@@ -629,15 +640,16 @@ public class GraphHNVOptm
                     double dificuldade = (kr[x] - aux[x]);
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
-                    bonusParcialNormalizado += (dificuldade / bonus);
                 }
             }
 
 //                dificuldadeTotal = kr[i] - aux[i];
 //                bonusTotal = grauI - kr[i];
+            grauI = di;
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
-            bonusTotalNormalizado = bonusTotal / dificuldadeTotal;
+            bonusTotalNormalizado = bonusTotal / grauContaminacao;
+            bonusParcialNormalizado = bonusParcial / contaminadoParcialmente;
             int deltaHsi = grauContaminacao;
 
             if (checkDeltaHsi) {
@@ -656,8 +668,6 @@ public class GraphHNVOptm
 //                        contaminadoParcialmente++;
 //                    }
 //                }
-            int di = degree[i];
-            int deltadei = di - aux[i];
 
             ddouble = contaminadoParcialmente / degree[i];
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
@@ -765,13 +775,13 @@ public class GraphHNVOptm
                     maiorGrauContaminacao = grauContaminacao;
                     maiorContaminadoParcialmente = contaminadoParcialmente;
                     maiorBonusParcialNormalizado = bonusParcialNormalizado;
-                    bestVertice = i;
-                    maiorProfundidadeS = profundidadeS;
                     maiorBonusTotal = bonusTotal;
                     maiorDificuldadeTotal = dificuldadeTotal;
-                    maiorGrau = di;
+                    bestVertice = i;
+                    maiorProfundidadeS = profundidadeS;
                     maiorDouble = ddouble;
                     maiorAux = aux[i];
+                    maiorGrau = di;
                     maiorBonusTotalNormalizado = bonusTotalNormalizado;
                     maiorBonusParcial = bonusParcial;
                     maiorDificuldadeParcial = dificuldadeParcial;
@@ -788,7 +798,7 @@ public class GraphHNVOptm
 //        op.setParameter(GraphBigHNVOptm.paux, true);
 //        op.setParameter(GraphBigHNVOptm.pgrau, true);
 //        op.setParameter(GraphBigHNVOptm.pbonusTotal, true);
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -811,9 +821,11 @@ public class GraphHNVOptm
 ////            System.out.println("" + e.getKey() + ": " + e.getValue().size());
 ////        }
 ////        }
-//        op.setR(10);
-//        op.resetParameters();
-//        op.setPularAvaliacaoOffset(true);
+        op.setR(4);
+        op.resetParameters();
+        op.setPularAvaliacaoOffset(true);
+        op.setVerbose(true);
+        op.setTryMinimal();
 ////        op.decompor = true;
 ////        op.setParameter(GraphBigHNVOptm.paux, true);
 ////        op.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -821,20 +833,20 @@ public class GraphHNVOptm
 //        op.setParameter(pbonusTotal, true);
 //        op.setParameter(pdificuldadeParcial, true);
 ////        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-////        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
 //
-//        UtilProccess.printStartTime();
-//        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+        UtilProccess.printStartTime();
+        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+
+        UtilProccess.printEndTime();
 //
-//        UtilProccess.printEndTime();
-//
-//        System.out.println(
-//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-//        op.checkIfHullSet(graph, buildOptimizedHullSet);
-//        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-//        if (!checkIfHullSet) {
-//            System.err.println("FAIL: fail on check hull setg");
-//        }
+        System.out.println(
+                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+        op.checkIfHullSet(graph, buildOptimizedHullSet);
+        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+        if (!checkIfHullSet) {
+            System.err.println("FAIL: fail on check hull setg");
+        }
         List<String> parametros = new ArrayList<>();
         parametros.addAll(List.of(
                 pdeltaHsi, pdificuldadeTotal,
@@ -846,6 +858,10 @@ public class GraphHNVOptm
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
+
+        if (true) {
+            return;
+        }
 
         String strFile = "hog-graphs-ge20-le50-ordered.g6";
         for (int t = 1; t <= 3; t++) //
@@ -1016,15 +1032,15 @@ public class GraphHNVOptm
         return map.values();
     }
 
-    void resetParameters() {
+    public void resetParameters() {
         this.parameters.clear();
     }
 
-    void setParameter(String p, boolean b) {
+    public void setParameter(String p, boolean b) {
         this.parameters.put(p, b);
     }
 
-    private void setPularAvaliacaoOffset(boolean b) {
+    public void setPularAvaliacaoOffset(boolean b) {
         this.pularAvaliacaoOffset = true;
     }
 }

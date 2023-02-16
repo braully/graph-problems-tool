@@ -392,8 +392,12 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         return map;
     }
 
-    protected void setTryMinimal() {
+    public void setTryMinimal() {
         parameters.put(MINIMAL, true);
+    }
+
+    public void setTryMinimal(boolean v) {
+        parameters.put(MINIMAL, v);
     }
 
     protected boolean tryMiminal() {

@@ -237,7 +237,9 @@ public class GraphHNVOptmNorm
         }
 
 //        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
+        if (tryMiminal()) {
         s = tryMinimal(graph, s);
+        }
 //        s = tryMinimal2(graph, s);
         return s;
     }
@@ -708,40 +710,44 @@ public class GraphHNVOptmNorm
                     if (get != null) {
                         switch (p) {
                             case pdeltaHsi:
-                                p1 = p1 / deltaHsi;
-                                p2 = p2 / maiorDeltaHs;
+                                p1 = p1 / Math.pow(deltaHsi, 2);
+                                p2 = p2 / Math.pow(maiorDeltaHs, 2);
                                 break;
                             case pbonusTotal:
-                                p1 = p1 / bonusTotal;
-                                p2 = p2 / maiorBonusTotal;
+                                p1 = p1 / Math.pow(bonusTotal, 2);
+                                p2 = p2 / Math.pow(maiorBonusTotal, 2);
                                 break;
                             case pbonusParcial:
-                                p1 = p1 / bonusParcial;
-                                p2 = p2 / maiorBonusParcial;
+                                p1 = p1 / Math.pow(bonusParcial, 2);
+                                p2 = p2 / Math.pow(maiorBonusParcial, 2);
+                                break;
+                            case pbonusParcialNormalizado:
+                                p1 = p1 / Math.pow(bonusParcialNormalizado, 2);
+                                p2 = p2 / Math.pow(maiorBonusParcialNormalizado, 2);
                                 break;
                             case pbonusTotalNormalizado:
-                                p1 = p1 / bonusTotalNormalizado;
-                                p2 = p2 / maiorBonusTotalNormalizado;
+                                p1 = p1 / Math.pow(bonusTotalNormalizado, 2);
+                                p2 = p2 / Math.pow(maiorBonusTotalNormalizado, 2);
                                 break;
                             case pdificuldadeTotal:
 //                                p1 = p1 / dificuldadeTotal;
 //                                p2 = p2 / maiorDificuldadeTotal;
                                 break;
                             case pdificuldadeParcial:
-                                p1 = p1 / dificuldadeParcial;
-                                p2 = p2 / maiorDificuldadeParcial;
+                                p1 = p1 / Math.pow(dificuldadeParcial, 2);
+                                p2 = p2 / Math.pow(maiorDificuldadeParcial, 2);
                                 break;
                             case pprofundidadeS:
                                 p1 = p1 / (profundidadeS + 1);
                                 p2 = p2 / (maiorProfundidadeS + 1);
                                 break;
                             case paux:
-                                p1 = p1 / (aux[i] + 1);
-                                p2 = p2 / (maiorAux + 1);
+                                p1 = p1 / Math.pow((aux[i] + 1), 2);
+                                p2 = p2 / Math.pow((maiorAux + 1), 2);
                                 break;
                             case pgrau:
-                                p1 = p1 / (di + 1);
-                                p2 = p2 / (maiorGrau + 1);
+                                p1 = p1 / Math.pow((di + 1), 2);
+                                p2 = p2 / Math.pow((maiorGrau + 1), 2);
                                 break;
                             default:
                                 break;
