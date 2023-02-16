@@ -422,7 +422,7 @@ public class ExecBigDataSets {
 //            tss.setMarjority(k);
 //            optm.setMarjority(k);
             optm.setR(k);
-            tss.setK(k);
+            tss.setR(k);
             System.out.println("-------------\n\nR: " + k);
             
             for (String s : dataSets) {
@@ -442,12 +442,12 @@ public class ExecBigDataSets {
                 System.out.println("Loaded Graph: " + s + " " + graphES.getVertexCount() + " " + graphES.getEdgeCount());
                 
                 for (int i = 0; i < operations.length; i++) {
-                    String arquivadoStr = operations[i].getName() + "-m" + k + "-" + s;
+                    String arquivadoStr = operations[i].getName() + "-k" + k + "-" + s;
                     Map<String, Object> doOperation = null;
 //                    BeanUtils.setProperty(operations[i], "K", k);
 //                    PropertyUtils.setSimpleProperty(operations[i], "K", k);
                     System.out.println("*************");
-                    System.out.print(" - EXEC: " + operations[i].getName() + "-m: " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
+                    System.out.print(" - EXEC: " + operations[i].getName() + "-k: " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
                     int[] get = resultadoArquivado.get(arquivadoStr);
                     if (get != null) {
                         result[i] = get[0];
