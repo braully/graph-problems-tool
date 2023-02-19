@@ -180,6 +180,8 @@ public class BFSUtil {
             for (Integer nv : ns) {
                 if (bfs[nv] == null) {
                     discored++;
+                    bfs[nv] = depth;
+                    queue.add(nv);
                 } else if (bfs[nv] > depth) {
                     bfs[nv] = depth;
                     queue.add(nv);

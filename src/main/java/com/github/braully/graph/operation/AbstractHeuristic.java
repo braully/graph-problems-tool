@@ -37,6 +37,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
     public static final String MINIMAL = "minimal";
 
     public Map<String, Boolean> parameters = new LinkedHashMap<>();
+    public boolean tentarMinamilzar = false;
 
     public String getTypeProblem() {
         return type;
@@ -393,16 +394,15 @@ public abstract class AbstractHeuristic implements IGraphOperation {
     }
 
     public void setTryMinimal() {
-        parameters.put(MINIMAL, true);
+        tentarMinamilzar = true;
     }
 
     public void setTryMinimal(boolean v) {
-        parameters.put(MINIMAL, v);
+        tentarMinamilzar = v;
     }
 
     protected boolean tryMiminal() {
-        Boolean get = parameters.get(MINIMAL);
-        return get != null && get;
+        return tentarMinamilzar;
     }
 
 }

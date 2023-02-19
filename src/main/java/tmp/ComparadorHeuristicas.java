@@ -6,8 +6,11 @@ package tmp;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
+import com.github.braully.graph.operation.GraphHNVOptm;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcialNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeTotal;
+import static com.github.braully.graph.operation.GraphHNVOptm.pprofundidadeS;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
 import com.github.braully.graph.operation.GraphTSSCordasco;
@@ -27,7 +30,10 @@ import java.util.Set;
 public class ComparadorHeuristicas {
 
     public static void main(String... args) throws FileNotFoundException, IOException {
-        String strFile = "hog-graphs-ge20-le50-ordered.g6";
+//        String strFile = "hog-graphs-ge20-le50-ordered.g6";
+//        String strFile = "database/hog/trees07.g6";
+        String strFile = "database/hog/trees14.g6";
+
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHullNumberHeuristicV5Tmp3 heur5 = new GraphHullNumberHeuristicV5Tmp3();
         GraphHullNumberHeuristicV5Tmp3Bkp heur5b = new GraphHullNumberHeuristicV5Tmp3Bkp();
@@ -36,6 +42,15 @@ public class ComparadorHeuristicas {
 //        GraphHullNumberHeuristicV5Tmp heur5 = new GraphHullNumberHeuristicV5Tmp();
         heur5.setVerbose(false);
         heur5b.setVerbose(false);
+        GraphHNVOptm optm = new GraphHNVOptm();
+        optm.resetParameters();
+        optm.setPularAvaliacaoOffset(true);
+        optm.setTryMinimal();
+//        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
+        optm.setParameter(pdificuldadeTotal, true);
+//        optm.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+        optm.setParameter(pbonusParcialNormalizado, true);
+//        optm.setParameter(pprofundidadeS, true);
 
         GraphHullNumberHeuristicV1 heur = new GraphHullNumberHeuristicV1();
 //        heur.setVerbose(false);
@@ -47,16 +62,25 @@ public class ComparadorHeuristicas {
 
         IGraphOperation[] operations = new IGraphOperation[]{
             //            heur,
-            //                        tss,
-//            tssg,
-            heur5, 
-            tss, //            heur5, //            heur5b
+            tss,
+            //            tssg,
+            //            heur5, //            tss, //           
+            //            heur5, //            heur5b
+            optm
         };
 
 //        heur.K = tss.K = heur5.K = heur5b.K = k;
-        heur5.setR(k);
-        tss.setR(k);
-        tssg.setR(k);
+        if (false) {
+            heur5.setR(k);
+            tss.setR(k);
+            tssg.setR(k);
+            optm.setR(k);
+        } else {
+            heur5.setK(k);
+            tss.setK(k);
+            tssg.setK(k);
+            optm.setK(k);
+        }
         heur5.startVertice = false;
         int igual = 0;
         int melhor = 0;

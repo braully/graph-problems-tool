@@ -11,9 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,12 +39,13 @@ public class GraphHNVOptm
 
     private static final Logger log = Logger.getLogger(GraphHNVOptm.class);
 
-    static final String description = "HHnV2";
+    static final String description = "HHnV2Optm";
     int etapaVerbose = -1;
     boolean checkaddirmao = true;
     boolean rollbackEnable = false;
     //
     public static final String pdeltaHsi = "deltaHsi";
+    public static final String pdeltaParcial = "deltaParcial";
     public static final String pbonusTotal = "bonusTotal";
     public static final String pbonusParcial = "bonusParcial";
     public static final String pdificuldadeTotal = "dificuldadeTotal";
@@ -60,14 +59,15 @@ public class GraphHNVOptm
     public static final List<String> allParameters = List.of(pdeltaHsi, pbonusTotal,
             pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
             pbonusTotalNormalizado, pbonusParcialNormalizado,
-            pprofundidadeS, pgrau, paux);
+            pprofundidadeS, pgrau, paux, pdeltaParcial);
     public boolean decompor = false;
 
     {
         setPularAvaliacaoOffset(true);
-        setParameter(pdeltaHsi, true);
-        setParameter(pbonusTotal, true);
-        setParameter(pdificuldadeParcial, true);
+        setTryMinimal();
+//        setParameter(pdeltaHsi, true);
+        setParameter(pdificuldadeTotal, true);
+        setParameter(pbonusParcialNormalizado, true);
     }
 
     @Override
@@ -97,8 +97,21 @@ public class GraphHNVOptm
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
-        Integer hullNumber = -1;
+        Integer hullNumber = 0;
         Set<Integer> minHullSet = null;
+
+        try {
+
+            String inputData = graph.getInputData();
+            if (inputData != null) {
+                int parseInt = Integer.parseInt(inputData.trim());
+                setR(parseInt);
+
+            }
+
+        } catch (Exception e) {
+
+        }
 
         try {
             minHullSet = findMinHullSetGraph(graph);
@@ -111,6 +124,7 @@ public class GraphHNVOptm
 
         /* Processar a buscar pelo hullset e hullnumber */
         Map<String, Object> response = new HashMap<>();
+        response.put("R", this.R);
         response.put(PARAM_NAME_HULL_NUMBER, hullNumber);
         response.put(PARAM_NAME_HULL_SET, minHullSet);
         response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, hullNumber);
@@ -710,6 +724,10 @@ public class GraphHNVOptm
                                 p1 = deltaHsi;
                                 p2 = maiorDeltaHs;
                                 break;
+                            case pdeltaParcial:
+                                p1 = contaminadoParcialmente;
+                                p2 = maiorContaminadoParcialmente;
+                                break;
                             case pbonusTotal:
                                 p1 = bonusTotal;
                                 p2 = maiorBonusTotal;
@@ -833,7 +851,7 @@ public class GraphHNVOptm
 //        op.setParameter(pbonusTotal, true);
 //        op.setParameter(pdificuldadeParcial, true);
 ////        op.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
-        op.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
+        op.setParameter(pdificuldadeTotal, true);
 //
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);

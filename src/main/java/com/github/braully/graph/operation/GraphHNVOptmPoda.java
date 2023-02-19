@@ -2,18 +2,23 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
+import static com.github.braully.graph.operation.GraphHNVOptm.allParameters;
+import static com.github.braully.graph.operation.GraphHNVOptm.paux;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcial;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcialNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusTotal;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusTotalNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdeltaHsi;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeParcial;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeTotal;
+import static com.github.braully.graph.operation.GraphHNVOptm.pprofundidadeS;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
-import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,25 +52,16 @@ public class GraphHNVOptmPoda
     boolean checkaddirmao = true;
     boolean rollbackEnable = false;
     //
-    public static final String pdeltaHsi = "deltaHsi";
-    public static final String pbonusTotal = "bonusTotal";
-    public static final String pbonusParcial = "bonusParcial";
-    public static final String pdificuldadeTotal = "dificuldadeTotal";
-    public static final String pdificuldadeParcial = "dificuldadeParcial";
-    public static final String pbonusTotalNormalizado = "bonusTotalNormalizado";
-    public static final String pbonusParcialNormalizado = "bonusParcialNormalizado";
-    public static final String pprofundidadeS = "profundidadeS";
-    public static final String pgrau = "grau";
-    public static final String paux = "aux";
 
-    public static final List<String> allParameters = List.of(pdeltaHsi, pbonusTotal,
-            pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
-            pbonusTotalNormalizado, pbonusParcialNormalizado,
-            pprofundidadeS, pgrau, paux);
     public boolean realizarPoda = true;
 
     {
-//        parameters.put(type, verbose)
+
+        setPularAvaliacaoOffset(true);
+        setTryMinimal();
+//        setParameter(pdeltaHsi, true);
+        setParameter(pdificuldadeTotal, true);
+        setParameter(pbonusParcialNormalizado, true);
     }
 
     @Override
@@ -97,6 +93,19 @@ public class GraphHNVOptmPoda
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
         Integer hullNumber = -1;
         Set<Integer> minHullSet = null;
+
+        try {
+
+            String inputData = graph.getInputData();
+            if (inputData != null) {
+                int parseInt = Integer.parseInt(inputData.trim());
+                setR(parseInt);
+
+            }
+
+        } catch (Exception e) {
+
+        }
 
         try {
             minHullSet = findMinHullSetGraph(graph);
@@ -139,107 +148,6 @@ public class GraphHNVOptmPoda
     Queue<Integer> mustBeIncluded = new ArrayDeque<>();
     MapCountOpt mapCount;
     List<Integer> melhores = new ArrayList<Integer>();
-
-    protected Set<Integer> buildOptimizedHullSetFromStartVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
-            Integer v, Set<Integer> sini, int[] auxini, int sizeHsini, List<Integer> verticeStart) {
-//        Set<Integer> s = new HashSet<>(sini);
-//        List<Integer> verticesInteresse = new ArrayList<>();
-        Set<Integer> s = new LinkedHashSet<>(sini);
-        Collection<Integer> vertices = verticesTrabalho;
-        int vertexCount = vertices.size();
-        Integer maxVertex = graph.maxVertex();
-        int[] aux = auxini.clone();
-        int sizeHs = sizeHsini;
-        if (verbose) {
-            System.out.println("Sini-Size: " + sini.size());
-            System.out.println("Sini: " + sini);
-        }
-        if (v != null) {
-            if (verbose) {
-                System.out.println("Start vertice: " + v);
-            }
-            sizeHs += addVertToS(v, s, graph, aux);
-        }
-        if (verticeStart != null) {
-            for (Integer vi : verticeStart) {
-                sizeHs += addVertToS(vi, s, graph, aux);
-            }
-        }
-//        BFSDistanceLabeler<Integer, Integer> bdls = new BFSDistanceLabeler<>();
-        bdls = BFSUtil.newBfsUtilSimple(maxVertex + 1);
-
-        bdls.labelDistances(graph, s);
-        int commit = sini.size();
-
-        bestVertice = -1;
-
-        mapCount = new MapCountOpt(maxVertex + 1);
-//        MapCountOpt mapCountS = new MapCountOpt(maxVertex + 1);
-
-//        for (Integer vt : sini) {
-//            Collection<Integer> ns = getNeighborsNaoPodados(graph, vt);
-//            for (Integer vnn : ns) {
-//                mapCountS.inc(vnn);
-//            }
-//        }
-        while (sizeHs < vertexCount) {
-            if (bestVertice != -1) {
-                bdls.incBfs(graph, bestVertice);
-            }
-
-            bestVertice = -1;
-            maiorIndiceCentralidade = 0;
-            maiorGrau = 0;
-            maiorGrauContaminacao = 0;
-            maiorDeltaHs = 0;
-            maiorContaminadoParcialmente = 0;
-            maiorBonusParcialNormalizado = 0;
-            maiorDificuldadeTotal = 0;
-            maiorBonusTotal = 0;
-            maiorProfundidadeS = 0;
-            maiorProfundidadeHS = 0;
-            maiorAux = 0;
-            maiorDouble = 0;
-            melhores.clear();
-            if (etapaVerbose == s.size()) {
-                System.out.println("- Verbose etapa: " + etapaVerbose);
-                System.out.println("Size:");
-                System.out.println(" * s: " + s.size());
-                System.out.println(" * hs: " + sizeHs);
-                System.out.println(" * n: " + vertexCount);
-                System.out.printf("- vert: del conta pconta prof aux grau\n");
-            }
-//            void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
-//            int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) 
-            escolherMelhorVerticeAlvo(graph, aux, vertices, bdls, sizeHs);
-            if (etapaVerbose == s.size()) {
-                System.out.println(" - " + bestVertice);
-                System.out.println(" - " + melhores);
-                for (Integer ml : melhores) {
-                    System.out.println("  -- " + ml + " [" + getNeighborsNaoPodados(graph, ml).size() + "]: " + getNeighborsNaoPodados(graph, ml));
-                }
-
-            }
-            if (bestVertice == -1) {
-                esgotado = true;
-                continue;
-            }
-            if (maiorDeltaHs == 1 && esgotado) {
-
-            }
-            esgotado = false;
-            sizeHs = sizeHs + addVertToS(bestVertice, s, graph, aux);
-//            if (sizeHs < vertexCount) {
-//                bdl.labelDistances(graph, s);
-//            }
-        }
-//        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
-        if (tryMiminal()) {
-            s = tryMinimal(graph, s);
-        }
-//        s = tryMinimal2(graph, s);
-        return s;
-    }
 
     public double trans(double x) {
         if (x == 0) {
@@ -388,40 +296,32 @@ public class GraphHNVOptmPoda
             Integer v = null;
             Double maiorRanking = null;
             for (var vi : verticesTrabalhados) {
-                double rankvi = (graup[vi] - krp[vi]) * (bdlhs.getDistance(graph, vi) + 1);
-                if (v == null) {
-                    v = vi;
-                    maiorRanking = rankvi;
-                } else if (rankvi > maiorRanking) {
-                    v = vi;
-                    maiorRanking = rankvi;
+//                double rankvi = (graup[vi] - krp[vi]) * (bdlhs.getDistance(graph, vi) + 1);
+                Integer distance = bdlhs.getDistance(graph, vi);
+                int entropia = graup[vi] - krp[vi];
+//                double rankvi = (distance + 1) / Math.max(1, entropia);
+                double rankvi = distance;
+                if (entropia == 0 && degree[vi] == graup[vi]) {
+                    if (v == null) {
+                        v = vi;
+                        maiorRanking = rankvi;
+                    } else if (rankvi > maiorRanking) {
+                        v = vi;
+                        maiorRanking = rankvi;
+                    }
                 }
             }
-            if (v == null || maiorRanking <= 0
-                    || krp[v] == 0 || graup[v] <= krp[v]) {
+            if (v == null) {
                 flag = false;
-//                System.out.println("Poda encerrada no vertice v: " + v);
-                if (v != null) {
-//                    System.out.println("Poda encerrada no vertice v seu ranking é: " + maiorRanking);
-                }
             } else {
-                boolean podeSerPodado = true;
+                if (verbose) {
+                    System.out.println("Removendo vertice de baixa qualidade: " + v);
+                }
                 for (Integer u : N[v]) {
                     graup[u]--;
-                    if (krp[u] > graup[u]) {
-                        podeSerPodado = false;
-                    }
-                    N[u].remove(v);
                 }
-                if (!podeSerPodado) {
-                    for (Integer u : N[v]) {
-                        graup[u]++;
-                    }
-//                    flag = false;
-                } else {
-                    verticesTrabalho.remove(v);
-                    podados.add(v);
-                }
+                verticesTrabalho.remove(v);
+                podados.add(v);
             }
             verticesTrabalhados.remove(v);
         }
@@ -430,7 +330,11 @@ public class GraphHNVOptmPoda
     }
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
-        verticesTrabalho = new LinkedHashSet<>((List<Integer>) graphRead.getVertices());
+        List<Integer> verticesOriginais = (List<Integer>) graphRead.getVertices();
+        verticesTrabalho = new LinkedHashSet<>(verticesOriginais);
+        initKr(graphRead);
+        findCenterOfGraph(graphRead);
+
         Set<Integer> hullSet = null;
         Integer vl = null;
         Set<Integer> sini = new LinkedHashSet<>();
@@ -446,18 +350,17 @@ public class GraphHNVOptmPoda
         int menorGrau = 0;
         int maiorGrau = 0;
 
-        for (int i = 0; i < vertexCount; i++) {
+        for (Integer i : verticesOriginais) {
             auxini[i] = 0;
             pularAvaliacao[i] = -1;
             scount[i] = 0;
+            degree[i] = graphRead.degree(i);
+            graup[i] = degree[i];
+            krp[i] = kr[i];
         }
 //        bdlhs = BFSUtil.newBfsUtilSimple(vertexCount + 1);
-        initKr(graphRead);
         int sizeHs = 0;
         for (Integer v : verticesTrabalho) {
-            degree[v] = graphRead.degree(v);
-            graup[v] = degree[v];
-            krp[v] = kr[v];
             if (degree[v] < degree[menorGrau]) {
                 menorGrau = v;
             }
@@ -479,93 +382,108 @@ public class GraphHNVOptmPoda
             scount[i] = 0;
         }
         if (realizarPoda) {
-            System.out.println("Realizando poda: " + verticesTrabalho.size());
+            if (verbose) {
+                System.out.println("Realizando poda: " + verticesTrabalho.size());
+            }
             Set<Integer> tipDecomp = poda(graphRead);
-            System.out.println("Poda realizada tfinal: " + verticesTrabalho.size());
+            if (verbose) {
+                System.out.println("Poda realizada tfinal: " + verticesTrabalho.size());
+            }
+            for (Integer v : verticesTrabalho) {
+                if (degree[v] < degree[menorGrau]) {
+                    menorGrau = v;
+                }
+                if (degree[v] > degree[maiorGrau]) {
+                    maiorGrau = v;
+                }
+                if (graup[v] <= krp[v] - 1) {
+                    sizeHs = sizeHs + addVertToS(v, sini, graphRead, auxini);
+                }
+                if (krp[v] == 0) {
+                    sizeHs = sizeHs + addVertToAux(v, graphRead, auxini);
+                }
+            }
         }
-//        vertices.sort(Comparator
-//                .comparingInt((Integer v) -> -graphRead.degree(v))
-//                .thenComparing(v -> -v));
-//        int total = graphRead.getVertexCount();
-//        int cont = 0;
-//        int ret = total & cont;
-//        Integer vi = vertices.get(0);
-        List<Integer> verticeStart = new ArrayList<>();
-//        Integer bestN = null;
 
-//        BFSDistanceLabeler<Integer, Integer> bdl = new BFSDistanceLabeler<>();
-//        TreeSet<Integer> verts = new TreeSet<>(vertices);
-//        while (!verts.isEmpty()) {
-//            Integer first = verts.pollFirst();
-//            bestN = first;
-//
-//            bdl.labelDistances(graphRead, first);
-//            for (Integer v : vertices) {
-//                if (bdl.getDistance(graphRead, v) >= 0) {
-//                    verts.remove(v);
-//                    if (graphRead.degree(v) > graphRead.degree(bestN)) {
-//                        bestN = v;
-//                    }
-//                }
-//            }
-////            verticeStart.add(bestN);
-////            sini.add(bestN);
-//        }
-//        for (Integer v : graphRead.getNeighborsUnprotected(vi)) {
-//            if (bestN == null) {
-//                bestN = v;
-//            } else if (graphRead.degree(v) > graphRead.degree(bestN)
-//                    || (graphRead.degree(bestN) == graphRead.degree(v)
-//                    && bestN > v)) {
-//                bestN = v;
-//            }
-//        }
-//        verticeStart.add(vi);
-//        verticeStart.add(bestN);
-//        for (Integer v : verticeStart) {
-//            if (sini.contains(v)) {
-//                continue;
-//            }
-//            if (verbose) {
-////                System.out.println("Trying ini vert: " + v);
-////                UtilProccess.printCurrentItme();
-//
-//            }
-        Integer v = null;
-
-        Set<Integer> tmp = buildOptimizedHullSetFromStartVertice(graphRead, v, sini, auxini, sizeHs,
-                verticeStart);
-//        tmp = tryMinimal(graphRead, tmp);
-        if (hullSet == null) {
-            hullSet = tmp;
-//                vl = v;
+        Set<Integer> s = new LinkedHashSet<>(sini);
+        Collection<Integer> vertices = verticesTrabalho;
+        vertexCount = vertices.size();
+        Integer maxVertex = graphRead.maxVertex();
+        int[] aux = auxini.clone();
+        if (verbose) {
+            System.out.println("Sini-Size: " + sini.size());
+            System.out.println("Sini: " + sini);
         }
-//            else if (tmp.size() < hullSet.size()) {
-//                if (verbose) {
-//                    System.out.println("Melhorado em: " + (hullSet.size() - tmp.size()));
-//                    System.out.println(" em i " + v + " vindo de " + vl);
-//                    System.out.println("d(" + v + ")=" + graphRead.degree(v) + " d(" + vl + ")=" + graphRead.degree(vl));
-//                    System.out.println(hullSet);
-//                    System.out.println(tmp);
-//                }
-//                hullSet = tmp;
-//            }
-//            cont++;
-//            if (verbose) {
-////                UtilProccess.printCurrentItmeAndEstimated(total - cont);
-////                System.out.println(" s size: " + tmp.size());
-//            }
-//        }
-        if (hullSet == null) {
-            hullSet = sini;
+//        BFSDistanceLabeler<Integer, Integer> bdls = new BFSDistanceLabeler<>();
+        bdls = BFSUtil.newBfsUtilSimple(maxVertex + 1);
 
+        bdls.labelDistances(graphRead, s);
+
+        bestVertice = -1;
+        mapCount = new MapCountOpt(maxVertex + 1);
+
+        while (sizeHs < vertexCount) {
+            if (bestVertice != -1) {
+                bdls.incBfs(graphRead, bestVertice);
+            }
+
+            bestVertice = -1;
+            maiorIndiceCentralidade = 0;
+            maiorGrau = 0;
+            maiorGrauContaminacao = 0;
+            maiorDeltaHs = 0;
+            maiorContaminadoParcialmente = 0;
+            maiorBonusParcialNormalizado = 0;
+            maiorDificuldadeTotal = 0;
+            maiorBonusTotal = 0;
+            maiorProfundidadeS = 0;
+            maiorProfundidadeHS = 0;
+            maiorAux = 0;
+            maiorDouble = 0;
+            melhores.clear();
+            if (etapaVerbose == s.size()) {
+                System.out.println("- Verbose etapa: " + etapaVerbose);
+                System.out.println("Size:");
+                System.out.println(" * s: " + s.size());
+                System.out.println(" * hs: " + sizeHs);
+                System.out.println(" * n: " + vertexCount);
+                System.out.printf("- vert: del conta pconta prof aux grau\n");
+            }
+//            void escolherMelhorVertice(UndirectedSparseGraphTO<Integer, Integer> graph,
+//            int[] aux, Collection<Integer> vertices, BFSUtil bdls, int sizeHs) 
+            escolherMelhorVerticeAlvo(graphRead, aux, vertices, bdls, sizeHs);
+            if (etapaVerbose == s.size()) {
+                System.out.println(" - " + bestVertice);
+                System.out.println(" - " + melhores);
+                for (Integer ml : melhores) {
+                    System.out.println("  -- " + ml + " [" + getNeighborsNaoPodados(graphRead, ml).size() + "]: " + getNeighborsNaoPodados(graphRead, ml));
+                }
+
+            }
+            if (bestVertice == -1) {
+                esgotado = true;
+                continue;
+            }
+            if (maiorDeltaHs == 1 && esgotado) {
+
+            }
+            esgotado = false;
+            sizeHs = sizeHs + addVertToS(bestVertice, s, graphRead, aux);
+//            if (sizeHs < vertexCount) {
+//                bdl.labelDistances(graph, s);
+//            }
         }
-        if (!checkIfHullSet(graphRead, hullSet)) {
-            System.err.println("" + hullSet.size() + ": " + hullSet);
+//        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
+        if (tryMiminal()) {
+            s = tryMinimal(graphRead, s);
+        }
+//        s = tryMinimal2(graph, s);
+        if (!checkIfHullSet(graphRead, s)) {
+            System.err.println("" + s.size() + ": " + s);
             System.err.println("NOT HULL SET");
 //            throw new IllegalStateException("NOT HULL SET");
         }
-        return hullSet;
+        return s;
     }
 
     public void printPesoAux(int[] auxb) {
@@ -684,9 +602,8 @@ public class GraphHNVOptmPoda
             int di = graup[i];
             int deltadei = di - aux[i];
 
-            ddouble = contaminadoParcialmente / graup[i];
+//            ddouble = contaminadoParcialmente / graup[i];
 //                int profundidadeHS = bdlhs.getDistance(graph, i);
-
 //                if (etapaVerbose == s.size()) {
 //                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
 //                            i, deltaHsi, grauContaminacao,
@@ -826,17 +743,20 @@ public class GraphHNVOptmPoda
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+        graph = UtilGraph.loadGraphG6("M??????_A?U?BoYG?");
 
         System.out.println(graph.toResumedString());
         System.out.println();
-        op.findCenterOfGraph(graph);
-//        op.setVerbose(true);
-
+        op.setVerbose(true);
+        op.setR(10);
+        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+        System.out.println(
+                "S[" + buildOptimizedHullSet.size() + "]: ");
         if (true) {
-//            return;
+            return;
         }
 
 //        System.out.println("Conected componentes: ");
@@ -1002,9 +922,9 @@ public class GraphHNVOptmPoda
                 } else if (melhor == res) {
                     melhores1.add(currentRerverse);
                 } else if (melhor > res) {
+                    melhor = res;
                     melhores1.clear();
                     melhores1.add(currentRerverse);
-                    melhor = res;
                     System.out.println(" melhor otimizado ");
                     System.out.println(out);
                 }
@@ -1031,6 +951,7 @@ public class GraphHNVOptmPoda
         } else if (melhor == res) {
             melhores1.add(currentSet);
         } else if (melhor > res) {
+            melhor = res;
             melhores1.clear();
             melhores1.add(currentSet);
         }
@@ -1081,9 +1002,7 @@ public class GraphHNVOptmPoda
         int vertexCount = (Integer) graph.maxVertex() + 1;
         bdlhs = BFSUtil.newBfsUtilSimple(vertexCount + 1);
         bdls = BFSUtil.newBfsUtilSimple(vertexCount + 1);
-
         findCenterOfGraph(vertices, graph);
-
     }
 
     protected void findCenterOfGraph(Collection<Integer> vertices, UndirectedSparseGraphTO<Integer, Integer> graph) {
@@ -1108,7 +1027,7 @@ public class GraphHNVOptmPoda
                 }
             }
             bdlhs.incBfs(graph, maior);
-            bdls.incBfs(graph, menor);
+//            bdls.incBfs(graph, menor);
 //            Integer maiorDistanciaDoMenor = 0;
 //            Integer vMaiorDistanciaDoMenor = null;
 //            Integer maiorDistanciaDoMaior = 0;
@@ -1132,7 +1051,7 @@ public class GraphHNVOptmPoda
 //                    }
 //                }
 //            }
-
+//
 //            System.out.println("Maior distancia de " + menor + ": " + maiorDistanciaDoMenor);
 //            System.out.println("Maior distancia de " + maior + ": " + maiorDistanciaDoMaior);
         }

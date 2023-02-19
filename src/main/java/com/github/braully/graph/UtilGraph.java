@@ -707,6 +707,31 @@ public class UtilGraph {
         return g;
     }
 
+    public static UndirectedSparseGraphTO<Integer, Integer> loadGraphES(String readLine) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        ret = new UndirectedSparseGraphTO<>();
+        int countEdge = 0;
+        String[] edges = null;
+        if (readLine != null && !readLine.isEmpty() && (edges = readLine.trim().split(",")) != null) {
+            try {
+                for (String stredge : edges) {
+                    String[] vs = stredge.split("-");
+                    if (vs != null && vs.length >= 2) {
+                        Integer source = Integer.parseInt(vs[0].trim());
+                        Integer target = Integer.parseInt(vs[1].trim());
+                        ret.addEdge(countEdge++, source, target);
+                    } else if (!stredge.isEmpty()) {
+                        ret.addVertex(Integer.parseInt(stredge));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ret;
+    }
+
     public static UndirectedSparseGraphTO<Integer, Integer> loadGraphES(InputStream uploadedInputStream) throws IOException {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
         if (uploadedInputStream != null) {

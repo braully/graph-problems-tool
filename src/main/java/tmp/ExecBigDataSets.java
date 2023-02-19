@@ -26,8 +26,9 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.AbstractHeuristic;
-import com.github.braully.graph.operation.GraphBigHNVOptm;
 import com.github.braully.graph.operation.GraphHNVOptm;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcialNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeTotal;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
@@ -57,9 +58,9 @@ import util.UtilProccess;
  * @author strike
  */
 public class ExecBigDataSets {
-    
+
     public static final Map<String, int[]> resultadoArquivado = new HashMap<>();
-    
+
     static {
         if (true) {
             resultadoArquivado.put("TSS-Greedy-k2-BlogCatalog", new int[]{75, 60199});
@@ -333,7 +334,7 @@ public class ExecBigDataSets {
             resultadoArquivado.put("TSS-Cordasco-k2-Last.fm", new int[]{330, 502092});
         }
     }
-    
+
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
             "ca-GrQc", "ca-HepTh",
@@ -367,15 +368,15 @@ public class ExecBigDataSets {
         GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
 //        GraphBigHNVOptm optm = new GraphBigHNVOptm();
         GraphHNVOptm optm = new GraphHNVOptm();
-        
+
         heur5t2.setVerbose(false);
         heur5t2.startVertice = false;
-        
+
         optm.resetParameters();
         optm.setPularAvaliacaoOffset(true);
         optm.setTryMinimal();
-        optm.setParameter(GraphBigHNVOptm.pdificuldadeTotal, true);
-        optm.setParameter(GraphBigHNVOptm.pbonusParcialNormalizado, true);
+        optm.setParameter(pdificuldadeTotal, true);
+        optm.setParameter(pbonusParcialNormalizado, true);
 
 //        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
 //        optm.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -387,7 +388,7 @@ public class ExecBigDataSets {
 //        optm.setParameter(GraphBigHNVOptm.pbonusTotal, false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
-        
+
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             tss, //            heur1,
             //            heur2, 
@@ -407,13 +408,13 @@ public class ExecBigDataSets {
         for (int i = 0; i < operations.length; i++) {
             contMelhor[i] = contPior[0] = contIgual[0] = 0;
         }
-        
+
         Arrays.sort(dataSets);
-        
+
         String strResultFile = "resultado-" + ExecBigDataSets.class.getSimpleName() + ".txt";
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
-        
+
         for (int k = 2; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
@@ -424,10 +425,10 @@ public class ExecBigDataSets {
             optm.setR(k);
             tss.setR(k);
             System.out.println("-------------\n\nR: " + k);
-            
+
             for (String s : dataSets) {
                 System.out.println("\n-DATASET: " + s);
-                
+
                 UndirectedSparseGraphTO<Integer, Integer> graphES
                         = null;
                 try {
@@ -440,7 +441,7 @@ public class ExecBigDataSets {
                     System.out.println("Fail to Load GRAPH: " + s);
                 }
                 System.out.println("Loaded Graph: " + s + " " + graphES.getVertexCount() + " " + graphES.getEdgeCount());
-                
+
                 for (int i = 0; i < operations.length; i++) {
                     String arquivadoStr = operations[i].getName() + "-k" + k + "-" + s;
                     Map<String, Object> doOperation = null;
@@ -460,18 +461,18 @@ public class ExecBigDataSets {
                         System.out.println(" - arquivar: resultadoArquivado.put(\"" + arquivadoStr + "\", new int[]{" + result[i] + ", " + totalTime[i] + "});");
                     }
                     System.out.println(" - Result: " + result[i]);
-                    
+
                     String out = "Big\t" + s + "\t" + graphES.getVertexCount() + "\t"
                             + graphES.getEdgeCount()
                             + "\t" + k + "\t" + operations[i].getName()
                             + "\t" + result[i] + "\t" + totalTime[i] + "\n";
-                    
+
                     System.out.print("xls: " + out);
-                    
+
                     writer.write(out);
 //                        writer.write(resultProcess);
                     writer.flush();
-                    
+
                     if (doOperation != null) {
                         boolean checkIfHullSet = operations[i].checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)));
                         if (!checkIfHullSet) {
@@ -486,24 +487,24 @@ public class ExecBigDataSets {
                         }
                     } else {
                         delta[i] = result[0] - result[i];
-                        
+
                         long deltaTempo = totalTime[0] - totalTime[i];
-                        System.out.print(" - Tempo: ");
-                        
+                        System.out.print(" - g:" + s + " k " + k + "  tempo: ");
+
                         if (deltaTempo >= 0) {
-                            System.out.println(" +RAPIDO " + deltaTempo);
+                            System.out.print(" +RAPIDO " + deltaTempo);
                         } else {
-                            System.out.println(" +LENTO " + deltaTempo);
+                            System.out.print(" +LENTO " + deltaTempo);
                         }
                         System.out.print(" - Delta: " + delta[i] + " ");
                         if (delta[i] == 0) {
-                            System.out.println(" = igual");
+                            System.out.print(" = igual");
                             contIgual[i]++;
                         } else if (delta[i] > 0) {
-                            System.out.println(" + MELHOR ");
+                            System.out.print(" + MELHOR ");
                             contMelhor[i]++;
                         } else {
-                            System.out.println(" - PIOR ");
+                            System.out.print(" - PIOR ");
                             contPior[i]++;
                         }
                         System.out.println(delta[i]);

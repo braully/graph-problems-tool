@@ -2,13 +2,21 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
+import static com.github.braully.graph.operation.GraphHNVOptm.allParameters;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcial;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcialNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusTotal;
+import static com.github.braully.graph.operation.GraphHNVOptm.pbonusTotalNormalizado;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdeltaHsi;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeParcial;
+import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeTotal;
+import static com.github.braully.graph.operation.GraphHNVOptm.pgrau;
+import static com.github.braully.graph.operation.GraphHNVOptm.pprofundidadeS;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -40,26 +48,11 @@ public class GraphBigHNVOptm
 
     private static final Logger log = Logger.getLogger(GraphBigHNVOptm.class);
 
-    static final String description = "HHnV2";
+    static final String description = "HHnV2Big";
     int etapaVerbose = -1;
     boolean checkaddirmao = true;
     boolean rollbackEnable = false;
     //
-    public static final String pdeltaHsi = "deltaHsi";
-    public static final String pbonusTotal = "bonusTotal";
-    public static final String pbonusParcial = "bonusParcial";
-    public static final String pdificuldadeTotal = "dificuldadeTotal";
-    public static final String pdificuldadeParcial = "dificuldadeParcial";
-    public static final String pbonusTotalNormalizado = "bonusTotalNormalizado";
-    public static final String pbonusParcialNormalizado = "bonusParcialNormalizado";
-    public static final String pprofundidadeS = "profundidadeS";
-    public static final String pgrau = "grau";
-    public static final String paux = "aux";
-
-    public static final List<String> allParameters = List.of(pdeltaHsi, pbonusTotal,
-            pbonusParcial, pdificuldadeTotal, pdificuldadeParcial,
-            pbonusTotalNormalizado, pbonusParcialNormalizado,
-            pprofundidadeS, pgrau, paux);
 
     {
 //        parameters.put(type, verbose)
