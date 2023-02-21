@@ -235,7 +235,7 @@ public class GraphHNVOptm
                 double dificuldade = (kr[verti] - aux[verti]);
 
                 bonusHs += bonus;
-                dificuldadeHs += (kr[verti] - aux[verti]);
+                dificuldadeHs += dificuldade;
 //                pularAvaliacao[verti] = sizeHs;
                 profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
@@ -255,8 +255,6 @@ public class GraphHNVOptm
                 }
             }
 
-//                dificuldadeTotal = kr[i] - aux[i];
-//                bonusTotal = grauI - kr[i];
             grauI = di;
             bonusTotal = bonusHs;
             dificuldadeTotal = dificuldadeHs;
@@ -264,25 +262,8 @@ public class GraphHNVOptm
             bonusParcialNormalizado = bonusParcial / contaminadoParcialmente;
             int deltaHsi = grauContaminacao;
 
-            //Contabilizar quantos vertices foram adicionados
-//                for (int j = 0; j < vertexCount; j++) {
-//                    if (auxb[j] >= K) {
-//                        grauContaminacao++;
-//                    }
-//                    if (auxb[j] > 0 && auxb[j] < K) {
-//                        contaminadoParcialmente++;
-//                    }
-//                }
             ddouble = contaminadoParcialmente / degree[i];
-//                int profundidadeHS = bdlhs.getDistance(graph, i);
 
-//                if (etapaVerbose == s.size()) {
-//                    System.out.printf(" * %3d: %3d %3d %3d %3d %3d %3d \n",
-//                            i, deltaHsi, grauContaminacao,
-//                            contaminadoParcialmente, profundidadeS, aux[i], di);
-//                }
-//                System.out.printf("- vert: del conta pconta prof aux grau");
-//                System.out.printf(" %d: ");
             if (bestVertice == -1) {
                 melhores.clear();
                 melhores.add(i);
@@ -327,7 +308,7 @@ public class GraphHNVOptm
                                 p2 = maiorBonusParcial;
                                 break;
                             case pbonusTotalNormalizado:
-                                p1 = bonusParcialNormalizado;
+                                p1 = bonusTotalNormalizado;
                                 p2 = maiorBonusTotalNormalizado;
                                 break;
                             case pdificuldadeTotal:
