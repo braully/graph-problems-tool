@@ -468,6 +468,15 @@ public class UtilProccess {
         }
     }
 
+    public static void startTime() {
+        try {
+            long current = System.currentTimeMillis();
+//            System.out.printf("time: %s\n", dateFormater.format(current));
+            lastime = current;
+        } catch (Exception e) {
+        }
+    }
+
     public static long printEndTime() {
         long delta = 0;
         try {
@@ -477,6 +486,23 @@ public class UtilProccess {
                 delta = current - lastime;
                 System.out.print("Delta time: ");
                 printTimeFormated(delta);
+            }
+
+            lastime = current;
+        } catch (Exception e) {
+        }
+        return delta;
+    }
+
+    public static long endTime() {
+        long delta = 0;
+        try {
+            long current = System.currentTimeMillis();
+//            System.out.printf("time: %s\n", dateFormater.format(current));
+            if (lastime > 0) {
+                delta = current - lastime;
+//                System.out.print("Delta time: ");
+//                printTimeFormated(delta);
             }
 
             lastime = current;

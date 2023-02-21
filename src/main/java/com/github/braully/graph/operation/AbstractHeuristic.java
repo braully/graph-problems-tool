@@ -38,6 +38,9 @@ public abstract class AbstractHeuristic implements IGraphOperation {
 
     public Map<String, Boolean> parameters = new LinkedHashMap<>();
     public boolean tentarMinamilzar = false;
+    public boolean tentarMinamilzar2 = false;
+
+    protected boolean grafoconexo = true;
 
     public String getTypeProblem() {
         return type;
@@ -83,7 +86,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         Set<Integer> s = tmp;
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
-            System.out.println("s: " + s);
+//            System.out.println("s: " + s);
         }
         int cont = 0;
         for (Integer v : tmp) {
@@ -100,11 +103,19 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             t.remove(v);
             if (checkIfHullSet(graphRead, t)) {
                 s = t;
-                if (verbose) {
-                    System.out.println("Reduzido removido: " + v);
-                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+//                if (verbose) {
+//                    System.out.println("Reduzido removido: " + v);
+//                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+//                }
+                if (cont > (tmp.size() / 2) && grafoconexo) {
+                    System.out.println("Poda de v:  " + v + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
+
                 }
             }
+        }
+        if (verbose) {
+            System.out.println("reduzido para: " + s.size());
+//            System.out.println("s: " + s);
         }
         return s;
     }
@@ -114,8 +125,8 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         Set<Integer> s = tmp;
         List<Integer> ltmp = new ArrayList<>(tmp);
         if (verbose) {
-            System.out.println("tentando reduzir: " + s.size());
-            System.out.println("s: " + s);
+            System.out.println("tentando reduzir-2: " + s.size());
+//            System.out.println("s: " + s);
         }
         Collection<Integer> vertices = graphRead.getVertices();
         int cont = 0;
@@ -197,11 +208,16 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                             System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
                             System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
                         }
+                        if (cont > (tmp.size() / 2) && grafoconexo) {
+                            System.out.println("Poda dupla removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
+
+                        }
                         t.add(z);
                         s = t;
                         ltmp = new ArrayList<>(s);
 //                        h--;
                         h = 0;
+//                        h = h / 2;
                         continue for_p;
                     }
                 }
@@ -397,12 +413,20 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         tentarMinamilzar = true;
     }
 
+    public void setTryMinimal2() {
+        tentarMinamilzar2 = true;
+    }
+
     public void setTryMinimal(boolean v) {
         tentarMinamilzar = v;
     }
 
     protected boolean tryMiminal() {
         return tentarMinamilzar;
+    }
+
+    protected boolean tryMiminal2() {
+        return tentarMinamilzar2;
     }
 
 }

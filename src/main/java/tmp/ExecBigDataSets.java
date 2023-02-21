@@ -337,17 +337,16 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
-            "ca-CondMat", "ca-HepPh",
-            "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
-            "BlogCatalog2",
-            "Livemocha",
-            "BlogCatalog",
-            "BuzzNet",
-            "Last.fm", //             "YouTube2"
+            "ca-GrQc", "ca-HepTh", //            "ca-CondMat", 
+        //            "ca-HepPh", //            "ca-AstroPh",
+        //            "Douban",
+        //            "Delicious",
+        //            "BlogCatalog3",
+        //            "BlogCatalog2",
+        //            "Livemocha",
+        //            "BlogCatalog",
+        //            "BuzzNet",
+        //            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -375,8 +374,10 @@ public class ExecBigDataSets {
         optm.resetParameters();
         optm.setPularAvaliacaoOffset(true);
         optm.setTryMinimal();
+        optm.setTryMinimal2();
         optm.setParameter(pdificuldadeTotal, true);
-        optm.setParameter(pbonusParcialNormalizado, true);
+//        optm.setParameter(pbonusParcialNormalizado, true);
+        optm.setVerbose(true);
 
 //        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
 //        optm.setParameter(GraphBigHNVOptm.pgrau, true);
@@ -415,7 +416,7 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 2; k <= 10; k++) {
+        for (int k = 3; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
