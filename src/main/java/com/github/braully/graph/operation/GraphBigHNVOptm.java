@@ -61,9 +61,8 @@ public class GraphBigHNVOptm
             //            "ca-CondMat", 
             "ca-HepPh",
             //            "ca-AstroPh",
-            "Douban", //            "Delicious",
-        //            "BlogCatalog3",
-        //            //            "BlogCatalog2",
+            //            "Douban", //            "Delicious",
+            "BlogCatalog3", //            //            "BlogCatalog2",
         //            //            "Livemocha",
         //            "BlogCatalog",
         //            //            "BuzzNet",
@@ -72,19 +71,26 @@ public class GraphBigHNVOptm
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
         List<String> parametros = new ArrayList<>();
         parametros.addAll(List.of(
-                pdificuldadeTotal, pdeltaHsi, pdeltaHsixdificuldadeTotal,
+                pdeltaHsixdificuldadeTotal,
+                pdificuldadeTotal, pdeltaHsi, pdeltaParcial,
                 pbonusTotal, pbonusParcial, pdificuldadeParcial,
-                pbonusTotalNormalizado, pbonusParcialNormalizado,
+                //                pbonusTotalNormalizado, pbonusParcialNormalizado,
                 //                pprofundidadeS, 
                 pgrau, paux, pprofundidadeS
         //        , pgrau, paux
         ));
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         //
+        op.resetParameters();
+        op.setPularAvaliacaoOffset(true);
+        op.setTryMinimal();
+        op.setSortByDegree(true);
 
         for (int t = 1; t <= 3; t++) {
             MapCountOpt contMelhorCiclo = new MapCountOpt(allParameters.size() * 100);
-
+            op.resetParameters();
+            System.out.println("Inicio Ciclo: " + t);
+            System.out.println("Otimizações iniciais: " + op.getName());
             for (int r = 10; r >= 8; r--) {
                 int cont = 0;
                 MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
@@ -213,6 +219,8 @@ public class GraphBigHNVOptm
             Map<String, Integer> map = new HashMap<>();
             System.out.println("----------------------");
             System.out.println("Resumo Ciclo: " + t);
+            op.resetParameters();
+            System.out.println("Otimizações iniciais: " + op.getName());
             for (int[] i : op.allarrays()) {
                 StringBuilder sb = new StringBuilder();
                 for (int ip : i) {

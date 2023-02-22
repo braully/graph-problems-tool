@@ -142,6 +142,7 @@ public class GraphHNVOptm
 //                System.out.println(s.size() + "-avaliando: " + i);
             profundidadeS = 0;
             int di = 0;
+//            int dei = degree[i];
             while (!mustBeIncluded.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
                 Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
@@ -168,6 +169,9 @@ public class GraphHNVOptm
                 profundidadeS += bdls.getDistanceSafe(graph, verti) + 1;
                 grauContaminacao++;
                 di += degree[verti];
+//                if (dei < degree[verti]) {
+//                    System.out.println("existem vertices de grau maior no bloco");
+//                }
             }
 
             for (Integer x : mapCount.keySet()) {
@@ -310,7 +314,7 @@ public class GraphHNVOptm
     }
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
-        List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
+        List<Integer> vertices = getVertices(graphRead);
         Set<Integer> hullSet = null;
         Integer vl = null;
         Set<Integer> sini = new LinkedHashSet<>();
@@ -328,6 +332,9 @@ public class GraphHNVOptm
         }
         grafoconexo = true;
         initKr(graphRead);
+        if (sortByDegree) {
+
+        }
         int sizeHs = 0;
         for (Integer v : vertices) {
             degree[v] = graphRead.degree(v);
@@ -434,10 +441,6 @@ public class GraphHNVOptm
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNVOptm op = new GraphHNVOptm();
-
-//        op.setParameter(GraphBigHNVOptm.paux, true);
-//        op.setParameter(GraphBigHNVOptm.pgrau, true);
-//        op.setParameter(GraphBigHNVOptm.pbonusTotal, true);
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
@@ -455,41 +458,25 @@ public class GraphHNVOptm
 //
 //        System.out.println(graph.toResumedString());
 //
-////        System.out.println("Conected componentes: ");
-////        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-////        for (Entry<Integer, Set<Integer>> e : connectedComponents.entrySet()) {
-////            System.out.println("" + e.getKey() + ": " + e.getValue().size());
-////        }
-////        }
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
-//        op.setR(3);
-        op.resetParameters();
-        op.setPularAvaliacaoOffset(true);
-//        op.setRealizarPoda(false);
-//        op.setVerbose(true);
-//        op.setTryMinimal();
-        op.setTryMinimal(false);
-//        op.setParameter(pdificuldadeTotal, true);
-//        op.setParameter(pbonusParcialNormalizado, true);
-////        op.decompor = true;
-////        op.setParameter(GraphBigHNVOptm.paux, true);
-////        op.setParameter(GraphBigHNVOptm.pgrau, true);
-//        op.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
-//        op.setParameter(pbonusTotal, true);
 
-//        op.setParameter(pdificuldadeParcial, true);
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-        System.out.println(op.getName());
-        UtilProccess.printEndTime();
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
+//        op.setR(3);
+//        op.resetParameters();
+//        op.setPularAvaliacaoOffset(true);
+//        op.setTryMinimal(false);
 //
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-        op.checkIfHullSet(graph, buildOptimizedHullSet);
-        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
-        if (!checkIfHullSet) {
-            System.err.println("FAIL: fail on check hull setg");
-        }
+//        UtilProccess.printStartTime();
+//        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+//        System.out.println(op.getName());
+//        UtilProccess.printEndTime();
+////
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+//        op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        boolean checkIfHullSet = op.checkIfHullSet(graph, buildOptimizedHullSet);
+//        if (!checkIfHullSet) {
+//            System.err.println("FAIL: fail on check hull setg");
+//        }
         List<String> parametros = new ArrayList<>();
         parametros.addAll(List.of(
                 pdeltaHsi, pdeltaParcial, pdificuldadeTotal,
@@ -498,6 +485,11 @@ public class GraphHNVOptm
                 pprofundidadeS, pgrau, paux, pdeltaHsixdificuldadeTotal
         //        , pgrau, paux
         ));
+        op.resetParameters();
+        op.setPularAvaliacaoOffset(true);
+        op.setTryMinimal();
+        op.setSortByDegree(true);
+
         int totalGlobal = 0;
         int melhorGlobal = 0;
         int piorGlobal = 0;
@@ -508,9 +500,10 @@ public class GraphHNVOptm
 //        String strFile = "hog-graphs-ge20-le50-ordered.g6";
         String strFile = "database/grafos-rand-densall-n50-150.txt";
 
-        for (int t = 1; t <= 3; t++) //
+        for (int t = 2; t <= 3; t++) //
         {
             System.out.println("Testando ciclo: " + t);
+
             for (int r = 10; r >= 5; r--) {
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;
@@ -598,6 +591,8 @@ public class GraphHNVOptm
                 files.close();
                 System.out.println("\n---------------");
                 System.out.println("Resumo r:" + r + " toal de grafos: " + cont);
+                op.resetParameters();
+                System.out.println("Otimizações iniciais: " + op.getName());
 
                 Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {

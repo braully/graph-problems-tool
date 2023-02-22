@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Queue;
@@ -71,6 +71,12 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
         this.pularAvaliacaoOffset = true;
     }
 
+    public boolean sortByDegree = false;
+
+    public void setSortByDegree(boolean sortByDegree) {
+        this.sortByDegree = sortByDegree;
+    }
+
     @Override
     public String getName() {
         StringBuilder sb = new StringBuilder(getDescription());
@@ -85,14 +91,20 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
                 sb.append(par);
             }
         }
+        if (sortByDegree) {
+            sb.append(":sort");
+        }
+        if (realizarPoda) {
+            sb.append(":poda");
+        }
+        if (pularAvaliacaoOffset) {
+            sb.append(":pularAva");
+        }
         if (tryMiminal()) {
             sb.append(":tryMinimal");
         }
         if (tryMiminal2()) {
             sb.append(":tryMinimal2");
-        }
-        if (pularAvaliacaoOffset) {
-            sb.append(":pularAva");
         }
         return sb.toString();
     }
@@ -719,4 +731,16 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
         }
         return ret;
     }
+
+    public List<Integer> getVertices(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
+        List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
+        if (sortByDegree) {
+            vertices.sort(Comparator
+                    .comparingInt((Integer v) -> -graphRead.degree(v))
+            //                .thenComparing(v -> -v)
+            );
+        }
+        return vertices;
+    }
+
 }

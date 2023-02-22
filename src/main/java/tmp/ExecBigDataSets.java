@@ -26,9 +26,8 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.AbstractHeuristic;
+import com.github.braully.graph.operation.AbstractHeuristicOptm;
 import com.github.braully.graph.operation.GraphHNVOptm;
-import static com.github.braully.graph.operation.GraphHNVOptm.pbonusParcialNormalizado;
-import static com.github.braully.graph.operation.GraphHNVOptm.pdificuldadeTotal;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
@@ -338,17 +337,17 @@ public class ExecBigDataSets {
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
             "ca-GrQc", "ca-HepTh",
-            "ca-CondMat",
+            //            "ca-CondMat",
             "ca-HepPh",
             "ca-AstroPh",
-//            "Douban",
-//            "Delicious",
-//            "BlogCatalog3",
-//            "BlogCatalog2",
-//            "Livemocha",
-//            "BlogCatalog",
-//            "BuzzNet",
-//            "Last.fm", //             "YouTube2"
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
+            "BlogCatalog2",
+            "Livemocha",
+            "BlogCatalog",
+            "BuzzNet",
+            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -375,12 +374,15 @@ public class ExecBigDataSets {
 
         optm.resetParameters();
         optm.setPularAvaliacaoOffset(true);
+        optm.setSortByDegree(true);
         optm.setTryMinimal();
-        optm.setTryMinimal2();
-        optm.setParameter(pdificuldadeTotal, true);
-        optm.setParameter(pbonusParcialNormalizado, true);
-//        optm.setVerbose(true);
+//        optm.setTryMinimal2();
+//        optm.setParameter(pdificuldadeTotal, true);
+//        optm.setParameter(pbonusParcialNormalizado, true);
+        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+        optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
 
+//        optm.setVerbose(true);
 //        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
 //        optm.setParameter(GraphBigHNVOptm.pgrau, true);
 //        optm.setParameter(GraphBigHNVOptm.pbonusTotal, true);
