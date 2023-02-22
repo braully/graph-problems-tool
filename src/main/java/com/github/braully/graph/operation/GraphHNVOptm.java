@@ -494,7 +494,7 @@ public class GraphHNVOptm
                 pdeltaHsi, pdeltaParcial, pdificuldadeTotal,
                 pbonusTotal, pbonusParcial, pdificuldadeParcial,
                 pbonusTotalNormalizado, pbonusParcialNormalizado,
-                pprofundidadeS, pgrau, paux
+                pprofundidadeS, pgrau, paux, pdeltaHsixdificuldadeTotal
         //        , pgrau, paux
         ));
         int totalGlobal = 0;
