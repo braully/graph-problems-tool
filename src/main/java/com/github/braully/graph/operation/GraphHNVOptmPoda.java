@@ -226,6 +226,10 @@ public class GraphHNVOptmPoda
                         System.out.println("Scount > kr: " + vertn + " removendo de S ");
                     }
                     s.remove(vertn);
+                    Collection<Integer> nn = getNeighborsNaoPodados(graph, vertn);
+                    for (Integer vnn : nn) {
+                        scount[vnn]--;
+                    }
                 }
             }
         }
@@ -299,8 +303,8 @@ public class GraphHNVOptmPoda
             if (verbose) {
                 System.out.println("Realizando poda: " + verticesTrabalho.size());
             }
-            Set<Integer> tipDecomp = podaBasica(graphRead);
-//            podaProfunda(graphRead);
+//            Set<Integer> tipDecomp = podaBasica(graphRead);
+            Set<Integer> tipDecomp = podaProfunda(graphRead);
             if (verbose) {
                 System.out.println("Poda realizada tfinal: " + verticesTrabalho.size());
             }
@@ -392,6 +396,10 @@ public class GraphHNVOptmPoda
         if (tryMiminal()) {
             s = tryMinimal(graphRead, s);
         }
+        if (tryMiminal2()) {
+            s = tryMinimal2Lite(graphRead, s);
+//            s = tryMinimal2(graphRead, s);
+        }
 //        s = tryMinimal2(graph, s);
         if (!checkIfHullSet(graphRead, s)) {
             System.err.println("" + s.size() + ": " + s);
@@ -423,9 +431,8 @@ public class GraphHNVOptmPoda
             }
 
             int bonusAjustado = graup[i] - (krp[i] - aux[i]);
-            if (bonusAjustado == 0 && verbose) {
-                System.out.println("vertice de baixa qualidade no processamento: " + i);
-                System.out.println("Graup: " + graup[i] + " krp: " + krp[i] + " aux: " + aux[i]);
+            if (bonusAjustado == 0 && verbose && aux[i] > 0) {
+                System.out.println("v baixa qualidade no: " + i + " graup: " + graup[i] + " krp: " + krp[i] + " aux: " + aux[i]);
             }
 
             int profundidadeS = bdls.getDistanceSafe(graph, i);
@@ -669,15 +676,21 @@ public class GraphHNVOptmPoda
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 //        graph = UtilGraph.loadGraphG6("M??????_A?U?BoYG?");
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
 
         System.out.println(graph.toResumedString());
         System.out.println();
-//        op.setVerbose(true);
-        op.setR(10);
+        op.setVerbose(true);
+        op.setR(3);
+        op.setRealizarPoda(false);
+        op.setTryMinimal();
+//        op.setTryMinimal(false);
+//        op.setTryMinimal2();
+//        op.realizarPoda = false;
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: ");

@@ -11,6 +11,7 @@ import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -206,6 +207,24 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                     if (contz == vertices.size()) {
                         if (verbose) {
                             System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
+                            if (scount != null) {
+                                Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
+                                Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
+                                Collection<Integer> nsZ = graphRead.getNeighborsUnprotected(z);
+                                System.out.print("Count s: " + x + ": "
+                                        + scount[x] + " " + y + ": " + scount[y]
+                                        + " adicionado " + z + ": " + scount[z]);
+                                if (Collections.disjoint(nsX, nsY)) {
+                                    System.out.print(" ... é disjunto");
+                                } else {
+                                    System.out.print(" ... tem vizinhos comuns");
+                                }
+                                if (Collections.disjoint(nsZ, nsY) && Collections.disjoint(nsZ, nsX)) {
+                                    System.out.println(" ... z é independente");
+                                } else {
+                                    System.out.println(" ... z intercept x ou y");
+                                }
+                            }
                             System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
                         }
                         if (cont > (tmp.size() / 2) && grafoconexo) {
@@ -228,6 +247,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         }
         return s;
     }
+    protected int[] scount = null;
 
     public Set<Integer> tryMinimal2KeepSize(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int sizeKeep) {
