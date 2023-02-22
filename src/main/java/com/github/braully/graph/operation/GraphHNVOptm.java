@@ -256,8 +256,8 @@ public class GraphHNVOptm
                                 p2 = maiorDificuldadeTotal * maiorDeltaHs;
                                 break;
                             case paux:
-                                p1 = dificuldadeTotal * deltaHsi;
-                                p2 = maiorDificuldadeTotal * maiorDeltaHs;
+                                p1 = bonusParcial * contaminadoParcialmente;
+                                p2 = maiorBonusParcial * maiorContaminadoParcialmente;
 //                                p1 = aux[i];
 //                                p2 = maiorAux;
 //                                p1 = dificuldadeParcial * contaminadoParcialmente;
