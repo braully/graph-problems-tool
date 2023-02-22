@@ -6,34 +6,28 @@ package tmp;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
-import com.github.braully.graph.operation.GraphIterationNumberOptm;
-import com.github.braully.graph.operation.GraphTSSCordasco;
-import com.github.braully.graph.operation.IGraphOperation;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
 
 /**
  *
  * @author strike
  */
 public class GraphRandDensityGenearte {
-    
-    public static final int INI_V = 10;
-    public static final int MAX_V = 100;
+
+    public static final int INI_V = 50;
+    public static final int MAX_V = 150;
     public static final int NREPETICOES = 10;
-    
+
     public static void main(String... args) throws IOException {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
+        String strResultFileGraphsAll = "grafos-rand-dens" + ("all") + "-n" + INI_V + "-" + MAX_V + ".txt";
+        File resultFileGraphsAll = new File(strResultFileGraphsAll);
+        BufferedWriter writerGraphsAll = new BufferedWriter(new FileWriter(resultFileGraphsAll, true));
+
         for (double density = 0.1; density <= 0.9; density += 0.1) {
             String strResultFileGraphs = "grafos-rand-dens" + ("" + density).replace(".", "") + "-n" + INI_V + "-" + MAX_V + ".txt";
             File resultFileGraphs = new File(strResultFileGraphs);
@@ -48,11 +42,15 @@ public class GraphRandDensityGenearte {
                     writerGraphs.write(strGraph);
                     writerGraphs.write("\n");
                     cont++;
+                    writerGraphsAll.write(strGraph);
+                    writerGraphsAll.write("\n");
                 }
             }
             System.out.println("Foram gerados: " + cont);
             writerGraphs.flush();
             writerGraphs.close();
         }
+        writerGraphsAll.flush();
+        writerGraphsAll.close();
     }
 }
