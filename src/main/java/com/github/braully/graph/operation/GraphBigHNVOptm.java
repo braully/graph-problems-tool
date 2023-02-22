@@ -85,7 +85,7 @@ public class GraphBigHNVOptm
         for (int t = 1; t <= 3; t++) {
             MapCountOpt contMelhorCiclo = new MapCountOpt(allParameters.size() * 100);
 
-            for (int r = 10; r >= 5; r--) {
+            for (int r = 10; r >= 8; r--) {
                 int cont = 0;
                 MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
 
