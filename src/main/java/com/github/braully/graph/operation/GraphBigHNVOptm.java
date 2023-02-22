@@ -57,7 +57,9 @@ public class GraphBigHNVOptm
         int piorGlobal = 0;
 
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh", //            "ca-CondMat", "ca-HepPh",
+            "ca-GrQc", "ca-HepTh",
+            //            "ca-CondMat", 
+            "ca-HepPh",
             //            "ca-AstroPh",
             "Douban", //            "Delicious",
         //            "BlogCatalog3",
