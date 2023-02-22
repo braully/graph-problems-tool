@@ -26,6 +26,8 @@ import util.MapCountOpt;
  */
 public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
 
+    public static final String pdeltaHsixdificuldadeTotal = "deltaHXdifTotal";
+
     public static final String pdeltaHsi = "deltaHsi";
     public static final String pdeltaParcial = "deltaParcial";
     public static final String pbonusTotal = "bonusTotal";

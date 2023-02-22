@@ -176,7 +176,8 @@ public class GraphHNVOptm
 //                        double bonus = kr[x] - dx;
                     double bonus = dx - kr[x];
                     bonusParcial += bonus;
-                    double dificuldade = (kr[x] - aux[x]);
+//                    double dificuldade = (kr[x] - aux[x]);
+                    double dificuldade = mapCount.getCount(x);
                     dificuldadeParcial += dificuldade;
                     contaminadoParcialmente++;
                 }
@@ -249,6 +250,10 @@ public class GraphHNVOptm
                             case pprofundidadeS:
                                 p1 = profundidadeS;
                                 p2 = maiorProfundidadeS;
+                                break;
+                            case pdeltaHsixdificuldadeTotal:
+                                p1 = dificuldadeTotal * deltaHsi;
+                                p2 = maiorDificuldadeTotal * maiorDeltaHs;
                                 break;
                             case paux:
                                 p1 = dificuldadeTotal * deltaHsi;
@@ -510,6 +515,7 @@ public class GraphHNVOptm
                 String line = null;
                 int cont = 0;
                 MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+
                 while (null != (line = files.readLine())) {
                     graph = UtilGraph.loadGraphES(line);
                     op.setR(r);
@@ -544,37 +550,33 @@ public class GraphHNVOptm
                             melhores.add(currentSet);
                         }
 
-                        int[] currentRerverse = currentSet.clone();
-                        for (int i = 0; i < currentSet.length; i++) {
-                            currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-                        }
-
+                        if (t > 1) {
+                            int[] currentRerverse = currentSet.clone();
+                            for (int i = 0; i < currentSet.length; i++) {
+                                currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
+                            }
 //                        op.setPularAvaliacaoOffset(false);
-                        op.resetParameters();
-                        for (int ip : currentRerverse) {
-                            String p = parametros.get(ip);
-                            if (t == 1) {
-                                op.setParameter(p, false);
-                            } else {
+                            op.resetParameters();
+                            for (int ip : currentRerverse) {
+                                String p = parametros.get(ip);
                                 op.setParameter(p, true);
                             }
-                        }
-                        optmHullSet = op.buildOptimizedHullSet(graph);
-                        name = op.getName();
-                        int res2 = optmHullSet.size();
-                        out = "R\t g" + cont++ + "\t r"
-                                + r + "\t" + name
-                                + "\t" + res2 + "\n";
-                        if (melhor == null) {
-                            melhor = res2;
-                            melhores.add(currentRerverse);
-                        } else if (melhor == res2) {
-                            melhores.add(currentRerverse);
-                        } else if (melhor > res2) {
-                            melhor = res2;
-                            melhores.clear();
-                            melhores.add(currentRerverse);
-                        }
+                            optmHullSet = op.buildOptimizedHullSet(graph);
+                            name = op.getName();
+                            int res2 = optmHullSet.size();
+                            out = "R\t g" + cont++ + "\t r"
+                                    + r + "\t" + name
+                                    + "\t" + res2 + "\n";
+                            if (melhor == null) {
+                                melhor = res2;
+                                melhores.add(currentRerverse);
+                            } else if (melhor == res2) {
+                                melhores.add(currentRerverse);
+                            } else if (melhor > res2) {
+                                melhor = res2;
+                                melhores.clear();
+                                melhores.add(currentRerverse);
+                            }
 //                        if (res != res2) {
 //                            System.out.print("Diferença nos resultados pra o parametro: ");
 //                            for (int s : currentSet) {
@@ -583,6 +585,7 @@ public class GraphHNVOptm
 //                            System.out.println();
 //                            System.out.println(res + "!=" + res2);
 //                        }
+                        }
                     }
 //                for (Integer i : melhores) {
                     for (int[] ip : melhores) {
@@ -590,11 +593,10 @@ public class GraphHNVOptm
                         contMelhor.inc(i);
                     }
                     cont++;
-
                 }
                 files.close();
                 System.out.println("\n---------------");
-                System.out.println("Resumo r:" + r);
+                System.out.println("Resumo r:" + r + " toal de grafos: " + cont);
 
                 Map<String, Integer> map = new HashMap<>();
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
@@ -605,7 +607,8 @@ public class GraphHNVOptm
                 for (int[] i : allarrays()) {
                     StringBuilder sb = new StringBuilder();
                     for (int ip : i) {
-                        sb.append(allParameters.get(ip));
+                        String get = allParameters.get(ip);
+                        sb.append(get);
 //                    String p = allParameters.get(ip);
                         sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));

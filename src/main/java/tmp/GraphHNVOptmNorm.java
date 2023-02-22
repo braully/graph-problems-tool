@@ -238,7 +238,7 @@ public class GraphHNVOptmNorm
 
 //        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
         if (tryMiminal()) {
-        s = tryMinimal(graph, s);
+            s = tryMinimal(graph, s);
         }
 //        s = tryMinimal2(graph, s);
         return s;
@@ -976,6 +976,7 @@ public class GraphHNVOptmNorm
         } else if (melhor == res) {
             melhores1.add(currentSet);
         } else if (melhor > res) {
+            melhor = res;
             melhores1.clear();
             melhores1.add(currentSet);
         }
