@@ -379,7 +379,9 @@ public class ExecBigDataSets {
 //        optm.setTryMinimal2();
 //        optm.setParameter(pdificuldadeTotal, true);
 //        optm.setParameter(pbonusParcialNormalizado, true);
-        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+//        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+//        optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
+        optm.setParameter(AbstractHeuristicOptm.pdeltaHsi, true);
         optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
 
 //        optm.setVerbose(true);
