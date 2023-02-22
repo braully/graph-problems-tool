@@ -504,6 +504,7 @@ public class GraphHNVOptm
 
         for (int t = 1; t <= 3; t++) //
         {
+            System.out.println("Testando ciclo: " + t);
             for (int r = 4; r <= 10; r++) {
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;

@@ -337,9 +337,9 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh", 
-            "ca-CondMat", 
-                    "ca-HepPh", 
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat",
+            "ca-HepPh",
             "ca-AstroPh",
             "Douban",
             "Delicious",
