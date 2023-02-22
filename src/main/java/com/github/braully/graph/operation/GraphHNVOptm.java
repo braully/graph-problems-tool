@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -510,11 +511,11 @@ public class GraphHNVOptm
         for (int t = 1; t <= 3; t++) //
         {
             System.out.println("Testando ciclo: " + t);
-            for (int r = 4; r <= 10; r++) {
+            for (int r = 10; r >= 5; r--) {
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;
                 int cont = 0;
-                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100);
+                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 10000);
 
                 while (null != (line = files.readLine())) {
                     graph = UtilGraph.loadGraphES(line);
@@ -589,7 +590,7 @@ public class GraphHNVOptm
                     }
 //                for (Integer i : melhores) {
                     for (int[] ip : melhores) {
-                        int i = array2idx(ip);
+                        int i = op.array2idx(ip);
                         contMelhor.inc(i);
                     }
                     cont++;
@@ -604,16 +605,16 @@ public class GraphHNVOptm
 ////                System.out.println(p + ": " + contMelhor.getCount(ip));
 //                map.put(p, contMelhor.getCount(ip));
 //            }
-                for (int[] i : allarrays()) {
+                for (int[] i : op.allarrays()) {
                     StringBuilder sb = new StringBuilder();
                     for (int ip : i) {
-                        String get = allParameters.get(ip);
+                        String get = parametros.get(ip);
                         sb.append(get);
 //                    String p = allParameters.get(ip);
                         sb.append("-");
 //                System.out.println(p + ": " + contMelhor.getCount(ip));
                     }
-                    map.put(sb.toString(), contMelhor.getCount(array2idx(i)));
+                    map.put(sb.toString(), contMelhor.getCount(op.array2idx(i)));
                 }
                 List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
                 entrySet.sort(
@@ -660,21 +661,26 @@ public class GraphHNVOptm
         return cont;
     }
 
-    static Map<Integer, int[]> map = new HashMap<>();
+    Map<Integer, int[]> map = new HashMap<>();
+    Map<Integer, int[]> mapCiclo = new HashMap<>();
 
-    static int[] offset = new int[]{1, 100};
+    static final int[] offset = new int[]{1, 100, 1000};
 
-    public static int array2idx(int[] ip) {
+    public int array2idx(int[] ip) {
         int cont = 0;
         for (int i = 0; i < ip.length; i++) {
-            int ipp = ip[i];
-            cont = cont + offset[i] * ipp;
-            map.put(cont, ip);
+            int ipp = ip[i] + 1;
+            cont = cont + (offset[i] * ipp);
+        }
+        map.get(cont);
+        int[] put = map.put(cont, ip);
+        if (put != null && Arrays.compare(put, ip) != 0) {
+            throw new IllegalStateException("Arrays diferentes no mesmo contador: " + cont + " " + Arrays.asList(ip) + " " + Arrays.asList(put));
         }
         return cont;
     }
 
-    public static Collection<int[]> allarrays() {
+    public Collection<int[]> allarrays() {
         return map.values();
     }
 

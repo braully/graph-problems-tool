@@ -109,7 +109,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
 //                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
 //                }
                 if (cont > (tmp.size() / 2) && grafoconexo) {
-                    System.out.println("Poda de v:  " + v + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
+//                    System.out.println("Poda de v:  " + v + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
 
                 }
             }

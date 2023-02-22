@@ -341,14 +341,14 @@ public class ExecBigDataSets {
             "ca-CondMat",
             "ca-HepPh",
             "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
-            "BlogCatalog2",
-            "Livemocha",
-            "BlogCatalog",
-            "BuzzNet",
-            "Last.fm", //             "YouTube2"
+//            "Douban",
+//            "Delicious",
+//            "BlogCatalog3",
+//            "BlogCatalog2",
+//            "Livemocha",
+//            "BlogCatalog",
+//            "BuzzNet",
+//            "Last.fm", //             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -409,7 +409,7 @@ public class ExecBigDataSets {
         int[] contPior = new int[operations.length];
         int[] contIgual = new int[operations.length];
         for (int i = 0; i < operations.length; i++) {
-            contMelhor[i] = contPior[0] = contIgual[0] = 0;
+            contMelhor[i] = contPior[i] = contIgual[i] = 0;
         }
 
         Arrays.sort(dataSets);
