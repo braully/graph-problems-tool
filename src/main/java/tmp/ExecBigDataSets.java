@@ -397,7 +397,7 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-//            tss, //            heur1,
+            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -422,7 +422,7 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 2; k <= 9; k++) {
+        for (int k = 1; k <= 9; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
@@ -432,7 +432,7 @@ public class ExecBigDataSets {
                 optm.setR(k);
                 tss.setR(k);
                 System.out.println("-------------\n\nR: " + k);
-            } else if (true) {
+            } else if (false) {
                 op = "m";
                 heur5t2.setMarjority(k);
                 optm.setMarjority(k);
