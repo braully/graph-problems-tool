@@ -427,17 +427,22 @@ public class ExecBigDataSets {
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
             String op = "r";
-            if (true) {
+            if (false) {
                 heur5t2.setR(k);
                 optm.setR(k);
                 tss.setR(k);
                 System.out.println("-------------\n\nR: " + k);
+            } else if (true) {
+                op = "m";
+                heur5t2.setMarjority(k);
+                optm.setMarjority(k);
+                tss.setMarjority(k);
+                System.out.println("-------------\n\nm: " + k);
             } else {
                 op = "k";
                 heur5t2.setK(k);
                 optm.setK(k);
                 tss.setK(k);
-
                 System.out.println("-------------\n\nk: " + k);
             }
             for (String s : dataSets) {
