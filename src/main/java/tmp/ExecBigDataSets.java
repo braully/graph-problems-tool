@@ -449,6 +449,10 @@ public class ExecBigDataSets {
                     tss.setK(k);
                     System.out.println("-------------\n\nk: " + k);
                 }
+                if (op.equals("m") && k == 1) {
+                    System.out.println("Será ignorado m=1 e k=1");
+                    continue;
+                }
                 for (String s : dataSets) {
                     System.out.println("\n-DATASET: " + s);
 
