@@ -26,8 +26,9 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import com.github.braully.graph.operation.AbstractHeuristic;
-import com.github.braully.graph.operation.AbstractHeuristicOptm;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pbonusParcial;
+import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsi;
+import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal;
 import com.github.braully.graph.operation.GraphHNVOptm;
 import com.github.braully.graph.operation.GraphHNVOptmPoda;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
@@ -61,10 +62,10 @@ import static util.UtilProccess.printTimeFormated;
  * @author strike
  */
 public class ExecRandDataSets {
-    
+
     public static final Map<String, int[]> resultadoArquivado = new HashMap<>();
     private static boolean verbose;
-    
+
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
             "grafos-rand-dens01-n10-100.txt",
@@ -109,25 +110,25 @@ public class ExecRandDataSets {
 ////        optmpoda.setParameter(GraphHNVOptm.pprofundidadeS, false);
         heur5t2.setVerbose(false);
         heur5t2.startVertice = false;
-        
+
         GraphHNVOptm optm = new GraphHNVOptm();
-        
+
         optm.resetParameters();
         optm.setVerbose(false);
         optm.setPularAvaliacaoOffset(true);
 //        optm.setTryMinimal(false);
         optm.setTryMinimal();
-        optm.setTryMinimal2();
+//        optm.setTryMinimal2();
 //        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
 //        optm.setParameter(pdeltaHsi, true);
         if (true) {
-            optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+            optm.setParameter(pdeltaHsixdificuldadeTotal, true);
             optm.setParameter(pbonusParcial, true);
 //            optm.setSortByDegree(true);
         } else {
 //        optm.setParameter(AbstractHeuristicOptm.paux, true);
-            optm.setParameter(AbstractHeuristicOptm.pdeltaHsi, true);
-            optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
+            optm.setParameter(pdeltaHsi, true);
+            optm.setParameter(pbonusParcial, true);
         }
 //        optm.setParameter(AbstractHeuristicOptm.paux, true);
 
@@ -145,7 +146,7 @@ public class ExecRandDataSets {
 //        optm.setParameter(GraphBigHNVOptm.pbonusTotal, false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
-        
+
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             //                        optm,
             tss, //            heur1,
@@ -168,25 +169,17 @@ public class ExecRandDataSets {
         for (int i = 0; i < operations.length; i++) {
             contMelhor[i] = contPior[i] = contIgual[i] = 0;
         }
-        
+
         Arrays.sort(dataSets);
-        
+
         String strResultFile = "resultado-" + ExecRandDataSets.class.getSimpleName() + ".txt";
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
-        
-        Map<String, Boolean> piorou = new HashMap<>();
-        
-        for (int k = 2; k <= 10; k++) {
 
-//            heur1.K = heur2.K = heur3.K
-//                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
-//            tss.setR(k);
-//            tss.setMarjority(k);
-//            optm.setMarjority(k);
-//            optm.setR(k);
-//            tss.setR(k);
-            if (false) {
+        Map<String, Boolean> piorou = new HashMap<>();
+
+        for (int k = 2; k <= 10; k++) {
+            if (true) {
                 optm.setK(k);
                 tss.setK(k);
                 optmpoda.setK(k);
@@ -198,7 +191,7 @@ public class ExecRandDataSets {
                 heur5t2.setR(k);
             }
             System.out.println("-------------\n\nR: " + k);
-            
+
             for (String s : dataSets) {
                 if (verbose) {
                     System.out.println("\n-DATASET: " + s);
@@ -209,7 +202,7 @@ public class ExecRandDataSets {
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;
                 int cont = 0;
-                
+
                 while (null != (line = files.readLine())) {
                     String id = s + "-" + cont;
                     graphES = UtilGraph.loadGraphES(line);
@@ -218,7 +211,7 @@ public class ExecRandDataSets {
                     if (verbose) {
                         System.out.println("Loaded Graph: " + s + " " + graphES.getVertexCount() + " " + graphES.getEdgeCount());
                     }
-                    
+
                     for (int i = 0; i < operations.length; i++) {
                         String arquivadoStr = operations[i].getName() + "-k" + k + "-" + s;
                         Map<String, Object> doOperation = null;
@@ -248,20 +241,20 @@ public class ExecRandDataSets {
                         if (verbose) {
                             System.out.println(" - Result: " + result[i]);
                         }
-                        
+
                         String out = "Big\t" + s + "\t" + graphES.getVertexCount() + "\t"
                                 + graphES.getEdgeCount()
                                 + "\t" + k + "\t" + operations[i].getName()
                                 + "\t" + result[i] + "\t" + totalTime[i] + "\n";
-                        
+
                         if (verbose) {
                             System.out.print("xls: " + out);
                         }
-                        
+
                         writer.write(out);
 //                        writer.write(resultProcess);
                         writer.flush();
-                        
+
                         if (doOperation != null) {
                             boolean checkIfHullSet = operations[i].checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)));
                             if (!checkIfHullSet) {
@@ -277,7 +270,7 @@ public class ExecRandDataSets {
                             }
                         } else {
                             delta[i] = result[0] - result[i];
-                            
+
                             long deltaTempo = totalTime[0] - totalTime[i];
                             if (verbose) {
                                 System.out.print(" - Tempo: ");
@@ -327,13 +320,13 @@ public class ExecRandDataSets {
                         }
                     }
                 }
-                
+
             }
             if (true) {
                 System.out.println("Resumo parcial: " + k);
                 for (int i = 1; i < operations.length; i++) {
                     int total = contMelhor[i] + contPior[i] + contIgual[i];
-                    
+
                     System.out.println("Operacao: " + operations[i].getName());
                     System.out.println("Melhor: " + contMelhor[i]);
                     System.out.println("Pior: " + contPior[i]);
@@ -359,7 +352,7 @@ public class ExecRandDataSets {
             System.out.println("Melhor: " + contMelhorGlobal);
             System.out.println("Pior: " + contPiorGlobal);
             System.out.println("Igual: " + contIgualGlobal);
-            
+
             System.out.println("------------");
             int total = contMelhorGlobal + contPiorGlobal + contIgualGlobal;
             if (total > 0) {

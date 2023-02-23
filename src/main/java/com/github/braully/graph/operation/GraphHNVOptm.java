@@ -113,13 +113,13 @@ public class GraphHNVOptm
                 continue;
             }
             int profundidadeS = bdls.getDistanceSafe(graph, i);
-//            if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
-//                grafoconexo = false;
-//                continue;
-//            }
-//            if (pularAvaliacaoOffset && pularAvaliacao[i] >= sizeHs) {
-//                continue;
-//            }
+            if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
+                grafoconexo = false;
+                continue;
+            }
+            if (pularAvaliacaoOffset && pularAvaliacao[i] >= sizeHs) {
+                continue;
+            }
 
             int grauContaminacao = 0;
             int contaminadoParcialmente = 0;
@@ -500,7 +500,7 @@ public class GraphHNVOptm
 //        String strFile = "hog-graphs-ge20-le50-ordered.g6";
         String strFile = "database/grafos-rand-densall-n50-150.txt";
 
-        for (int t = 2; t <= 3; t++) //
+        for (int t = 1; t <= 3; t++) //
         {
             System.out.println("Testando ciclo: " + t);
 
@@ -512,6 +512,7 @@ public class GraphHNVOptm
 
                 while (null != (line = files.readLine())) {
                     graph = UtilGraph.loadGraphES(line);
+//                    op.setK(r);
                     op.setR(r);
                     Integer melhor = null;
                     List<int[]> melhores = new ArrayList<>();
@@ -659,7 +660,7 @@ public class GraphHNVOptm
     Map<Integer, int[]> map = new HashMap<>();
     Map<Integer, int[]> mapCiclo = new HashMap<>();
 
-    static final int[] offset = new int[]{1, 100, 1000};
+    static final int[] offset = new int[]{1, 100, 10000};
 
     public int array2idx(int[] ip) {
         int cont = 0;
