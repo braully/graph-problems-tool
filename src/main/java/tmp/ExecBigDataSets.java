@@ -422,7 +422,7 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
 
-        for (int k = 10; k >= 1; k--) {
+        for (int k = 1; k <= 9; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
@@ -431,7 +431,6 @@ public class ExecBigDataSets {
                 heur5t2.setR(k);
                 optm.setR(k);
                 tss.setR(k);
-
                 System.out.println("-------------\n\nR: " + k);
             } else {
                 op = "k";
