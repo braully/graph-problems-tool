@@ -397,7 +397,7 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
+//            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
