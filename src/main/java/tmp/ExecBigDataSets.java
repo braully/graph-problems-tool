@@ -338,18 +338,17 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
-            //            "ca-CondMat",
-            "ca-HepPh",
-            "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
+            //            "ca-GrQc", "ca-HepTh",
+            //                        "ca-CondMat",
+            //            "ca-HepPh",
+            //            "ca-AstroPh", //            "Douban",
+            //            "Delicious",
+            //            "BlogCatalog3",
             "BlogCatalog2",
-            "Livemocha",
-            "BlogCatalog",
-            "BuzzNet",
-            "Last.fm", //             "YouTube2"
+                        "Livemocha",
+            //            "BlogCatalog",
+            "BuzzNet", //                    "Last.fm", 
+        //            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -401,14 +400,14 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            //            tss, //            heur1,
-            //            heur2, 
-            //            heur3, heur4,
-            //            heur5,
-            //            heur5t,
-            //            tssg,
-            //            heur5t2
-            optm
+            tss, //            heur1,
+        //            heur2, 
+        //            heur3, heur4,
+        //            heur5,
+        //            heur5t,
+        //            tssg,
+        //            heur5t2
+        //            optm
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
@@ -425,7 +424,10 @@ public class ExecBigDataSets {
         String strResultFile = "resultado-" + ExecBigDataSets.class.getSimpleName() + ".txt";
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
-        for (String op : new String[]{"m", "k", "r"}) {
+        for (String op : new String[]{
+            //            "m",
+            "k", //            "r"
+        }) {
             for (int k = 1; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
@@ -491,7 +493,7 @@ public class ExecBigDataSets {
 
                         String out = "Big\t" + s + "\t" + graphES.getVertexCount() + "\t"
                                 + graphES.getEdgeCount()
-                                + "\t" + k + "\t" + operations[i].getName()
+                                + "\t" + op + "\t" + k + "\t" + " " + "\t" + operations[i].getName()
                                 + "\t" + result[i] + "\t" + totalTime[i] + "\n";
 
                         System.out.print("xls: " + out);
