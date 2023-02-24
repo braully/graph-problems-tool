@@ -338,17 +338,18 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            //            "ca-GrQc", "ca-HepTh",
-            //                        "ca-CondMat",
-            //            "ca-HepPh",
-            //            "ca-AstroPh", //            "Douban",
-            //            "Delicious",
-            //            "BlogCatalog3",
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat",
+            "ca-HepPh",
+            "ca-AstroPh",
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
             "BlogCatalog2",
             "Livemocha",
-            //            "BlogCatalog",
-            "BuzzNet", //                    "Last.fm", 
-        //            "YouTube2"
+            "BlogCatalog",
+            "BuzzNet",
+            "Last.fm", //            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -380,9 +381,9 @@ public class ExecBigDataSets {
 //        optm.setTryMinimal2();
 //        optm.setParameter(pdificuldadeTotal, true);
 //        optm.setParameter(pbonusParcialNormalizado, true);
-        optm.setParameter(pdeltaHsi, true);
+//        optm.setParameter(pdeltaHsi, true);
 //        optm.setParameter(pdificuldadeTotal, true);
-//        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
         optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
 //        optm.setParameter(AbstractHeuristicOptm.pdeltaHsi, true);
 //        optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
@@ -400,14 +401,14 @@ public class ExecBigDataSets {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
-        //            heur2, 
-        //            heur3, heur4,
-        //            heur5,
-        //            heur5t,
-        //            tssg,
-        //            heur5t2
-        //            optm
+            //            tss, //            heur1,
+            //            heur2, 
+            //            heur3, heur4,
+            //            heur5,
+            //            heur5t,
+            //            tssg,
+            //            heur5t2
+            optm
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
@@ -425,11 +426,11 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            //            "m",
-            //            "k", 
-            "r"
+            "k",
+            "r",
+            "m"
         }) {
-            for (int k = 1; k <= 10; k++) {
+            for (int k = 10; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
