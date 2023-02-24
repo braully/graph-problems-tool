@@ -479,17 +479,20 @@ public class ExecBigDataSets {
                     heur5t2.setR(k);
                     optm.setR(k);
                     tss.setR(k);
+                    optm2.setR(k);
                     System.out.println("-------------\n\nR: " + k);
                 } else if (op.equals("m")) {
                     op = "m";
                     heur5t2.setMarjority(k);
                     optm.setMarjority(k);
+                    optm2.setMarjority(k);
                     tss.setMarjority(k);
                     System.out.println("-------------\n\nm: " + k);
                 } else {
                     op = "k";
                     heur5t2.setK(k);
                     optm.setK(k);
+                    optm2.setK(k);
                     tss.setK(k);
                     System.out.println("-------------\n\nk: " + k);
                 }
