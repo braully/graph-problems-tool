@@ -333,23 +333,53 @@ public class ExecBigDataSets {
             resultadoArquivado.put("TSS-Cordasco-r2-Delicious", new int[]{650, 379078});
             resultadoArquivado.put("TSS-Cordasco-r2-Douban", new int[]{241, 412210});
             resultadoArquivado.put("TSS-Cordasco-r2-Last.fm", new int[]{330, 502092});
+
+            resultadoArquivado.put("TSS-Cordasco-k1-BlogCatalog2", new int[]{1, 121942});
+            resultadoArquivado.put("TSS-Cordasco-k1-BuzzNet", new int[]{6, 279634});
+            resultadoArquivado.put("TSS-Cordasco-k1-Livemocha", new int[]{336, 458879});
+            resultadoArquivado.put("TSS-Cordasco-k2-BlogCatalog2", new int[]{27638, 482217});
+            resultadoArquivado.put("TSS-Cordasco-k2-BuzzNet", new int[]{7561, 485019});
+            resultadoArquivado.put("TSS-Cordasco-k2-Livemocha", new int[]{7182, 487730});
+            resultadoArquivado.put("TSS-Cordasco-k3-BlogCatalog2", new int[]{40662, 545022});
+            resultadoArquivado.put("TSS-Cordasco-k3-BuzzNet", new int[]{19630, 550552});
+            resultadoArquivado.put("TSS-Cordasco-k3-Livemocha", new int[]{13603, 554108});
+            resultadoArquivado.put("TSS-Cordasco-k4-BlogCatalog2", new int[]{48604, 631997});
+            resultadoArquivado.put("TSS-Cordasco-k4-BuzzNet", new int[]{23647, 636905});
+            resultadoArquivado.put("TSS-Cordasco-k4-Livemocha", new int[]{19345, 640528});
+            resultadoArquivado.put("TSS-Cordasco-k5-BlogCatalog2", new int[]{54171, 736839});
+            resultadoArquivado.put("TSS-Cordasco-k5-BuzzNet", new int[]{27242, 742056});
+            resultadoArquivado.put("TSS-Cordasco-k5-Livemocha", new int[]{24466, 761846});
+            resultadoArquivado.put("TSS-Cordasco-k6-BlogCatalog2", new int[]{58325, 797824});
+            resultadoArquivado.put("TSS-Cordasco-k6-BuzzNet", new int[]{30850, 805473});
+            resultadoArquivado.put("TSS-Cordasco-k6-Livemocha", new int[]{29079, 833801});
+            resultadoArquivado.put("TSS-Cordasco-k7-BlogCatalog2", new int[]{61589, 871786});
+            resultadoArquivado.put("TSS-Cordasco-k7-BuzzNet", new int[]{34503, 886278});
+            resultadoArquivado.put("TSS-Cordasco-k7-Livemocha", new int[]{33179, 924904});
+            resultadoArquivado.put("TSS-Cordasco-k8-BlogCatalog2", new int[]{64126, 1062920});
+            resultadoArquivado.put("TSS-Cordasco-k8-BuzzNet", new int[]{37815, 1073218});
+            resultadoArquivado.put("TSS-Cordasco-k8-Livemocha", new int[]{36928, 1102529});
+            resultadoArquivado.put("TSS-Cordasco-k9-BlogCatalog2", new int[]{66462, 1142551});
+            resultadoArquivado.put("TSS-Cordasco-k9-BuzzNet", new int[]{40725, 1155595});
+            resultadoArquivado.put("TSS-Cordasco-k9-Livemocha", new int[]{40275, 1221780});
+            resultadoArquivado.put("TSS-Cordasco-k10-BlogCatalog2", new int[]{68321, 1383763});
+            resultadoArquivado.put("TSS-Cordasco-k10-BuzzNet", new int[]{43122, 1412166});
+            resultadoArquivado.put("TSS-Cordasco-k10-Livemocha", new int[]{43439, 1473506});
         }
     }
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
-            "ca-CondMat",
-            "ca-HepPh",
-            "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
-            "BlogCatalog2",
-            "Livemocha",
-            "BlogCatalog",
-            "BuzzNet",
-            "Last.fm", //            "YouTube2"
+            //            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat", //            "ca-HepPh",
+        //            "ca-AstroPh",
+        //            "Douban",
+        //            "Delicious",
+        //            "BlogCatalog3",
+        //            "BlogCatalog2",
+        //            "Livemocha",
+        //            "BlogCatalog",
+        //            "BuzzNet",
+        //            "Last.fm", //            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -368,11 +398,12 @@ public class ExecBigDataSets {
         heur5t.setVerbose(false);
 //        GraphHullNumberHeuristicV5Tmp2 heur5t2 = new GraphHullNumberHeuristicV5Tmp2();
         GraphHullNumberHeuristicV5Tmp3 heur5t2 = new GraphHullNumberHeuristicV5Tmp3();
-//        GraphBigHNVOptm optm = new GraphBigHNVOptm();
-        GraphHNVOptm optm = new GraphHNVOptm();
 
         heur5t2.setVerbose(false);
         heur5t2.startVertice = false;
+
+//        GraphBigHNVOptm optm = new GraphBigHNVOptm();
+        GraphHNVOptm optm = new GraphHNVOptm();
 
         optm.resetParameters();
         optm.setPularAvaliacaoOffset(true);
@@ -381,9 +412,9 @@ public class ExecBigDataSets {
 //        optm.setTryMinimal2();
 //        optm.setParameter(pdificuldadeTotal, true);
 //        optm.setParameter(pbonusParcialNormalizado, true);
-//        optm.setParameter(pdeltaHsi, true);
+        optm.setParameter(pdeltaHsi, true);
 //        optm.setParameter(pdificuldadeTotal, true);
-        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+//        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
         optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
 //        optm.setParameter(AbstractHeuristicOptm.pdeltaHsi, true);
 //        optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
@@ -400,6 +431,14 @@ public class ExecBigDataSets {
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
+        GraphHNVOptm optm2 = new GraphHNVOptm();
+        optm2.resetParameters();
+        optm2.setPularAvaliacaoOffset(true);
+        optm2.setSortByDegree(true);
+        optm2.setTryMinimal();
+        optm2.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+        optm2.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
+
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             //            tss, //            heur1,
             //            heur2, 
@@ -408,7 +447,8 @@ public class ExecBigDataSets {
             //            heur5t,
             //            tssg,
             //            heur5t2
-            optm
+            optm,
+            optm2
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
@@ -430,7 +470,7 @@ public class ExecBigDataSets {
             "r",
             "m"
         }) {
-            for (int k = 10; k <= 10; k++) {
+            for (int k = 1; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
