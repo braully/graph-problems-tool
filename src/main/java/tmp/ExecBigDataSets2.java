@@ -152,10 +152,9 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            "m",
+            "r",
             "k",
-            "r"
-        }) {
+            "m",}) {
             for (int k = 1; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
