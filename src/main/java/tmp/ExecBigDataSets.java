@@ -345,7 +345,7 @@ public class ExecBigDataSets {
             //            "Delicious",
             //            "BlogCatalog3",
             "BlogCatalog2",
-                        "Livemocha",
+            "Livemocha",
             //            "BlogCatalog",
             "BuzzNet", //                    "Last.fm", 
         //            "YouTube2"
@@ -426,7 +426,8 @@ public class ExecBigDataSets {
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
             //            "m",
-            "k", //            "r"
+            //            "k", 
+            "r"
         }) {
             for (int k = 1; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
