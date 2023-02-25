@@ -214,80 +214,9 @@ public class GraphHNVOptm
                 maiorBonusParcial = bonusParcial;
                 maiorDificuldadeParcial = dificuldadeParcial;
             } else {
-
-                double[] list = new double[parameters.size() * 2];
-                int cont = 0;
-                for (String p : parameters.keySet()) {
-                    Boolean get = parameters.get(p);
-                    double p1 = 0, p2 = 0;
-                    if (get != null) {
-                        switch (p) {
-                            case pdeltaHsi:
-                                p1 = deltaHsi;
-                                p2 = maiorDeltaHs;
-                                break;
-                            case pdeltaParcial:
-                                p1 = contaminadoParcialmente;
-                                p2 = maiorContaminadoParcialmente;
-                                break;
-                            case pbonusTotal:
-                                p1 = bonusTotal;
-                                p2 = maiorBonusTotal;
-                                break;
-                            case pbonusParcial:
-                                p1 = bonusParcial;
-                                p2 = maiorBonusParcial;
-                                break;
-                            case pbonusTotalNormalizado:
-                                p1 = bonusTotalNormalizado;
-                                p2 = maiorBonusTotalNormalizado;
-//                                p1 = dificuldadeTotal * deltaHsi;
-//                                p2 = maiorDificuldadeTotal * maiorDeltaHs;
-                                break;
-                            case pdificuldadeTotal:
-                                p1 = dificuldadeTotal;
-                                p2 = maiorDificuldadeTotal;
-                                break;
-                            case pdificuldadeParcial:
-                                p1 = dificuldadeParcial;
-                                p2 = maiorDificuldadeParcial;
-                                break;
-                            case pprofundidadeS:
-                                p1 = profundidadeS;
-                                p2 = maiorProfundidadeS;
-                                break;
-                            case pdeltaHsixdificuldadeTotal:
-                                p1 = dificuldadeTotal * deltaHsi;
-                                p2 = maiorDificuldadeTotal * maiorDeltaHs;
-                                break;
-                            case paux:
-                                p1 = bonusParcial * contaminadoParcialmente;
-                                p2 = maiorBonusParcial * maiorContaminadoParcialmente;
-//                                p1 = aux[i];
-//                                p2 = maiorAux;
-//                                p1 = dificuldadeParcial * contaminadoParcialmente;
-//                                p2 = maiorDificuldadeParcial * maiorContaminadoParcialmente;
-                                break;
-                            case pbonusParcialNormalizado:
-                                p1 = bonusParcialNormalizado;
-                                p2 = maiorBonusParcialNormalizado;
-                                break;
-                            case pgrau:
-                                p1 = di;
-                                p2 = maiorGrau;
-                                break;
-                            default:
-                                break;
-                        }
-                        if (get) {
-                            list[cont++] = p1;
-                            list[cont++] = p2;
-                        } else {
-                            list[cont++] = -p1;
-                            list[cont++] = -p2;
-                        }
-                    }
-                }
+                double[] list = null;
+                list = new double[parameters.size() * 2];
+                calcularRanking(i, deltaHsi, contaminadoParcialmente, bonusTotal, bonusParcial, bonusTotalNormalizado, dificuldadeTotal, dificuldadeParcial, profundidadeS, bonusParcialNormalizado, di);
                 Boolean greater = isGreater(list);
                 if (greater == null) {
                     melhores.add(i);
@@ -311,6 +240,83 @@ public class GraphHNVOptm
                 }
             }
         }
+    }
+
+    protected double[] calcularRanking(int v, int deltaHsi, int contaminadoParcialmente, double bonusTotal, double bonusParcial, double bonusTotalNormalizado, double dificuldadeTotal, double dificuldadeParcial, int profundidadeS, double bonusParcialNormalizado, int di) {
+        double[] list = new double[parameters.size() * 2];
+        int cont = 0;
+        for (String p : parameters.keySet()) {
+            Boolean get = parameters.get(p);
+            double p1 = 0, p2 = 0;
+            if (get != null) {
+                switch (p) {
+                    case pdeltaHsi:
+                        p1 = deltaHsi;
+                        p2 = maiorDeltaHs;
+                        break;
+                    case pdeltaParcial:
+                        p1 = contaminadoParcialmente;
+                        p2 = maiorContaminadoParcialmente;
+                        break;
+                    case pbonusTotal:
+                        p1 = bonusTotal;
+                        p2 = maiorBonusTotal;
+                        break;
+                    case pbonusParcial:
+                        p1 = bonusParcial;
+                        p2 = maiorBonusParcial;
+                        break;
+                    case pbonusTotalNormalizado:
+                        p1 = bonusTotalNormalizado;
+                        p2 = maiorBonusTotalNormalizado;
+//                                p1 = dificuldadeTotal * deltaHsi;
+//                                p2 = maiorDificuldadeTotal * maiorDeltaHs;
+                        break;
+                    case pdificuldadeTotal:
+                        p1 = dificuldadeTotal;
+                        p2 = maiorDificuldadeTotal;
+                        break;
+                    case pdificuldadeParcial:
+                        p1 = dificuldadeParcial;
+                        p2 = maiorDificuldadeParcial;
+                        break;
+                    case pprofundidadeS:
+                        p1 = profundidadeS;
+                        p2 = maiorProfundidadeS;
+                        break;
+                    case pdeltaHsixdificuldadeTotal:
+                        p1 = dificuldadeTotal * deltaHsi;
+                        p2 = maiorDificuldadeTotal * maiorDeltaHs;
+                        break;
+                    case paux:
+                        p1 = bonusParcial * contaminadoParcialmente;
+                        p2 = maiorBonusParcial * maiorContaminadoParcialmente;
+//                                p1 = aux[i];
+//                                p2 = maiorAux;
+//                                p1 = dificuldadeParcial * contaminadoParcialmente;
+//                                p2 = maiorDificuldadeParcial * maiorContaminadoParcialmente;
+                        break;
+                    case pbonusParcialNormalizado:
+                        p1 = bonusParcialNormalizado;
+                        p2 = maiorBonusParcialNormalizado;
+                        break;
+                    case pgrau:
+                        p1 = di;
+                        p2 = maiorGrau;
+                        break;
+                    default:
+                        break;
+                }
+                if (get) {
+                    list[cont++] = p1;
+                    list[cont++] = p2;
+                } else {
+                    list[cont++] = -p1;
+                    list[cont++] = -p2;
+                }
+            }
+        }
+        return list;
     }
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
@@ -516,6 +522,7 @@ public class GraphHNVOptm
                     op.setR(r);
                     Integer melhor = null;
                     List<int[]> melhores = new ArrayList<>();
+                    
 //                for (int ip = 0; ip < allParameters.size(); ip++) {
 
                     Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), t);
