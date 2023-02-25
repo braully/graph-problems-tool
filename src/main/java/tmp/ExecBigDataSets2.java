@@ -107,9 +107,9 @@ public class ExecBigDataSets2 {
 //        optm.setTryMinimal2();
 //        optm.setParameter(pdificuldadeTotal, true);
 //        optm.setParameter(pbonusParcialNormalizado, true);
-        optm.setParameter(pdeltaHsi, true);
+//        optm.setParameter(pdeltaHsi, true);
 //        optm.setParameter(pdificuldadeTotal, true);
-//        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
+        optm.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
         optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
 //        optm.setParameter(AbstractHeuristicOptm.pdeltaHsi, true);
 //        optm.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
@@ -127,7 +127,7 @@ public class ExecBigDataSets2 {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
+//            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -155,7 +155,7 @@ public class ExecBigDataSets2 {
             "r",
             "k",
             "m",}) {
-            for (int k = 1; k <= 10; k++) {
+            for (int k = 10; k >= 1; k--) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
