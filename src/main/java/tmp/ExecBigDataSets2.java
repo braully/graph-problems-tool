@@ -127,7 +127,7 @@ public class ExecBigDataSets2 {
         GraphTSSGreedy tssg = new GraphTSSGreedy();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-//            tss, //            heur1,
+            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -152,7 +152,7 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            "r",
+//            "r",
             "k",
             "m",}) {
             for (int k = 10; k >= 1; k--) {
