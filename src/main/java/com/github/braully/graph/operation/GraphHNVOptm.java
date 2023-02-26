@@ -821,7 +821,7 @@ public class GraphHNVOptm
     Map<Integer, int[]> map = new HashMap<>();
     Map<Integer, int[]> mapCiclo = new HashMap<>();
 
-    static final int[] offset = new int[]{1, 10, 100, 1000};
+    static final int[] offset = new int[]{1, 10, 100, 1000, 10000};
 
     public int array2idx(int[] ip) {
         int cont = 0;
