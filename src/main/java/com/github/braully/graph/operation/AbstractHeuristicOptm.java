@@ -47,6 +47,8 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
 
     public boolean realizarPoda = false;
     protected boolean pularAvaliacaoOffset = false;
+    protected boolean rankMult = false;
+
     protected int[] pularAvaliacao = null;
     protected int[] degree = null;
 
@@ -106,7 +108,14 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
         if (tryMiminal2()) {
             sb.append(":tryMinimal2");
         }
+        if (rankMult) {
+            sb.append(":rankMult");
+        }
         return sb.toString();
+    }
+
+    public void setRankMult(boolean rankMult) {
+        this.rankMult = rankMult;
     }
 
     public int addVertToAux(Integer verti,
