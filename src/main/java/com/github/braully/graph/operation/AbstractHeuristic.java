@@ -6,7 +6,6 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.NEIGHBOOR_COUNT_INCLUDED;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -83,7 +82,8 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         this.verbose = verbose;
     }
 
-    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead, Set<Integer> tmp) {
+    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
+            Set<Integer> tmp) {
         Set<Integer> s = tmp;
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
@@ -105,12 +105,13 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             if (checkIfHullSet(graphRead, t)) {
                 s = t;
 //                if (verbose) {
-//                    System.out.println("Reduzido removido: " + v);
-//                    System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+//                System.out.println("Reduzido removido: " + v + " na posição " + cont + "/" + (tmp.size() - 1));
 //                }
                 if (cont > (tmp.size() / 2) && grafoconexo) {
-//                    System.out.println("Poda de v:  " + v + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
-
+//                    System.out.println("Poda de v:  " + v + " realizada depois de 50% em grafo conexo " + cont + "/" + (tmp.size() - 1));
+//                    System.out.println(" - Detalhes de v: "
+//                            + v + " degree: " + graphRead.degree(v) + " scount: "
+//                            + scount[v] + " kr:" + kr[v]);
                 }
             }
         }
@@ -169,7 +170,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                             continue;
                         }
                         if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                            aux[vertn] = aux[vertn] + 1;
                             if (aux[vertn] == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
                             }
@@ -195,7 +196,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                                 continue;
                             }
                             if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                                auxb[vertn] = auxb[vertn] + 1;
                                 if (auxb[vertn] == kr[vertn]) {
                                     mustBeIncluded.add(vertn);
                                 }
@@ -228,8 +229,13 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                             System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
                         }
                         if (cont > (tmp.size() / 2) && grafoconexo) {
-                            System.out.println("Poda dupla removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
-
+                            System.out.println("Poda dupla em grafo conexo removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
+                            System.out.println(" - Detalhes de v: "
+                                    + x + " degree: " + graphRead.degree(x) + " scount: "
+                                    + scount[x] + " kr:" + kr[x]);
+                            System.out.println(" - Detalhes de v: "
+                                    + y + " degree: " + graphRead.degree(y) + " scount: "
+                                    + scount[y] + " kr:" + kr[y]);
                         }
                         t.add(z);
                         s = t;
@@ -298,7 +304,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                             continue;
                         }
                         if (!vertn.equals(verti) && aux[vertn] <= K - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                            aux[vertn] = aux[vertn] + 1;
                             if (aux[vertn] == K) {
                                 mustBeIncluded.add(vertn);
                             }
@@ -326,7 +332,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                                 continue;
                             }
                             if (!vertn.equals(verti) && auxb[vertn] <= K - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                                auxb[vertn] = auxb[vertn] + 1;
                                 if (auxb[vertn] == K) {
                                     mustBeIncluded.add(vertn);
                                 }

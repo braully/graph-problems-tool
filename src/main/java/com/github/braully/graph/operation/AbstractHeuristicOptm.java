@@ -6,7 +6,6 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphCaratheodoryCheckSet.NEIGHBOOR_COUNT_INCLUDED;
 import static com.github.braully.graph.operation.GraphHNVOptm.getDescription;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -451,129 +450,44 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
     protected MapCountOpt mapCount;
     protected List<Integer> melhores = new ArrayList<Integer>();
 
-    public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
-            Set<Integer> tmp) {
-        int contVizinhoComum = 0;
-        int contSemVizinhoComum = 0;
-        Set<Integer> s = tmp;
-        List<Integer> ltmp = new ArrayList<>(tmp);
-        if (verbose) {
-            System.out.println("tentando reduzir-2-lite: " + s.size());
-//            System.out.println("s: " + s);
+    protected boolean isGreaterSimple(int... compare) {
+        boolean ret = false;
+        int i = 0;
+        while (i < compare.length - 2
+                && compare[i] == compare[i + 1]) {
+            i += 2;
         }
-        Collection<Integer> vertices = graphRead.getVertices();
-        int cont = 0;
-        for_p:
-        for (int h = 0; h < ltmp.size(); h++) {
-            Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
-                continue;
+        if (i <= compare.length - 2 && compare[i] > compare[i + 1]) {
+            ret = true;
+        }
+        return ret;
+    }
+
+    public Boolean isGreater(double... compare) {
+        Boolean ret = false;
+        int i = 0;
+        while (i < compare.length - 2 && compare[i] == compare[i + 1]) {
+            i += 2;
+        }
+        if (i <= compare.length - 2) {
+            if (compare[i] > compare[i + 1]) {
+                ret = true;
+            } else if (compare[i] == compare[i + 1]) {
+                ret = null;
             }
-            Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
-            for (int j = h + 1; j < ltmp.size(); j++) {
-                Integer y = ltmp.get(j);
-                Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
-                boolean xydisjoint = Collections.disjoint(nsX, nsY);
-                if (graphRead.degree(y) < kr[y]
-                        || y.equals(x)
-                        || !s.contains(y)
-                        || xydisjoint) {
-                    continue;
-                }
-                Set<Integer> t = new LinkedHashSet<>(s);
-                t.remove(x);
-                t.remove(y);
-
-                int contadd = 0;
-
-                int[] aux = new int[(Integer) graphRead.maxVertex() + 1];
-                for (int i = 0; i < aux.length; i++) {
-                    aux[i] = 0;
-                }
-
-                mustBeIncluded.clear();
-                for (Integer iv : t) {
-                    Integer v = iv;
-                    mustBeIncluded.add(v);
-                    aux[v] = kr[v];
-                }
-                while (!mustBeIncluded.isEmpty()) {
-                    Integer verti = mustBeIncluded.remove();
-                    contadd++;
-                    Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                    for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)) {
-                            continue;
-                        }
-                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                            if (aux[vertn] == kr[vertn]) {
-                                mustBeIncluded.add(vertn);
-                            }
-                        }
-                    }
-                    aux[verti] += kr[verti];
-                }
-//                Set<Integer> verticesTest = new LinkedHashSet<>(nsX);
-//                verticesTest.retainAll(nsY);
-                for (Integer z : vertices) {
-                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
-                        continue;
-                    }
-                    int contz = contadd;
-                    int[] auxb = (int[]) aux.clone();
-                    mustBeIncluded.add(z);
-                    auxb[z] = kr[z];
-                    while (!mustBeIncluded.isEmpty()) {
-                        Integer verti = mustBeIncluded.remove();
-                        contz++;
-                        Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                        for (Integer vertn : neighbors) {
-                            if (vertn.equals(verti)) {
-                                continue;
-                            }
-                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                                if (auxb[vertn] == kr[vertn]) {
-                                    mustBeIncluded.add(vertn);
-                                }
-                            }
-                        }
-                        auxb[verti] += kr[verti];
-                    }
-
-                    if (contz == vertices.size()) {
-                        if (verbose) {
-                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
-                            System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                        }
-                        if (cont > (tmp.size() / 2) && grafoconexo) {
-                            System.out.println("Poda dupla removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
-
-                        }
-                        t.add(z);
-                        s = t;
-                        ltmp = new ArrayList<>(s);
-//                        h--;
-                        h = 0;
-//                        h = h / 2;
-                        if (Collections.disjoint(graphRead.getNeighborsUnprotected(x), graphRead.getNeighborsUnprotected(y))) {
-                            contSemVizinhoComum++;
-                        } else {
-                            contVizinhoComum++;
-                        }
-                        continue for_p;
-                    }
-                }
-
-            }
-            cont++;
-
         }
-        if (contVizinhoComum != 0 || contSemVizinhoComum != 0) {
-            System.out.println("Minimal: sem vizinhos comum " + contSemVizinhoComum + " com vizinhos comuns " + contVizinhoComum);
+        return ret;
+    }
+
+    public List<Integer> getVertices(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
+        List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
+        if (sortByDegree) {
+            vertices.sort(Comparator
+                    .comparingInt((Integer v) -> -graphRead.degree(v))
+            //                .thenComparing(v -> -v)
+            );
         }
-        return s;
+        return vertices;
     }
 
     public Set<Integer> tryMinimal2Medium(UndirectedSparseGraphTO<Integer, Integer> graphRead,
@@ -630,7 +544,7 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
                             continue;
                         }
                         if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
-                            aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                            aux[vertn] = aux[vertn] + 1;
                             if (aux[vertn] == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
                             }
@@ -666,7 +580,7 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
                                 continue;
                             }
                             if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                                auxb[vertn] = auxb[vertn] + 1;
                                 if (auxb[vertn] == kr[vertn]) {
                                     mustBeIncluded.add(vertn);
                                 }
@@ -710,46 +624,6 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
             System.out.println("minimal lite: " + tmp.size() + "/" + s.size());
         }
         return s;
-    }
-
-    protected boolean isGreaterSimple(int... compare) {
-        boolean ret = false;
-        int i = 0;
-        while (i < compare.length - 2
-                && compare[i] == compare[i + 1]) {
-            i += 2;
-        }
-        if (i <= compare.length - 2 && compare[i] > compare[i + 1]) {
-            ret = true;
-        }
-        return ret;
-    }
-
-    public Boolean isGreater(double... compare) {
-        Boolean ret = false;
-        int i = 0;
-        while (i < compare.length - 2 && compare[i] == compare[i + 1]) {
-            i += 2;
-        }
-        if (i <= compare.length - 2) {
-            if (compare[i] > compare[i + 1]) {
-                ret = true;
-            } else if (compare[i] == compare[i + 1]) {
-                ret = null;
-            }
-        }
-        return ret;
-    }
-
-    public List<Integer> getVertices(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
-        List<Integer> vertices = new ArrayList<>((List<Integer>) graphRead.getVertices());
-        if (sortByDegree) {
-            vertices.sort(Comparator
-                    .comparingInt((Integer v) -> -graphRead.degree(v))
-            //                .thenComparing(v -> -v)
-            );
-        }
-        return vertices;
     }
 
 }

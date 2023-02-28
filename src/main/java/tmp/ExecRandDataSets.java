@@ -118,8 +118,9 @@ public class ExecRandDataSets {
         optm.setPularAvaliacaoOffset(true);
         optm.setSortByDegree(true);
 //        optm.setTryMinimal(false);
+//        optm.setRealizarPoda(true);
         optm.setTryMinimal();
-//        optm.setTryMinimal2();
+        optm.setTryMinimal2();
 //        optm.setParameter(GraphBigHNVOptm.pdeltaHsi, true);
 //        optm.setParameter(pdeltaHsi, true);
         if (true) {
@@ -350,7 +351,7 @@ public class ExecRandDataSets {
         }
         writer.flush();
         writer.close();
-        System.out.println("Resumo ");
+        System.out.println("\n\nResumo Global");
         for (int i = 1; i < operations.length; i++) {
             System.out.println("Operacao: " + operations[i].getName());
             System.out.println("Melhor: " + contMelhorGlobal);

@@ -397,8 +397,8 @@ public class GraphHNVOptmPoda
             s = tryMinimal(graphRead, s);
         }
         if (tryMiminal2()) {
-            s = tryMinimal2Lite(graphRead, s);
-//            s = tryMinimal2(graphRead, s);
+//            s = tryMinimal2Lite(graphRead, s);
+            s = tryMinimal2(graphRead, s);
         }
 //        s = tryMinimal2(graph, s);
         if (!checkIfHullSet(graphRead, s)) {
