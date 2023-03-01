@@ -29,6 +29,7 @@ import com.github.braully.graph.operation.AbstractHeuristic;
 import com.github.braully.graph.operation.AbstractHeuristicOptm;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsi;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdificuldadeTotal;
+import com.github.braully.graph.operation.GraphHNV;
 import com.github.braully.graph.operation.GraphHNVOptm;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
@@ -369,17 +370,18 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            //            "ca-GrQc", "ca-HepTh",
-            "ca-CondMat", //            "ca-HepPh",
-        //            "ca-AstroPh",
-        //            "Douban",
-        //            "Delicious",
-        //            "BlogCatalog3",
-        //            "BlogCatalog2",
-        //            "Livemocha",
-        //            "BlogCatalog",
-        //            "BuzzNet",
-        //            "Last.fm", //            "YouTube2"
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat",
+            "ca-HepPh",
+            "ca-AstroPh",
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
+            "BlogCatalog2",
+            "Livemocha",
+            "BlogCatalog",
+            "BuzzNet",
+            "Last.fm", //            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -438,18 +440,18 @@ public class ExecBigDataSets {
         optm2.setTryMinimal();
         optm2.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
         optm2.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
-
+        GraphHNV hnv2 = new GraphHNV();
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            //            tss, //            heur1,
+            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
             //            heur5t,
             //            tssg,
             //            heur5t2
-            optm,
-            optm2
-        };
+            //            optm,
+            //            optm2, 
+            hnv2};
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
@@ -466,8 +468,9 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            "k",
             "r",
+            "k",
+            //            "r",
             "m"
         }) {
             for (int k = 1; k <= 10; k++) {
@@ -480,6 +483,7 @@ public class ExecBigDataSets {
                     optm.setR(k);
                     tss.setR(k);
                     optm2.setR(k);
+                    hnv2.setR(k);
                     System.out.println("-------------\n\nR: " + k);
                 } else if (op.equals("m")) {
                     op = "m";
@@ -487,6 +491,7 @@ public class ExecBigDataSets {
                     optm.setMarjority(k);
                     optm2.setMarjority(k);
                     tss.setMarjority(k);
+                    hnv2.setMarjority(k);
                     System.out.println("-------------\n\nm: " + k);
                 } else {
                     op = "k";
@@ -494,6 +499,7 @@ public class ExecBigDataSets {
                     optm.setK(k);
                     optm2.setK(k);
                     tss.setK(k);
+                    hnv2.setK(k);
                     System.out.println("-------------\n\nk: " + k);
                 }
                 if (op.equals("m") && k == 1) {

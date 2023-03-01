@@ -184,7 +184,7 @@ public class ExecRandDataSets {
         Map<String, Boolean> piorou = new HashMap<>();
 
         for (int k = 2; k <= 10; k++) {
-            if (true) {
+            if (false) {
                 optm.setK(k);
                 tss.setK(k);
                 optmpoda.setK(k);
