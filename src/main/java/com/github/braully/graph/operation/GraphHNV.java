@@ -40,6 +40,11 @@ public class GraphHNV
         return description;
     }
 
+    @Override
+    public String getName() {
+        return "HHnV2:st:pa:tt2";
+    }
+
     public GraphHNV() {
     }
 
@@ -181,7 +186,7 @@ public class GraphHNV
                     grafoconexo = false;
                     continue;
                 }
-                if (pularAvaliacaoOffset && pularAvaliacao[i] >= sizeHs) {
+                if (pularAvaliacao[i] >= sizeHs) {
                     continue;
                 }
 
