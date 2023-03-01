@@ -565,6 +565,13 @@ public class GraphHNV
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
+        GraphHNV hnv2 = new GraphHNV();
+        System.out.println(
+                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+
+        UtilProccess.printStartTime();
+        buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
+        UtilProccess.printEndTime();
 
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
