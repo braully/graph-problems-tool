@@ -330,4 +330,10 @@ public class BFSUtil {
         int pos = calcPositionCompactMatrix(i, j);
         compactMatrix[pos] = value;
     }
+
+    public void clearBfs() {
+        for (int i = 0; i < bfs.length; i++) {
+            bfs[i] = null;
+        }
+    }
 }

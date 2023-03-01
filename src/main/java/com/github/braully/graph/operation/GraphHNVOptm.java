@@ -439,9 +439,10 @@ public class GraphHNVOptm
 
     public Set<Integer> buildOptimizedHullSet(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         List<Integer> vertices = getVertices(graphRead);
-        Set<Integer> hullSet = null;
+        Set<Integer> hullSet = new LinkedHashSet<>();
+        Set<Integer> s = new LinkedHashSet<>();
+
         Integer vl = null;
-        Set<Integer> sini = new LinkedHashSet<>();
         Integer maxVertex = (Integer) graphRead.maxVertex() + 1;
 
         int[] aux = new int[maxVertex];
@@ -450,8 +451,6 @@ public class GraphHNVOptm
         graup = new int[maxVertex];
         pularAvaliacao = new int[maxVertex];
         auxb = new int[maxVertex];
-
-        int offset = 0;
 
         for (int i = 0; i < maxVertex; i++) {
             aux[i] = 0;
@@ -469,7 +468,7 @@ public class GraphHNVOptm
             degree[v] = graphRead.degree(v);
             graup[v] = degree[v];
             if (degree[v] <= kr[v] - 1) {
-                sizeHs = sizeHs + addVertToS(v, sini, graphRead, aux);
+                sizeHs = sizeHs + addVertToS(v, s, graphRead, aux);
             }
             if (kr[v] == 0) {
                 sizeHs = sizeHs + addVertToAux(v, graphRead, aux);
@@ -484,13 +483,13 @@ public class GraphHNVOptm
                     continue;
                 }
                 if (graup[v] <= (kr[v] - aux[v]) - 1) {
-                    sizeHs = sizeHs + addVertToS(v, sini, graphRead, aux);
+                    sizeHs = sizeHs + addVertToS(v, s, graphRead, aux);
                 }
             }
         }
 
-        Set<Integer> s = new LinkedHashSet<>(sini);
         int vertexCount = graphRead.getVertexCount();
+        int offset = 0;
         if (verbose) {
 //            System.out.println("Sini-Size: " + sini.size());
 //            System.out.println("Sini: " + sini);
@@ -541,12 +540,15 @@ public class GraphHNVOptm
             if (bestVertice == -1) {
                 esgotado = true;
                 if (tryMiminal()) {
-                    s = tryMinimal(graphRead, s, sizeHs);
+                    s = tryMinimal(graphRead, s, sizeHs - offset);
                 }
                 if (tryMiminal2()) {
-                    s = tryMinimal2Lite(graphRead, s, sizeHs);
+                    s = tryMinimal2Lite(graphRead, s, sizeHs - offset);
                 }
-                offset = s.size();
+                offset = sizeHs;
+                hullSet.addAll(s);
+                s.clear();
+                bdls.clearBfs();
                 continue;
             }
             esgotado = false;
@@ -560,19 +562,14 @@ public class GraphHNVOptm
 
 //        System.out.println("Vertices de interesse[" + verticesInteresse.size() + "]: ");
         if (tryMiminal()) {
-            s = tryMinimal(graphRead, s, sizeHs);
+            s = tryMinimal(graphRead, s, sizeHs - offset);
         }
         if (tryMiminal2()) {
-            s = tryMinimal2Lite(graphRead, s, sizeHs);
+            s = tryMinimal2Lite(graphRead, s, sizeHs - offset);
 //            s = tryMinimal2(graphRead, s);
         }
-
-        hullSet = s;
-
-        if (hullSet == null) {
-            hullSet = sini;
-
-        }
+        hullSet.addAll(s);
+        s.clear();
         return hullSet;
     }
 
@@ -596,8 +593,13 @@ public class GraphHNVOptm
 
             int[] aux = auxb;
 
+            int maiorScount = 0;
+
             for (int i = 0; i < aux.length; i++) {
                 aux[i] = 0;
+                if (scount[i] > maiorScount) {
+                    maiorScount = scount[i];
+                }
             }
 
             mustBeIncluded.clear();
@@ -627,6 +629,9 @@ public class GraphHNVOptm
                 s = t;
 //                if (verbose) {
 //                System.out.println("Reduzido removido: " + v + " na posição " + cont + "/" + (tmp.size() - 1));
+                System.out.println(" - Detalhes de " + graphRead.getName() + " v: "
+                        + v + " degree: " + degree[v] + " scount: "
+                        + scount[v] + "/" + maiorScount + " kr:" + kr[v] + " posicao: " + cont + "/" + (s.size() - 1) + " " + grafoconexo);
 //                }
                 if (cont > (tmp.size() / 2) && grafoconexo) {
 //                    System.out.println("Poda de v:  " + v + " realizada depois de 50% em grafo conexo " + cont + "/" + (tmp.size() - 1));
@@ -680,8 +685,7 @@ public class GraphHNVOptm
                 if (graphRead.degree(y) < kr[y]
                         || y.equals(x)
                         || !s.contains(y)
-                        || xydisjoint
-                        ) {
+                        || xydisjoint) {
                     continue;
                 }
                 Set<Integer> t = new LinkedHashSet<>(s);
