@@ -118,7 +118,6 @@ public class GraphHNV
         Set<Integer> hullSet = new LinkedHashSet<>();
         Set<Integer> s = new LinkedHashSet<>();
 
-        Integer vl = null;
         Integer maxVertex = (Integer) graphRead.maxVertex() + 1;
 
         int[] aux = new int[maxVertex];
@@ -133,11 +132,8 @@ public class GraphHNV
             scount[i] = 0;
 
         }
-        grafoconexo = true;
         initKr(graphRead);
-        if (sortByDegree) {
 
-        }
         int sizeHs = 0;
         for (Integer v : vertices) {
             degree[v] = graphRead.degree(v);
@@ -183,7 +179,6 @@ public class GraphHNV
                 }
                 int profundidadeS = bdls.getDistanceSafe(graphRead, i);
                 if (profundidadeS == -1 && (sizeHs > 0 && !esgotado)) {
-                    grafoconexo = false;
                     continue;
                 }
                 if (pularAvaliacao[i] >= sizeHs) {
@@ -215,9 +210,7 @@ public class GraphHNV
                     Integer verti = mustBeIncluded.remove();
                     Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
                     for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)
-                                || vertn.equals(i)
-                                || (aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
+                        if ((aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
                             continue;
                         }
                         Integer inc = mapCount.inc(vertn);
@@ -351,10 +344,7 @@ public class GraphHNV
                 contadd++;
                 Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
                 for (Integer vertn : neighbors) {
-                    if (vertn.equals(verti)) {
-                        continue;
-                    }
-                    if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
+                    if (aux[vertn] <= kr[vertn] - 1) {
                         aux[vertn] = aux[vertn] + 1;
                         if (aux[vertn] == kr[vertn]) {
                             mustBeIncluded.add(vertn);
@@ -384,7 +374,6 @@ public class GraphHNV
                 verticesElegiveis.add(v);
             }
         }
-        int cont = 0;
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
 
@@ -398,8 +387,7 @@ public class GraphHNV
                 Integer y = ltmp.get(j);
                 Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
                 boolean xydisjoint = Collections.disjoint(nsX, nsY);
-                if (graphRead.degree(y) < kr[y]
-                        || y.equals(x)
+                if (degree[y] < kr[y]
                         || !s.contains(y)
                         || xydisjoint) {
                     continue;
@@ -427,10 +415,7 @@ public class GraphHNV
                     contadd++;
                     Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
                     for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)) {
-                            continue;
-                        }
-                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
+                        if (aux[vertn] <= kr[vertn] - 1) {
                             aux[vertn] = aux[vertn] + 1;
                             if (aux[vertn] == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
@@ -439,33 +424,29 @@ public class GraphHNV
                     }
                     aux[verti] += kr[verti];
                 }
-//                Set<Integer> verticesTest = new LinkedHashSet<>(nsX);
-//                verticesTest.retainAll(nsY);
-//                for (Integer z : vertices) {
                 for (Integer z : verticesElegiveis) {
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
                     int contz = contadd;
-                    int[] auxb = (int[]) aux.clone();
+
+                    mapCount.clear();
+                    mapCount.setVal(z, kr[z]);
                     mustBeIncluded.add(z);
-                    auxb[z] = kr[z];
+
                     while (!mustBeIncluded.isEmpty()) {
                         Integer verti = mustBeIncluded.remove();
                         contz++;
                         Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
                         for (Integer vertn : neighbors) {
-                            if (vertn.equals(verti)) {
+                            if ((aux[vertn] + mapCount.getCount(vertn)) >= kr[vertn]) {
                                 continue;
                             }
-                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + 1;
-                                if (auxb[vertn] == kr[vertn]) {
-                                    mustBeIncluded.add(vertn);
-                                }
+                            Integer inc = mapCount.inc(vertn);
+                            if ((inc + aux[vertn]) == kr[vertn]) {
+                                mustBeIncluded.add(vertn);
                             }
                         }
-                        auxb[verti] += kr[verti];
                     }
 
                     if (contz == tamanhoAlvo) {
@@ -480,8 +461,6 @@ public class GraphHNV
                 }
 
             }
-            cont++;
-
         }
         return s;
     }
@@ -570,6 +549,7 @@ public class GraphHNV
                 "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
         UtilProccess.printStartTime();
+        hnv2.setR(7);
         buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
 
@@ -773,131 +753,4 @@ public class GraphHNV
         return map.values();
     }
 
-    public Set<Integer> tryMinimalH(UndirectedSparseGraphTO<Integer, Integer> graphRead,
-            Set<Integer> tmp) {
-        Set<Integer> s = tmp;
-        List<Integer> ltmp = new ArrayList<>(tmp);
-        if (verbose) {
-            System.out.println("tentando reduzir-h: " + s.size());
-//            System.out.println("s: " + s);
-        }
-        Collection<Integer> vertices = graphRead.getVertices();
-        int cont = 0;
-        for_p:
-        for (int h = 0; h < ltmp.size(); h++) {
-            Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < kr[x]
-                    || !s.contains(x)) {
-                continue;
-            }
-            for (int j = h + 1; j < ltmp.size(); j++) {
-                Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < kr[y] || y.equals(x)
-                        || !s.contains(y)) {
-                    continue;
-                }
-                Set<Integer> t = new LinkedHashSet<>(s);
-                t.remove(x);
-                t.remove(y);
-
-                int contadd = 0;
-
-                int[] aux = new int[(Integer) graphRead.maxVertex() + 1];
-                for (int i = 0; i < aux.length; i++) {
-                    aux[i] = 0;
-                }
-
-                Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-                for (Integer iv : t) {
-                    Integer v = iv;
-                    mustBeIncluded.add(v);
-                    aux[v] = kr[v];
-                }
-                while (!mustBeIncluded.isEmpty()) {
-                    Integer verti = mustBeIncluded.remove();
-                    contadd++;
-                    Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                    for (Integer vertn : neighbors) {
-                        if (vertn.equals(verti)) {
-                            continue;
-                        }
-                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
-                            aux[vertn] = aux[vertn] + 1;
-                            if (aux[vertn] == kr[vertn]) {
-                                mustBeIncluded.add(vertn);
-                            }
-                        }
-                    }
-                    aux[verti] += kr[verti];
-                }
-
-                for (Integer z : vertices) {
-                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
-                        continue;
-                    }
-                    int contz = contadd;
-                    int[] auxb = (int[]) aux.clone();
-                    mustBeIncluded.add(z);
-                    auxb[z] = kr[z];
-                    while (!mustBeIncluded.isEmpty()) {
-                        Integer verti = mustBeIncluded.remove();
-                        contz++;
-                        Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
-                        for (Integer vertn : neighbors) {
-                            if (vertn.equals(verti)) {
-                                continue;
-                            }
-                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
-                                auxb[vertn] = auxb[vertn] + 1;
-                                if (auxb[vertn] == kr[vertn]) {
-                                    mustBeIncluded.add(vertn);
-                                }
-                            }
-                        }
-                        auxb[verti] += kr[verti];
-                    }
-
-                    if (contz == vertices.size()) {
-                        if (verbose) {
-                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
-                            if (scount != null) {
-                                Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
-                                Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
-                                Collection<Integer> nsZ = graphRead.getNeighborsUnprotected(z);
-                                System.out.print("Count s: " + x + ": "
-                                        + scount[x] + " " + y + ": " + scount[y]
-                                        + " adicionado " + z + ": " + scount[z]);
-                                if (Collections.disjoint(nsX, nsY)) {
-                                    System.out.print(" ... é disjunto");
-                                } else {
-                                    System.out.print(" ... tem vizinhos comuns");
-                                }
-                                if (Collections.disjoint(nsZ, nsY) && Collections.disjoint(nsZ, nsX)) {
-                                    System.out.println(" ... z é independente");
-                                } else {
-                                    System.out.println(" ... z intercept x ou y");
-                                }
-                            }
-                            System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
-                        }
-                        if (cont > (tmp.size() / 2) && grafoconexo) {
-                            System.out.println("Poda dupla removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
-
-                        }
-                        t.add(z);
-                        s = t;
-                        ltmp = new ArrayList<>(s);
-//                        h--;
-                        h = 0;
-//                        h = h / 2;
-                        continue for_p;
-                    }
-                }
-
-            }
-            cont++;
-
-        }
-        return s;
-    }
 }
