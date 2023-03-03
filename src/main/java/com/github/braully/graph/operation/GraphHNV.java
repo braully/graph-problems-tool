@@ -313,10 +313,10 @@ public class GraphHNV
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
-//        if (verbose) {
-//            System.out.println("tentando reduzir: " + s.size());
-////            System.out.println("s: " + s);
-//        }
+        if (verbose) {
+            System.out.println("tentando reduzir: " + s.size());
+//            System.out.println("s: " + s);
+        }
         for (Integer v : tmp) {
             if (graphRead.degree(v) < kr[v]) {
                 continue;
@@ -371,10 +371,10 @@ public class GraphHNV
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
-//        if (verbose) {
-//            System.out.println("tentando reduzir-2-lite: " + s.size() + " tamanho alvo: " + tamanhoAlvo);
-////            System.out.println("s: " + s);
-//        }
+        if (verbose) {
+            System.out.println("tentando reduzir-2-lite: " + s.size() + " tamanho alvo: " + tamanhoAlvo);
+//            System.out.println("s: " + s);
+        }
         List<Integer> ltmp = new ArrayList<>(tmp);
         Collection<Integer> vertices = graphRead.getVertices();
         List<Integer> verticesElegiveis = new ArrayList<>();
@@ -577,7 +577,7 @@ public class GraphHNV
 
         GraphHNV hnv2 = new GraphHNV();
         hnv2.setVerbose(true);
-        hnv2.setR(3);
+        hnv2.setR(10);
         UtilProccess.printStartTime();
         buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();

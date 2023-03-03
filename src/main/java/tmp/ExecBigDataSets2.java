@@ -29,6 +29,7 @@ import com.github.braully.graph.operation.AbstractHeuristic;
 import com.github.braully.graph.operation.AbstractHeuristicOptm;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsi;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdificuldadeTotal;
+import com.github.braully.graph.operation.GraphHNV;
 import com.github.braully.graph.operation.GraphHNVOptm;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
@@ -64,18 +65,18 @@ public class ExecBigDataSets2 {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            //            "ca-GrQc", "ca-HepTh",
-            //                        "ca-CondMat",
-            //            "ca-HepPh",
-            //            "ca-AstroPh", //            "Douban",
-            //            "Delicious",
-            //            "BlogCatalog3",
-            //            "BlogCatalog2",
-            //            "Livemocha",
-            //            "BlogCatalog",
-            //            "BuzzNet",
-            //                    "Last.fm", 
-            "YouTube2"
+            "ca-GrQc", "ca-HepTh",
+            "ca-CondMat",
+            "ca-HepPh",
+            "ca-AstroPh",
+            "Douban",
+            "Delicious",
+            "BlogCatalog3",
+            "BlogCatalog2",
+            "Livemocha",
+            "BlogCatalog",
+            "BuzzNet",
+            "Last.fm", //            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -125,6 +126,7 @@ public class ExecBigDataSets2 {
 //        optm.setParameter(GraphBigHNVOptm.pbonusTotal, false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
+        GraphHNV hnv2 = new GraphHNV();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             tss, //            heur1,
@@ -134,7 +136,8 @@ public class ExecBigDataSets2 {
             //            heur5t,
             //            tssg,
             //            heur5t2
-            optm
+            //            optm
+            hnv2
         };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
@@ -152,8 +155,8 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-//            "r",
             "k",
+            "r",
             "m",}) {
             for (int k = 10; k >= 1; k--) {
 //            heur1.K = heur2.K = heur3.K
@@ -164,18 +167,25 @@ public class ExecBigDataSets2 {
                     heur5t2.setR(k);
                     optm.setR(k);
                     tss.setR(k);
+                    hnv2.setR(k);
                     System.out.println("-------------\n\nR: " + k);
+                    if (k <= 2) {
+                        System.out.println("Pulando resultados já processados: " + op + " " + k);
+                        continue;
+                    }
                 } else if (op.equals("m")) {
                     op = "m";
                     heur5t2.setMarjority(k);
                     optm.setMarjority(k);
                     tss.setMarjority(k);
+                    hnv2.setMarjority(k);
                     System.out.println("-------------\n\nm: " + k);
                 } else {
                     op = "k";
                     heur5t2.setK(k);
                     optm.setK(k);
                     tss.setK(k);
+                    hnv2.setK(k);
                     System.out.println("-------------\n\nk: " + k);
                 }
                 if (op.equals("m") && k == 1) {
