@@ -454,7 +454,7 @@ public class GraphHNV
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
-                    if (pularAvaliacaoOffset && pularAvaliacao[z] >= contadd) {
+                    if (pularAvaliacao[z] >= contadd) {
                         continue;
                     }
 
