@@ -34,7 +34,6 @@ public class GraphHNV
     private static final Logger log = Logger.getLogger(GraphHNV.class);
 
     static final String description = "HHnV2-final";
-    int etapaVerbose = -1;
 
     public static String getDescription() {
         return description;
@@ -314,6 +313,10 @@ public class GraphHNV
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
+//        if (verbose) {
+//            System.out.println("tentando reduzir: " + s.size());
+////            System.out.println("s: " + s);
+//        }
         for (Integer v : tmp) {
             if (graphRead.degree(v) < kr[v]) {
                 continue;
@@ -358,13 +361,20 @@ public class GraphHNV
                 s = t;
             }
         }
+//        if (verbose) {
+//            System.out.println("reduzido para: " + s.size());
+////            System.out.println("s: " + s);
+//        }
         return s;
     }
 
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
-
+//        if (verbose) {
+//            System.out.println("tentando reduzir-2-lite: " + s.size() + " tamanho alvo: " + tamanhoAlvo);
+////            System.out.println("s: " + s);
+//        }
         List<Integer> ltmp = new ArrayList<>(tmp);
         Collection<Integer> vertices = graphRead.getVertices();
         List<Integer> verticesElegiveis = new ArrayList<>();
@@ -374,14 +384,23 @@ public class GraphHNV
                 verticesElegiveis.add(v);
             }
         }
+
+//        if (verbose) {
+//            System.out.println("vertices elegiveis " + verticesElegiveis.size());
+////            System.out.println("s: " + s);
+//        }
+
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
 
         for (int h = 0; h < ltmp.size(); h++) {
             Integer x = ltmp.get(h);
-            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
+            if (degree[x] < kr[x] || !s.contains(x)) {
                 continue;
             }
+//            if (verbose) {
+//                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
+//            }
             Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
             for (int j = h + 1; j < ltmp.size(); j++) {
                 Integer y = ltmp.get(j);
@@ -392,6 +411,10 @@ public class GraphHNV
                         || xydisjoint) {
                     continue;
                 }
+
+//                if (verbose) {
+//                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
+//                }
                 Set<Integer> t = new LinkedHashSet<>(s);
                 t.remove(x);
                 t.remove(y);
@@ -402,6 +425,7 @@ public class GraphHNV
 
                 for (int i = 0; i < aux.length; i++) {
                     aux[i] = 0;
+                    pularAvaliacao[i] = -1;
                 }
 
                 mustBeIncluded.clear();
@@ -424,10 +448,16 @@ public class GraphHNV
                     }
                     aux[verti] += kr[verti];
                 }
+                int c = 0;
                 for (Integer z : verticesElegiveis) {
+                    c++;
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
+                    if (pularAvaliacaoOffset && pularAvaliacao[z] >= contadd) {
+                        continue;
+                    }
+
                     int contz = contadd;
 
                     mapCount.clear();
@@ -445,9 +475,14 @@ public class GraphHNV
                             Integer inc = mapCount.inc(vertn);
                             if ((inc + aux[vertn]) == kr[vertn]) {
                                 mustBeIncluded.add(vertn);
+                                pularAvaliacao[vertn] = contadd;
                             }
                         }
                     }
+
+//                    if (verbose) {
+//                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1) + " contz: " + contz + "/" + tamanhoAlvo);
+//                    }
 
                     if (contz == tamanhoAlvo) {
                         t.add(z);
@@ -478,7 +513,7 @@ public class GraphHNV
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNV op = new GraphHNV();
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -514,194 +549,42 @@ public class GraphHNV
 //        if (!checkIfHullSet) {
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
-        List<String> parametros = new ArrayList<>();
-        parametros.addAll(List.of(
-                pdeltaHsi, pdeltaParcial,
-                pdificuldadeTotal, pdificuldadeParcial,
-                pbonusTotal, pbonusParcial,
-                //                pbonusTotalNormalizado, 
-                //                pbonusParcialNormalizado,
-                pprofundidadeS, pgrau,
-                paux,
-                pdeltaHsixdificuldadeTotal
-        //        , pgrau, paux
-        ));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/BuzzNet.txt"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv")
+        );
+
         GraphTSSCordasco tss = new GraphTSSCordasco();
         op.map.put(0, new int[0]);
         op.setPularAvaliacaoOffset(true);
         op.setTryMinimal();
         op.setTryMinimal2();
         op.setSortByDegree(true);
-        op.setR(7);
-//        op.setRankMult(true);
-//        op.setRealizarPoda(true);
+        op.setR(2);
 
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
+        op.setVerbose(true);
         Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
 
         System.out.println("num conected comps: " + connectedComponents.size());
+        Set<Integer> buildOptimizedHullSet = null;
+        //
+//        UtilProccess.printStartTime();
+//        buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
+//        UtilProccess.printEndTime();
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
-        UtilProccess.printEndTime();
         GraphHNV hnv2 = new GraphHNV();
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
+        hnv2.setVerbose(true);
+        hnv2.setR(3);
         UtilProccess.printStartTime();
-        hnv2.setR(7);
         buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
 
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
-//        op.resetParameters();
-        int totalGlobal = 0;
-        int melhorGlobal = 0;
-        int piorGlobal = 0;
-
-//        if (true) {
-//            return;
-//        }
-//        String strFile = "hog-graphs-ge20-le50-ordered.g6";
-        String strFile = "database/grafos-rand-densall-n50-150.txt";
-
-        for (int t = 3; t <= 5; t++) //
-        {
-            System.out.println("Testando ciclo: " + t);
-
-            for (int r = 10; r >= 7; r--) {
-                BufferedReader files = new BufferedReader(new FileReader(strFile));
-                String line = null;
-                int cont = 0;
-                MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100000);
-
-                while (null != (line = files.readLine())) {
-                    graph = UtilGraph.loadGraphES(line);
-//                    op.setK(r);
-                    op.setR(r);
-                    tss.setR(r);
-                    Set<Integer> tssCordasco = tss.tssCordasco(graph);
-                    Integer melhor = tssCordasco.size();
-                    List<int[]> melhores = new ArrayList<>();
-                    melhores.add(new int[0]);
-
-//                for (int ip = 0; ip < allParameters.size(); ip++) {
-                    Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(parametros.size(), t);
-                    while (combinationsIterator.hasNext()) {
-
-                        int[] currentSet = combinationsIterator.next();
-//                        op.setPularAvaliacaoOffset(true);
-                        op.resetParameters();
-                        for (int ip : currentSet) {
-                            String p = parametros.get(ip);
-                            op.setParameter(p, true);
-                        }
-                        Set<Integer> optmHullSet = op.buildOptimizedHullSet(graph);
-                        String name = op.getName();
-                        int res = optmHullSet.size();
-                        String out = "R\t g" + cont++ + "\t r"
-                                + r + "\t" + name
-                                + "\t" + res + "\n";
-                        if (melhor == null) {
-                            melhor = res;
-                            melhores.add(currentSet);
-                        } else if (melhor == res) {
-                            melhores.add(currentSet);
-                        } else if (melhor > res) {
-                            melhor = res;
-                            melhores.clear();
-                            melhores.add(currentSet);
-                        }
-
-                        if (t > 1) {
-                            int[] currentRerverse = currentSet.clone();
-                            for (int i = 0; i < currentSet.length; i++) {
-                                currentRerverse[i] = currentSet[(currentSet.length - 1) - i];
-                            }
-//                        op.setPularAvaliacaoOffset(false);
-                            op.resetParameters();
-                            for (int ip : currentRerverse) {
-                                String p = parametros.get(ip);
-                                op.setParameter(p, true);
-                            }
-                            optmHullSet = op.buildOptimizedHullSet(graph);
-                            name = op.getName();
-                            int res2 = optmHullSet.size();
-                            out = "R\t g" + cont++ + "\t r"
-                                    + r + "\t" + name
-                                    + "\t" + res2 + "\n";
-                            if (melhor == null) {
-                                melhor = res2;
-                                melhores.add(currentRerverse);
-                            } else if (melhor == res2) {
-                                melhores.add(currentRerverse);
-                            } else if (melhor > res2) {
-                                melhor = res2;
-                                melhores.clear();
-                                melhores.add(currentRerverse);
-                            }
-//                        if (res != res2) {
-//                            System.out.print("Diferença nos resultados pra o parametro: ");
-//                            for (int s : currentSet) {
-//                                System.out.print(parametros.get(s));
-//                            }
-//                            System.out.println();
-//                            System.out.println(res + "!=" + res2);
-//                        }
-                        }
-                    }
-//                for (Integer i : melhores) {
-                    for (int[] ip : melhores) {
-                        int i = op.array2idx(ip);
-                        contMelhor.inc(i);
-                    }
-                    cont++;
-                }
-                files.close();
-                System.out.println("\n---------------");
-                System.out.println("Resumo r:" + r + " toal de grafos: " + cont);
-                op.resetParameters();
-                System.out.println("Otimizações iniciais: " + op.getName());
-
-                Map<String, Integer> map = new HashMap<>();
-//            for (int ip = 0; ip < allParameters.size(); ip++) {
-//                String p = allParameters.get(ip);
-////                System.out.println(p + ": " + contMelhor.getCount(ip));
-//                map.put(p, contMelhor.getCount(ip));
-//            }
-                for (int[] i : op.allarrays()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int ip : i) {
-                        String get = parametros.get(ip);
-                        sb.append(get);
-//                    String p = allParameters.get(ip);
-                        sb.append("-");
-//                System.out.println(p + ": " + contMelhor.getCount(ip));
-                    }
-                    if (sb.length() == 0) {
-                        sb.append("tss");
-                    }
-                    map.put(sb.toString(), contMelhor.getCount(op.array2idx(i)));
-                }
-                List<Entry<String, Integer>> entrySet = new ArrayList<>(map.entrySet());
-                entrySet.sort(
-                        Comparator.comparingInt(
-                                (Entry<String, Integer> v) -> -v.getValue()
-                        )
-                                .thenComparing(v -> v.getKey())
-                );
-                for (Entry<String, Integer> e : entrySet) {
-                    String p = e.getKey();
-                    System.out.println(p + ": " + e.getValue());
-                }
-//            for (int ip = 0; ip < allParameters.size(); ip++) {
-//                String p = allParameters.get(ip);
-//                System.out.println(p + ": " + contMelhor.getCount(ip));
-//            }
-            }
-        }
     }
 
     private static int apply(GraphHNV op, int[] currentSet, UndirectedSparseGraphTO<Integer, Integer> graph, int cont, int r, Integer melhor, List<int[]> melhores1) {

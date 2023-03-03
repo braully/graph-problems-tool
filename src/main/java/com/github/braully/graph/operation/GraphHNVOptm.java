@@ -657,7 +657,7 @@ public class GraphHNVOptm
 
         List<Integer> ltmp = new ArrayList<>(tmp);
         if (verbose) {
-            System.out.println("tentando reduzir-2-lite: " + s.size());
+            System.out.println("tentando reduzir-2-lite: " + s.size() + " tamanho alvo: " + tamanhoAlvo);
 //            System.out.println("s: " + s);
         }
         Collection<Integer> vertices = graphRead.getVertices();
@@ -668,6 +668,10 @@ public class GraphHNVOptm
                 verticesElegiveis.add(v);
             }
         }
+        if (verbose) {
+            System.out.println("vertices elegiveis " + verticesElegiveis.size());
+//            System.out.println("s: " + s);
+        }
         int cont = 0;
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
@@ -676,6 +680,9 @@ public class GraphHNVOptm
             Integer x = ltmp.get(h);
             if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
                 continue;
+            }
+            if (verbose) {
+                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
             }
             Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
             for (int j = h + 1; j < ltmp.size(); j++) {
@@ -688,6 +695,9 @@ public class GraphHNVOptm
                         || xydisjoint) {
                     continue;
                 }
+                if (verbose) {
+                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
+                }
                 Set<Integer> t = new LinkedHashSet<>(s);
                 t.remove(x);
                 t.remove(y);
@@ -698,6 +708,7 @@ public class GraphHNVOptm
 
                 for (int i = 0; i < aux.length; i++) {
                     aux[i] = 0;
+                    pularAvaliacao[i] = -1;
                 }
 
                 mustBeIncluded.clear();
@@ -726,9 +737,17 @@ public class GraphHNVOptm
 //                Set<Integer> verticesTest = new LinkedHashSet<>(nsX);
 //                verticesTest.retainAll(nsY);
 //                for (Integer z : vertices) {
+                int c = 0;
                 for (Integer z : verticesElegiveis) {
+                    c++;
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
+                    }
+                    if (pularAvaliacaoOffset && pularAvaliacao[z] >= contadd) {
+                        continue;
+                    }
+                    if (verbose) {
+                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1));
                     }
                     int contz = contadd;
                     int[] auxb = (int[]) aux.clone();
@@ -746,6 +765,7 @@ public class GraphHNVOptm
                                 auxb[vertn] = auxb[vertn] + 1;
                                 if (auxb[vertn] == kr[vertn]) {
                                     mustBeIncluded.add(vertn);
+                                    pularAvaliacao[vertn] = contadd;
                                 }
                             }
                         }
@@ -847,6 +867,9 @@ public class GraphHNVOptm
 //        if (!checkIfHullSet) {
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv"));
         List<String> parametros = new ArrayList<>();
         parametros.addAll(List.of(
                 pdeltaHsi, pdeltaParcial,
@@ -865,7 +888,8 @@ public class GraphHNVOptm
         op.setTryMinimal();
         op.setTryMinimal2();
         op.setSortByDegree(true);
-        op.setR(7);
+        op.setR(3);
+//        op.setVerbose(true);
 //        op.setRankMult(true);
 //        op.setRealizarPoda(true);
 
