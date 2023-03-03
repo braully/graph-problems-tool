@@ -448,9 +448,9 @@ public class GraphHNV
                     }
                     aux[verti] += kr[verti];
                 }
-                int c = 0;
+//                int c = 0;
                 for (Integer z : verticesElegiveis) {
-                    c++;
+//                    c++;
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
