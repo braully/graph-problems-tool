@@ -61,8 +61,6 @@ import util.UtilProccess;
  */
 public class ExecBigDataSets2 {
 
-    public static final Map<String, int[]> resultadoArquivado = new HashMap<>();
-
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
             "ca-GrQc", "ca-HepTh",
@@ -215,7 +213,7 @@ public class ExecBigDataSets2 {
 //                    PropertyUtils.setSimpleProperty(operations[i], "K", k);
                         System.out.println("*************");
                         System.out.print(" - EXEC: " + operations[i].getName() + "-" + op + ": " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
-                        int[] get = resultadoArquivado.get(arquivadoStr);
+                        int[] get = ExecBigDataSets.resultadoArquivado.get(arquivadoStr);
                         if (get != null) {
                             result[i] = get[0];
                             totalTime[i] = get[1];
