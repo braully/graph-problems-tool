@@ -373,7 +373,10 @@ public class GraphHNV
         List<Integer> verticesElegiveis = new ArrayList<>();
         for (Integer v : vertices) {
             Integer distance = bdls.getDistance(graphRead, v);
-            if (!s.contains(v) && distance != null && distance <= 1 && scount[v] < kr[v]) {
+            if (!s.contains(v) && distance != null 
+                    && distance <= 1
+//                    && scount[v] < kr[v]
+                    ) {
                 verticesElegiveis.add(v);
             }
         }

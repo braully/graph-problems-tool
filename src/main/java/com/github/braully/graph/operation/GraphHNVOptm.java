@@ -681,8 +681,8 @@ public class GraphHNVOptm
         tamanhoReduzido = tmp.size() - s.size();
 
         if (tamanhoReduzido > 0) {
-            bdls.clearBfs();
-            bdls.labelDistances(graphRead, s);
+//            bdls.clearBfs();
+//            bdls.labelDistances(graphRead, s);
         }
 
         if (verbose) {
@@ -728,7 +728,8 @@ public class GraphHNVOptm
             Integer distance = bdls.getDistance(graphRead, v);
             if (!s.contains(v) && distance != null
                     && distance <= 1
-                    && scount[v] < kr[v]) {
+//                    && scount[v] < kr[v]
+                    ) {
                 verticesElegiveis.add(v);
             }
         }
@@ -752,15 +753,13 @@ public class GraphHNVOptm
             }
             Collection<Integer> nsY = new LinkedHashSet<>();
             for (Integer ny : graphRead.getNeighborsUnprotected(x)) {
-                if (!s.contains(ny) 
-                        && scount[ny] < kr[ny] + 1) {
+                if (scount[ny] < kr[ny] + 1) {
                     nsY.add(ny);
                 }
             }
             for (int j = h + 1; j < ltmp.size(); j++) {
                 Integer y = ltmp.get(j);
-                if (graphRead.degree(y) < kr[y]
-                        || y.equals(x)
+                if (degree[y] < kr[y]
                         || !s.contains(y)) {
                     continue;
                 }
@@ -880,17 +879,21 @@ public class GraphHNVOptm
 //                                    + bdls.getDistance(graphRead, z));
                         }
 
-                        int menortRef = menorT + tamanhoReduzido;
-                        System.out.println(" - Detalhes de z: "
-                                + z + " degree: " + degree[z] + " scount: "
-                                + scount[z] + " degreexy:" + degree[x] + "/" + degree[y]
-                                + " " + " scountxy: " + scount[x] + "/" + scount[y]
-                                + " tamt x/y: " + tamanhoT.get(x) + "/" + tamanhoT.get(y)
-                                + " [" + menorT + "," + menortRef + "," + maiorT + "] " + " está no menor "
-                                + (tamanhoT.get(x) <= menortRef || tamanhoT.get(y) <= menortRef)
-                        //+ " distancia de s: "
-                        //                                + bdls.getDistance(graphRead, z)
-                        );
+                        try {
+                            int menortRef = menorT + tamanhoReduzido;
+                            System.out.println(" - Detalhes de z: "
+                                    + z + " degree: " + degree[z] + " scount: "
+                                    + scount[z] + " degreexy:" + degree[x] + "/" + degree[y]
+                                    + " " + " scountxy: " + scount[x] + "/" + scount[y]
+                                    + " tamt x/y: " + tamanhoT.get(x) + "/" + tamanhoT.get(y)
+                                    + " [" + menorT + "," + menortRef + "," + maiorT + "] " + " está no menor "
+                                    + (tamanhoT.get(x) <= menortRef || tamanhoT.get(y) <= menortRef)
+                            //+ " distancia de s: "
+                            //                                + bdls.getDistance(graphRead, z)
+                            );
+                        } catch (Exception e) {
+
+                        }
 
                         t.add(z);
                         s = t;
@@ -987,8 +990,8 @@ public class GraphHNVOptm
         op.setTryMinimal();
         op.setTryMinimal2();
         op.setSortByDegree(true);
-        op.setR(7);
-        op.setVerbose(true);
+        op.setR(10);
+//        op.setVerbose(true);
 //        op.setRankMult(true);
 //        op.setRealizarPoda(true);
 
