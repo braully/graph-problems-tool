@@ -29,6 +29,7 @@ import com.github.braully.graph.operation.AbstractHeuristic;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pbonusParcial;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsi;
 import static com.github.braully.graph.operation.AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal;
+import com.github.braully.graph.operation.GraphHNV;
 import com.github.braully.graph.operation.GraphHNVOptm;
 import com.github.braully.graph.operation.GraphHNVOptmPoda;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
@@ -151,6 +152,7 @@ public class ExecRandDataSets {
 //        optm.setParameter(GraphBigHNVOptm.pbonusTotal, false);
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
+        GraphHNV hnv2 = new GraphHNV();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             //                        optm,
@@ -160,7 +162,8 @@ public class ExecRandDataSets {
             //            heur5,
             //            heur5t,
             //            tssg,
-            //            heur5t2, 
+            //            heur5t2,
+//            hnv2
             optm
 //            optmpoda
         };
@@ -189,11 +192,13 @@ public class ExecRandDataSets {
                 tss.setK(k);
                 optmpoda.setK(k);
                 heur5t2.setK(k);
+                hnv2.setK(k);
             } else {
                 optm.setR(k);
                 tss.setR(k);
                 optmpoda.setR(k);
                 heur5t2.setR(k);
+                hnv2.setR(k);
             }
             System.out.println("-------------\n\nR: " + k);
 

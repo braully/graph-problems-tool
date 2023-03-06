@@ -4,25 +4,18 @@ import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_SET;
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 import util.BFSUtil;
 import util.MapCountOpt;
@@ -380,15 +373,15 @@ public class GraphHNV
         List<Integer> verticesElegiveis = new ArrayList<>();
         for (Integer v : vertices) {
             Integer distance = bdls.getDistance(graphRead, v);
-            if (!s.contains(v) && distance != null && distance <= 1) {
+            if (!s.contains(v) && distance != null && distance <= 1 && scount[v] < kr[v]) {
                 verticesElegiveis.add(v);
             }
         }
 
-//        if (verbose) {
-//            System.out.println("vertices elegiveis " + verticesElegiveis.size());
-////            System.out.println("s: " + s);
-//        }
+        if (verbose) {
+            System.out.println("vertices elegiveis " + verticesElegiveis.size());
+//            System.out.println("s: " + s);
+        }
 
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
@@ -398,10 +391,17 @@ public class GraphHNV
             if (degree[x] < kr[x] || !s.contains(x)) {
                 continue;
             }
-//            if (verbose) {
-//                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
-//            }
-            Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
+            if (verbose) {
+                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
+            }
+//            Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
+            Collection<Integer> nsY = new LinkedHashSet<>();
+            for (Integer ny : graphRead.getNeighborsUnprotected(x)) {
+                if (!s.contains(ny)
+                        && scount[ny] < kr[ny] + 1) {
+                    nsY.add(ny);
+                }
+            }
             for (int j = h + 1; j < ltmp.size(); j++) {
                 Integer y = ltmp.get(j);
                 Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
@@ -412,9 +412,9 @@ public class GraphHNV
                     continue;
                 }
 
-//                if (verbose) {
-//                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
-//                }
+                if (verbose) {
+                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
+                }
                 Set<Integer> t = new LinkedHashSet<>(s);
                 t.remove(x);
                 t.remove(y);
@@ -448,9 +448,9 @@ public class GraphHNV
                     }
                     aux[verti] += kr[verti];
                 }
-//                int c = 0;
+                int c = 0;
                 for (Integer z : verticesElegiveis) {
-//                    c++;
+                    c++;
                     if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
                         continue;
                     }
@@ -480,9 +480,9 @@ public class GraphHNV
                         }
                     }
 
-//                    if (verbose) {
-//                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1) + " contz: " + contz + "/" + tamanhoAlvo);
-//                    }
+                    if (verbose) {
+                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1) + " contz: " + contz + "/" + tamanhoAlvo);
+                    }
 
                     if (contz == tamanhoAlvo) {
                         t.add(z);

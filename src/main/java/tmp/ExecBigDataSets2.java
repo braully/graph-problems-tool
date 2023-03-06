@@ -167,10 +167,6 @@ public class ExecBigDataSets2 {
                     tss.setR(k);
                     hnv2.setR(k);
                     System.out.println("-------------\n\nR: " + k);
-                    if (k <= 2) {
-                        System.out.println("Pulando resultados já processados: " + op + " " + k);
-                        continue;
-                    }
                 } else if (op.equals("m")) {
                     op = "m";
                     heur5t2.setMarjority(k);

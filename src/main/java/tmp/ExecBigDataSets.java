@@ -370,7 +370,8 @@ public class ExecBigDataSets {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
+            "ca-GrQc",
+            "ca-HepTh",
             "ca-CondMat",
             "ca-HepPh",
             "ca-AstroPh",
@@ -470,10 +471,11 @@ public class ExecBigDataSets {
         for (String op : new String[]{
             "r",
             "k",
-            //            "r",
             "m"
+
+        //            "r",
         }) {
-            for (int k = 1; k <= 10; k++) {
+            for (int k = 10; k >= 1; k--) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
@@ -485,10 +487,10 @@ public class ExecBigDataSets {
                     optm2.setR(k);
                     hnv2.setR(k);
                     System.out.println("-------------\n\nR: " + k);
-                    if (k <= 2) {
-                        System.out.println("Pulando resultados já processados: " + op + " " + k);
-                        continue;
-                    }
+//                    if (k <= 2) {
+//                        System.out.println("Pulando resultados já processados: " + op + " " + k);
+//                        continue;
+//                    }
                 } else if (op.equals("m")) {
                     op = "m";
                     heur5t2.setMarjority(k);
