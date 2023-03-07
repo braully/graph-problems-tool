@@ -469,9 +469,10 @@ public class ExecBigDataSets {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            "r",
-            "k",
-            "m"
+            "r"
+//                ,
+//             "k",
+//            "m"
 
         //            "r",
         }) {
