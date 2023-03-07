@@ -306,6 +306,7 @@ public class GraphHNV
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
+
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
 //            System.out.println("s: " + s);
@@ -352,14 +353,20 @@ public class GraphHNV
 
             if (contadd >= tamanhoAlvo) {
                 s = t;
+                Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(v);
+                for (Integer vertn : neighbors) {
+                    scount[vertn]--;
+                }
             }
         }
 //        if (verbose) {
 //            System.out.println("reduzido para: " + s.size());
 ////            System.out.println("s: " + s);
 //        }
+//        tamanhoReduzido = tmp.size() - s.size();
         return s;
     }
+//    int tamanhoReduzido = 0;
 
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
@@ -373,9 +380,8 @@ public class GraphHNV
         List<Integer> verticesElegiveis = new ArrayList<>();
         for (Integer v : vertices) {
             Integer distance = bdls.getDistance(graphRead, v);
-            if (!s.contains(v) && distance != null 
-                    && distance <= 1
-//                    && scount[v] < kr[v]
+            if (!s.contains(v) && distance != null
+                    && distance <= 1 //                    && scount[v] < kr[v]
                     ) {
                 verticesElegiveis.add(v);
             }
@@ -397,11 +403,11 @@ public class GraphHNV
             if (verbose) {
                 System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
             }
-//            Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
+//            Collection<Integer> nssY = graphRead.getNeighborsUnprotected(x);
             Collection<Integer> nsY = new LinkedHashSet<>();
             for (Integer ny : graphRead.getNeighborsUnprotected(x)) {
                 if (!s.contains(ny)
-                        && scount[ny] < kr[ny] + 1) {
+                        && scount[ny] <= kr[ny] + 1) {
                     nsY.add(ny);
                 }
             }
@@ -488,6 +494,22 @@ public class GraphHNV
                     }
 
                     if (contz == tamanhoAlvo) {
+                        for (Integer vertn : nsX) {
+                            scount[vertn]--;
+                        }
+                        for (Integer vertn : graphRead.getNeighborsUnprotected(x)) {
+                            scount[vertn]--;
+                        }
+                        for (Integer vertn : graphRead.getNeighborsUnprotected(z)) {
+                            if ((++scount[vertn]) == kr[vertn] && t.contains(vertn)) {
+                                t.remove(vertn);
+                                Collection<Integer> nn = graphRead.getNeighborsUnprotected(vertn);
+                                for (Integer vnn : nn) {
+                                    scount[vnn]--;
+                                }
+                            }
+                        }
+
                         t.add(z);
                         s = t;
                         ltmp = new ArrayList<>(s);

@@ -650,6 +650,10 @@ public class GraphHNVOptm
             }
             if (contadd >= tamanhoAlvo) {
                 s = t;
+                Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(v);
+                for (Integer vertn : neighbors) {
+                    scount[vertn]--;
+                }
                 if (verbose) {
                     System.out.println(
                             "Reduzido removido: " + v
@@ -727,8 +731,7 @@ public class GraphHNVOptm
         for (Integer v : vertices) {
             Integer distance = bdls.getDistance(graphRead, v);
             if (!s.contains(v) && distance != null
-                    && distance <= 1
-//                    && scount[v] < kr[v]
+                    && distance <= 1 //                    && scount[v] < kr[v]
                     ) {
                 verticesElegiveis.add(v);
             }
@@ -752,8 +755,9 @@ public class GraphHNVOptm
                 System.out.println("  - tentando v " + x + " pos: " + h + "/" + (ltmp.size() - 1));
             }
             Collection<Integer> nsY = new LinkedHashSet<>();
-            for (Integer ny : graphRead.getNeighborsUnprotected(x)) {
-                if (scount[ny] < kr[ny] + 1) {
+            Collection<Integer> nnsy = graphRead.getNeighborsUnprotected(x);
+            for (Integer ny : nnsy) {
+                if (scount[ny] < kr[ny] + 2) {
                     nsY.add(ny);
                 }
             }
@@ -893,6 +897,23 @@ public class GraphHNVOptm
                             );
                         } catch (Exception e) {
 
+                        }
+
+                        for (Integer vertn : nsX) {
+                            scount[vertn]--;
+                        }
+                        for (Integer vertn : nnsy) {
+                            scount[vertn]--;
+                        }
+
+                        for (Integer vertn : graphRead.getNeighborsUnprotected(z)) {
+                            if ((++scount[vertn]) == kr[vertn] && t.contains(vertn)) {
+                                t.remove(vertn);
+                                Collection<Integer> nn = getNeighborsNaoPodados(graphRead, vertn);
+                                for (Integer vnn : nn) {
+                                    scount[vnn]--;
+                                }
+                            }
                         }
 
                         t.add(z);
