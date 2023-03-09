@@ -307,6 +307,10 @@ public class GraphHNV
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
 
+        if (s.size() <= 1) {
+            return s;
+        }
+
         if (verbose) {
             System.out.println("tentando reduzir: " + s.size());
 //            System.out.println("s: " + s);
