@@ -698,9 +698,13 @@ public class GraphHNVOptm
 
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
+        Set<Integer> s = tmp;
+
+        if (s.size() <= 2) {
+            return s;
+        }
         int contVizinhoComum = 0;
         int contSemVizinhoComum = 0;
-        Set<Integer> s = tmp;
 
         List<Integer> tmps = new ArrayList<>(tmp);
 
@@ -955,9 +959,9 @@ public class GraphHNVOptm
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNVOptm op = new GraphHNVOptm();
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
 ////        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Delicious/edges.csv"));
@@ -965,13 +969,12 @@ public class GraphHNVOptm
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-//        graph = UtilGraph.loadBigDataset(
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
-//
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+
 //        System.out.println(graph.toResumedString());
 //
-
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
 //        op.setR(3);
 //        op.resetParameters();
@@ -990,9 +993,9 @@ public class GraphHNVOptm
 //        if (!checkIfHullSet) {
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv"));
         List<String> parametros = new ArrayList<>();
         parametros.addAll(List.of(
                 pdeltaHsi, pdeltaParcial,
@@ -1011,8 +1014,8 @@ public class GraphHNVOptm
         op.setTryMinimal();
         op.setTryMinimal2();
         op.setSortByDegree(true);
-        op.setR(10);
-//        op.setVerbose(true);
+        op.setVerbose(true);
+        op.setR(2);
 //        op.setRankMult(true);
 //        op.setRealizarPoda(true);
 

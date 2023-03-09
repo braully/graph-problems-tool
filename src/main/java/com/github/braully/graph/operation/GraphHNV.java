@@ -371,6 +371,9 @@ public class GraphHNV
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
+        if (s.size() <= 2) {
+            return s;
+        }
         if (verbose) {
             System.out.println("tentando reduzir-2-lite: " + s.size() + " tamanho alvo: " + tamanhoAlvo);
 //            System.out.println("s: " + s);
@@ -575,18 +578,21 @@ public class GraphHNV
 //            System.err.println("FAIL: fail on check hull setg");
 //        }
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/BuzzNet.txt"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv")
+//        );
         graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv")
-        );
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 
         GraphTSSCordasco tss = new GraphTSSCordasco();
         op.map.put(0, new int[0]);
-        op.setPularAvaliacaoOffset(true);
-        op.setTryMinimal();
-        op.setTryMinimal2();
-        op.setSortByDegree(true);
-        op.setR(2);
+//        op.setPularAvaliacaoOffset(true);
+//        op.setTryMinimal();
+//        op.setTryMinimal2();
+//        op.setSortByDegree(true);
+//        op.setR(2);
 
         op.setVerbose(true);
         Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
@@ -602,7 +608,8 @@ public class GraphHNV
 
         GraphHNV hnv2 = new GraphHNV();
         hnv2.setVerbose(true);
-        hnv2.setR(10);
+        hnv2.setR(2);
+        hnv2.setVerbose(true);
         UtilProccess.printStartTime();
         buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();

@@ -127,7 +127,7 @@ public class ExecBigDataSets2 {
         GraphHNV hnv2 = new GraphHNV();
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
+            //            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -153,9 +153,10 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-//            "k",
-            "r",
-            "m",}) {
+            //            "k",
+            "r"
+//            "m",
+        }) {
             for (int k = 10; k >= 1; k--) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
