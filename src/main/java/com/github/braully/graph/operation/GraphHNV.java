@@ -303,9 +303,23 @@ public class GraphHNV
         return hullSet;
     }
 
+    Map<Integer, Integer> tamanhoT = new HashMap<>();
+    int maiorScount = 0;
+    int menorScount = Integer.MAX_VALUE;
+    int maiorT = 0;
+    int menorT = Integer.MAX_VALUE;
+    int tamanhoReduzido = 0;
+
     public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
+
+        tamanhoT.clear();
+        maiorScount = 0;
+        tamanhoReduzido = 0;
+        menorScount = Integer.MAX_VALUE;
+        maiorT = 0;
+        menorT = Integer.MAX_VALUE;
 
         if (s.size() <= 1) {
             return s;
@@ -361,6 +375,16 @@ public class GraphHNV
                 for (Integer vertn : neighbors) {
                     scount[vertn]--;
                 }
+            } else {
+                //            int tamt = contadd - t.size();
+                int tamt = contadd;
+                tamanhoT.put(v, tamt);
+                if (tamt > maiorT) {
+                    maiorT = tamt;
+                }
+                if (tamt < menorT) {
+                    menorT = tamt;
+                }
             }
         }
 //        if (verbose) {
@@ -398,7 +422,8 @@ public class GraphHNV
             System.out.println("vertices elegiveis " + verticesElegiveis.size());
 //            System.out.println("s: " + s);
         }
-
+        int menortRef = menorT + tamanhoReduzido + 1;
+        
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
 
@@ -406,6 +431,12 @@ public class GraphHNV
             Integer x = ltmp.get(h);
             if (degree[x] < kr[x] || !s.contains(x)) {
                 continue;
+            }
+            Integer get = tamanhoT.get(x);
+            if (get == null || get > menortRef) {
+                if (scount[x] < kr[x] - 1) {
+                    continue;
+                }
             }
             if (verbose) {
                 System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
@@ -610,12 +641,10 @@ public class GraphHNV
 //        System.out.println(
 //                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
-        GraphHNV hnv2 = new GraphHNV();
-        hnv2.setVerbose(true);
-        hnv2.setR(2);
-        hnv2.setVerbose(true);
+        op.setVerbose(true);
+        op.setMarjority(2);
         UtilProccess.printStartTime();
-        buildOptimizedHullSet = hnv2.buildOptimizedHullSet(graph);
+        buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
 
         System.out.println(

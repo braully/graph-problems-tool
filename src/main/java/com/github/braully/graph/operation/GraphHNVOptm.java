@@ -640,14 +640,6 @@ public class GraphHNVOptm
                 }
                 aux[verti] += kr[verti];
             }
-            int tamt = contadd - t.size();
-            tamanhoT.put(v, tamt);
-            if (tamt > maiorT) {
-                maiorT = tamt;
-            }
-            if (tamt < menorT) {
-                menorT = tamt;
-            }
             if (contadd >= tamanhoAlvo) {
                 s = t;
                 Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(v);
@@ -679,6 +671,16 @@ public class GraphHNVOptm
                             + scount[v] + " kr:" + kr[v]
                     );
                 }
+            } else {
+                //            int tamt = contadd - t.size();
+                int tamt = contadd;
+                tamanhoT.put(v, tamt);
+                if (tamt > maiorT) {
+                    maiorT = tamt;
+                }
+                if (tamt < menorT) {
+                    menorT = tamt;
+                }
             }
         }
 
@@ -699,6 +701,7 @@ public class GraphHNVOptm
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
+        int menortRef = menorT + tamanhoReduzido + 1;
 
         if (s.size() <= 2) {
             return s;
@@ -745,6 +748,8 @@ public class GraphHNVOptm
 //            System.out.println("s: " + s);
         }
         int cont = 0;
+//        int menortRef = menorT + tamanhoReduzido + 1;
+
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
 
@@ -754,6 +759,12 @@ public class GraphHNVOptm
             Integer x = ltmp.get(h);
             if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
                 continue;
+            }
+            Integer get = tamanhoT.get(x);
+            if (get == null || get > menortRef) {
+                if (scount[x] < kr[x] - 1) {
+                    continue;
+                }
             }
             if (verbose) {
                 System.out.println("  - tentando v " + x + " pos: " + h + "/" + (ltmp.size() - 1));
@@ -787,9 +798,9 @@ public class GraphHNVOptm
 //                        System.out.println(" - vn " + vn + " não está em s " + scount[vn] + "/" + kr[vn]);
 //                    }
 //                }
-                if (verbose) {
-                    System.out.println("     --- tentando vx " + x + " pos: " + h + " x " + y + " pos: " + j + "/" + (ltmp.size() - 1));
-                }
+//                if (verbose) {
+//                    System.out.println("     --- tentando vx " + x + " pos: " + h + " x " + y + " pos: " + j + "/" + (ltmp.size() - 1));
+//                }
                 Set<Integer> t = new LinkedHashSet<>(s);
                 t.remove(x);
                 t.remove(y);
@@ -868,6 +879,8 @@ public class GraphHNVOptm
                         if (verbose) {
                             System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
                             System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+                            System.out.println(" - Detalhes de v: "
+                                    + x + " tamt: " + tamanhoT.get(x) + " [" + menorT + "," + maiorT + "]");
                         }
                         if (cont > (tmp.size() / 2)) {
                             System.out.println("Poda dupla em grafo conexo removido:  "
@@ -888,11 +901,13 @@ public class GraphHNVOptm
                         }
 
                         try {
-                            int menortRef = menorT + tamanhoReduzido;
+
                             System.out.println(" - Detalhes de z: "
-                                    + z + " degree: " + degree[z] + " scount: "
-                                    + scount[z] + " degreexy:" + degree[x] + "/" + degree[y]
-                                    + " " + " scountxy: " + scount[x] + "/" + scount[y]
+                                    //                                    + z + " degree: " + degree[z] 
+                                    + " scount: "
+                                    + scount[z]
+                                    //                                    + " degreexy:" + degree[x] + "/" + degree[y]
+                                    + " " + " scount x/y: " + scount[x] + "/" + scount[y]
                                     + " tamt x/y: " + tamanhoT.get(x) + "/" + tamanhoT.get(y)
                                     + " [" + menorT + "," + menortRef + "," + maiorT + "] " + " está no menor "
                                     + (tamanhoT.get(x) <= menortRef || tamanhoT.get(y) <= menortRef)
@@ -1015,7 +1030,8 @@ public class GraphHNVOptm
         op.setTryMinimal2();
         op.setSortByDegree(true);
         op.setVerbose(true);
-        op.setR(2);
+//        op.setR(2);
+        op.setMarjority(2);
 //        op.setRankMult(true);
 //        op.setRealizarPoda(true);
 

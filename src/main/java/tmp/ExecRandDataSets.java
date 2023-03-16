@@ -163,8 +163,8 @@ public class ExecRandDataSets {
             //            heur5t,
             //            tssg,
             //            heur5t2,
-            hnv2
-//            optm
+//            hnv2
+            optm
 //            optmpoda
         };
         long totalTime[] = new long[operations.length];
@@ -203,9 +203,9 @@ public class ExecRandDataSets {
             System.out.println("-------------\n\nR: " + k);
 
             for (String s : dataSets) {
-                if (verbose) {
+//                if (verbose) {
                     System.out.println("\n-DATASET: " + s);
-                }
+//                }
 //                /home/strike/Workspace/graph-problems-tool/database/rand10/
                 UndirectedSparseGraphTO<Integer, Integer> graphES = null;
                 String strFile = "/home/strike/Workspace/graph-problems-tool/database/rand10/" + s;
