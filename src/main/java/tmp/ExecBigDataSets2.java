@@ -153,8 +153,8 @@ public class ExecBigDataSets2 {
         File resultFile = new File(strResultFile);
         BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile, true));
         for (String op : new String[]{
-            //            "k",
-                        "r"
+            //                        "k",
+            "r"
 //            "m",
         }) {
             for (int k = 10; k >= 1; k--) {
