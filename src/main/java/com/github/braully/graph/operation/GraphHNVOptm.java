@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,8 +41,8 @@ public class GraphHNVOptm
         setPularAvaliacaoOffset(true);
         setTryMinimal();
 //        setParameter(pdeltaHsi, true);
-        setParameter(pdificuldadeTotal, true);
-        setParameter(pbonusParcialNormalizado, true);
+        setParameter(pdeltaHsixdificuldadeTotal, true);
+        setParameter(pbonusParcial, true);
     }
 
     public static String getDescription() {
@@ -767,7 +766,7 @@ public class GraphHNVOptm
                 }
             }
             if (verbose) {
-                System.out.println("  - tentando v " + x + " pos: " + h + "/" + (ltmp.size() - 1));
+//                System.out.println("  - tentando v " + x + " pos: " + h + "/" + (ltmp.size() - 1));
             }
             Collection<Integer> nsY = new LinkedHashSet<>();
             Collection<Integer> nnsy = graphRead.getNeighborsUnprotected(x);
@@ -973,7 +972,7 @@ public class GraphHNVOptm
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNVOptm op = new GraphHNVOptm();
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -984,9 +983,9 @@ public class GraphHNVOptm
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
 
 //        System.out.println(graph.toResumedString());
 //
@@ -1030,22 +1029,27 @@ public class GraphHNVOptm
         op.setTryMinimal2();
         op.setSortByDegree(true);
         op.setVerbose(true);
-//        op.setR(2);
-        op.setMarjority(2);
+        op.setR(8);
+//        op.setMarjority(2);
 //        op.setRankMult(true);
 //        op.setRealizarPoda(true);
 
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-HepTh/ca-HepTh.txt"));
-        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
-
-        System.out.println("num conected comps: " + connectedComponents.size());
-
+//        Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
+//
+//        System.out.println("num conected comps: " + connectedComponents.size());
         UtilProccess.printStartTime();
         Set<Integer> buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
 
         System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+                "S[" + buildOptimizedHullSet.size() + "]: "
+//                        + buildOptimizedHullSet
+        );
+
+        if (true) {
+            return;
+        }
 
 //        op.resetParameters();
         int totalGlobal = 0;

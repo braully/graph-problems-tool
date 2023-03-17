@@ -391,7 +391,7 @@ public class GraphHNV
 //            System.out.println("reduzido para: " + s.size());
 ////            System.out.println("s: " + s);
 //        }
-//        tamanhoReduzido = tmp.size() - s.size();
+        tamanhoReduzido = tmp.size() - s.size();
         return s;
     }
 //    int tamanhoReduzido = 0;
@@ -423,7 +423,7 @@ public class GraphHNV
 //            System.out.println("s: " + s);
         }
         int menortRef = menorT + tamanhoReduzido + 1;
-        
+
         for_p:
 //        for (int h = 0; h < ltmp.size() / 2; h++) {
 
@@ -439,7 +439,7 @@ public class GraphHNV
                 }
             }
             if (verbose) {
-                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
+//                System.out.println("  - tentando v " + h + "/" + (ltmp.size() - 1));
             }
 //            Collection<Integer> nssY = graphRead.getNeighborsUnprotected(x);
             Collection<Integer> nsY = new LinkedHashSet<>();
@@ -460,7 +460,7 @@ public class GraphHNV
                 }
 
                 if (verbose) {
-                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
+//                    System.out.println("     -- tentando x " + j + "/" + (ltmp.size() - 1));
                 }
                 Set<Integer> t = new LinkedHashSet<>(s);
                 t.remove(x);
@@ -528,10 +528,16 @@ public class GraphHNV
                     }
 
                     if (verbose) {
-                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1) + " contz: " + contz + "/" + tamanhoAlvo);
+//                        System.out.println("        --- tentando z " + c + "/" + (verticesElegiveis.size() - 1) + " contz: " + contz + "/" + tamanhoAlvo);
                     }
 
                     if (contz == tamanhoAlvo) {
+                        if (verbose) {
+                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
+                            System.out.println("Na posição x " + "/" + (tmp.size() - 1));
+                            System.out.println(" - Detalhes de v: "
+                                    + x + " tamt: " + tamanhoT.get(x) + " [" + menorT + "," + maiorT + "]");
+                        }
                         for (Integer vertn : nsX) {
                             scount[vertn]--;
                         }
@@ -576,7 +582,7 @@ public class GraphHNV
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNV op = new GraphHNV();
-//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -617,10 +623,9 @@ public class GraphHNV
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BuzzNet/edges.csv")
 //        );
-        graph = UtilGraph.loadBigDataset(
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
-
+//        graph = UtilGraph.loadBigDataset(
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
+//                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
         GraphTSSCordasco tss = new GraphTSSCordasco();
         op.map.put(0, new int[0]);
 //        op.setPularAvaliacaoOffset(true);
@@ -642,13 +647,16 @@ public class GraphHNV
 //                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
 
         op.setVerbose(true);
-        op.setMarjority(2);
+//        op.setMarjority(2);
+        op.setR(8);
         UtilProccess.printStartTime();
         buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
 
         System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+                "S[" + buildOptimizedHullSet.size() + "]: "
+        //                        + buildOptimizedHullSet
+        );
 
     }
 
