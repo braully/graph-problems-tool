@@ -603,7 +603,7 @@ public class GraphHNVOptm
         int cont = 0;
         for (Integer v : tmp) {
             cont++;
-            if (graphRead.degree(v) < kr[v]) {
+            if (degree[v] < kr[v]) {
                 continue;
             }
             Set<Integer> t = new LinkedHashSet<>(s);
@@ -710,10 +710,11 @@ public class GraphHNVOptm
 
         List<Integer> tmps = new ArrayList<>(tmp);
 
-//        tmps.sort(Comparator
-//                .comparingInt((Integer v) -> -scount[v])
-//        //                .thenComparing(v -> -tamanhoT.get(v))
-//        );
+        tmps.sort(Comparator
+                //                .comparingInt((Integer v) -> -scount[v])
+                .comparingInt((Integer v) -> tamanhoT.get(v))
+        //                .thenComparing(v -> -tamanhoT.get(v))
+        );
         maiorScount = 0;
         menorScount = Integer.MAX_VALUE;
 
@@ -734,16 +735,27 @@ public class GraphHNVOptm
         }
         Collection<Integer> vertices = graphRead.getVertices();
         List<Integer> verticesElegiveis = new ArrayList<>();
+        double nacessivel = 0;
+        double nedges = 0;
+        double bonusdisponivel = 0;
         for (Integer v : vertices) {
             Integer distance = bdls.getDistance(graphRead, v);
-            if (!s.contains(v) && distance != null
-                    && distance <= 1 //                    && scount[v] < kr[v]
-                    ) {
+            if (distance == null) {
+                continue;
+            }
+            bonusdisponivel += Math.max(0, degree[v] - kr[v]);
+            nacessivel++;
+            nedges += degree[v];
+            if (distance <= 1 && !s.contains(v)) {
                 verticesElegiveis.add(v);
             }
         }
+        double density = (2 * nedges) / (nacessivel * (nacessivel - 1));
+        double bonusdisponivelnorm = bonusdisponivel / (double) nacessivel;
+
         if (verbose) {
             System.out.println("vertices elegiveis " + verticesElegiveis.size());
+            System.out.printf("n %d m %d density: %f bdisp: %f \n", nacessivel, nedges, density, bonusdisponivelnorm);
 //            System.out.println("s: " + s);
         }
         int cont = 0;
@@ -759,12 +771,12 @@ public class GraphHNVOptm
             if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
                 continue;
             }
-            Integer get = tamanhoT.get(x);
-            if (get == null || get > menortRef) {
-                if (scount[x] < kr[x] - 1) {
-                    continue;
-                }
-            }
+//            Integer get = tamanhoT.get(x);
+//            if (get == null || get > menortRef) {
+//                if (scount[x] < kr[x] - 1) {
+//                    continue;
+//                }
+//            }
             if (verbose) {
 //                System.out.println("  - tentando v " + x + " pos: " + h + "/" + (ltmp.size() - 1));
             }
@@ -900,16 +912,22 @@ public class GraphHNVOptm
                         }
 
                         try {
-
+//                            System.out.printf("n %d m %d density: %f \n", nacessivel, nedges, density);
+                            int menorm = Math.min(tamanhoT.get(x), tamanhoT.get(y));
                             System.out.println(" - Detalhes de z: "
                                     //                                    + z + " degree: " + degree[z] 
                                     + " scount: "
                                     + scount[z]
                                     //                                    + " degreexy:" + degree[x] + "/" + degree[y]
-                                    + " " + " scount x/y: " + scount[x] + "/" + scount[y]
+                                    + " scount x/y: " + scount[x] + "/" + scount[y]
                                     + " tamt x/y: " + tamanhoT.get(x) + "/" + tamanhoT.get(y)
                                     + " [" + menorT + "," + menortRef + "," + maiorT + "] " + " está no menor "
                                     + (tamanhoT.get(x) <= menortRef || tamanhoT.get(y) <= menortRef)
+                                    + " distancia: "
+                                    + (menorm - menorT) + " " + (menorm - menortRef)
+                                    + " dens: "
+                                    + " bonus: " + Math.round(bonusdisponivelnorm * 10.0) + " dens: "
+                                    + Math.round(density * 10.0) + " " //                                    + (int) nacessivel + "-" + (int) nedges + " "
                             //+ " distancia de s: "
                             //                                + bdls.getDistance(graphRead, z)
                             );
@@ -1044,7 +1062,7 @@ public class GraphHNVOptm
 
         System.out.println(
                 "S[" + buildOptimizedHullSet.size() + "]: "
-//                        + buildOptimizedHullSet
+        //                        + buildOptimizedHullSet
         );
 
         if (true) {
