@@ -17,9 +17,9 @@ import java.io.IOException;
  */
 public class GraphRandDensityGenearte {
 
-    public static final int INI_V = 50;
-    public static final int MAX_V = 150;
-    public static final int NREPETICOES = 10;
+    public static final int INI_V = 5;
+    public static final int MAX_V = 100;
+    public static final int NREPETICOES = 1;
 
     public static void main(String... args) throws IOException {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();

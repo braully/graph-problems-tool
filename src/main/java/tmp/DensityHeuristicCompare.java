@@ -7,10 +7,7 @@ package tmp;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.generator.GraphGeneratorRandomGilbert;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp3Bkp;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -18,7 +15,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 
 /**
