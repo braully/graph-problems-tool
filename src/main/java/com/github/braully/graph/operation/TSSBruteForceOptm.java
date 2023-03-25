@@ -8,10 +8,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.math3.util.CombinatoricsUtils;
@@ -30,10 +32,9 @@ public class TSSBruteForceOptm
 
         try {
             minHullSet = findMinHullSetGraph(graph);
-            if (minHullSet != null && !minHullSet.isEmpty()) {
-                hullNumber = minHullSet.size();
-            }
+            hullNumber = minHullSet.size();
         } catch (Exception ex) {
+            ex.printStackTrace();
 //            log.error(null, ex);
         }
 
@@ -57,39 +58,41 @@ public class TSSBruteForceOptm
         int currentSize = ceilling.size() - 1;
         int countOneNeigh = 0;
 
-        Collection<Integer> vertices = graph.getVertices();
+        if (currentSize > 0) {
+            Collection<Integer> vertices = graph.getVertices();
 
-        for (Integer i : vertices) {
-            if (graph.degree(i) == 1) {
-                countOneNeigh++;
+            for (Integer i : vertices) {
+                if (graph.degree(i) == 1) {
+                    countOneNeigh++;
+                }
             }
-        }
-        minSizeSet = Math.max(minSizeSet, countOneNeigh);
-        if (verbose) {
-            System.out.println(" - Teto heuristico: " + ceilling.size());
-        }
+            minSizeSet = Math.max(minSizeSet, countOneNeigh);
+            if (verbose) {
+                System.out.println(" - Teto heuristico: " + ceilling.size());
+            }
 //        System.out.println("Find hull number: min val " + minSizeSet);
-        while (currentSize >= minSizeSet) {
+            while (currentSize >= minSizeSet) {
 //            System.out.println("Find hull number: current founded " + (currentSize + 1));
 //            System.out.println("Find hull number: trying find " + currentSize);
 
 //            System.out.println("trying : " + currentSize);
-            Set<Integer> hs = findHullSetBruteForce(graph, currentSize);
-            if (hs != null && !hs.isEmpty()) {
-                hullSet = hs;
-            } else {
+                Set<Integer> hs = findHullSetBruteForce(graph, currentSize);
+                if (hs != null && !hs.isEmpty()) {
+                    hullSet = hs;
+                } else {
 //                System.out.println("not find break ");
-                break;
+                    break;
+                }
+                currentSize--;
             }
-            currentSize--;
-        }
-        if (verbose) {
-            int delta = hullSet.size() - ceilling.size();
-            if (delta == 0) {
-                System.out.println(" - Heuristica match");
-            } else {
-                System.out.println(" - Heuristica fail by: " + delta);
+            if (verbose) {
+                int delta = hullSet.size() - ceilling.size();
+                if (delta == 0) {
+                    System.out.println(" - Heuristica match");
+                } else {
+                    System.out.println(" - Heuristica fail by: " + delta);
 
+                }
             }
         }
         return hullSet;
@@ -113,7 +116,19 @@ public class TSSBruteForceOptm
         }
         int[] aux = auxb;
         int tamanhoAlvo = graph.getVertexCount();
-        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), currentSetSize);
+
+        List<Integer> verticesElegiveis = new ArrayList<>();
+        Collection<Integer> vertices = graph.getVertices();
+        for (Integer v : vertices) {
+            if (kr[v] > 0 && degree[v] <= kr[v]) {
+                verticesElegiveis.add(v);
+            }
+        }
+        int size = verticesElegiveis.size();
+        if (size == 0) {
+            return hullSet;
+        }
+        Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(size, currentSetSize);
         while (combinationsIterator.hasNext()) {
             int[] currentSet = combinationsIterator.next();
             for (int i = 0; i < aux.length; i++) {
@@ -121,7 +136,8 @@ public class TSSBruteForceOptm
             }
             int contadd = 0;
             mustBeIncluded.clear();
-            for (Integer iv : currentSet) {
+            for (Integer i : currentSet) {
+                Integer iv = verticesElegiveis.get(i);
                 mustBeIncluded.add(iv);
                 aux[iv] = kr[iv];
             }
@@ -161,6 +177,10 @@ public class TSSBruteForceOptm
         GraphHNV hnv2 = new GraphHNV();
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
+
+//        graph = UtilGraph.loadGraphES("0-18,0-32,0-53,1-33,1-35,2-5,2-12,2-13,2-16,2-25,2-35,3-11,3-46,4-11,4-13,4-31,4-37,5-7,5-11,5-14,5-35,5-53,6-13,6-19,6-31,6-52,7-9,7-15,7-21,7-24,8-10,8-13,8-22,8-25,8-26,8-37,8-40,8-53,8-54,9-10,9-19,9-31,9-40,10-11,10-31,10-34,10-36,10-50,10-54,11-35,11-46,11-54,12-16,12-44,13-23,13-24,13-31,13-46,13-48,13-52,14-17,14-24,14-27,14-37,15-32,15-33,15-38,15-54,16-31,16-35,17-20,17-23,17-42,17-44,18-20,18-33,18-45,19-21,19-39,19-43,19-48,20-24,20-29,20-33,20-34,20-39,20-40,21-23,21-28,21-40,21-44,21-45,21-50,22-23,22-42,22-49,23-26,23-31,24-26,24-41,24-44,24-54,25-37,26-28,26-52,27-33,27-38,27-39,28-34,28-38,28-44,29-36,30-37,30-46,30-49,30-54,32-35,33-36,33-53,34-44,35-48,35-52,36-52,37-38,37-48,37-51,37-52,38-48,39-47,39-53,40-46,40-50,40-51,41-47,41-54,43-46,43-49,43-54,44-47,46-49,47-49,");
+//        opf.doOperation(graph);
+//        opf.setMarjority(2);
         Set<Integer> optmHullSet = null;
         String strFile = "database/grafos-rand-densall-n5-100.txt";
 
@@ -178,9 +198,8 @@ public class TSSBruteForceOptm
         long totalTime[] = new long[operations.length];
 
         for (String op : new String[]{
-            "m",
-            "r",
-            "k"
+            "m", //            "r",
+        //            "k"
         }) {
             for (int k = 1; k <= 10; k++) {
                 if (op.equals("r")) {
@@ -247,7 +266,8 @@ public class TSSBruteForceOptm
                             boolean checkIfHullSet = operations[i].checkIfHullSet(graph, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)));
                             if (!checkIfHullSet) {
                                 System.out.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
-                                System.err.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
+//                                System.err.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
+                                System.out.println(line);
 //                            throw new IllegalStateException("CORDASSO IS NOT HULL SET");
                             }
                         }

@@ -163,8 +163,8 @@ public class ExecRandDataSets {
             //            heur5t,
             //            tssg,
             //            heur5t2,
-//            hnv2
-            optm
+            hnv2
+//            optm
 //            optmpoda
         };
         long totalTime[] = new long[operations.length];
