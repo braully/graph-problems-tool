@@ -220,11 +220,10 @@ public class TSSBruteForceOptm
         long totalTime[] = new long[operations.length];
 
         for (String op : new String[]{
-//            "m",
-//            "k",
-            "r"
+            "m", //            "k",
+        //            "r"
         }) {
-            for (int k = 1; k <= 10; k++) {
+            for (int k = 10; k >= 1; k--) {
                 if (op.equals("r")) {
                     tss.setR(k);
                     opf.setR(k);
