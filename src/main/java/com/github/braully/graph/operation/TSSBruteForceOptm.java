@@ -221,7 +221,7 @@ public class TSSBruteForceOptm
 
         for (String op : new String[]{
 //            "m",
-            "k",
+//            "k",
             "r"
         }) {
             for (int k = 1; k <= 10; k++) {
