@@ -198,8 +198,9 @@ public class TSSBruteForceOptm
         long totalTime[] = new long[operations.length];
 
         for (String op : new String[]{
-            "m", //            "r",
-        //            "k"
+            "m",
+            "r",
+            "k"
         }) {
             for (int k = 1; k <= 10; k++) {
                 if (op.equals("r")) {
