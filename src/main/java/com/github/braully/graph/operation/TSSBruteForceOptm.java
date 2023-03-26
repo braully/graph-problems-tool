@@ -220,7 +220,7 @@ public class TSSBruteForceOptm
         long totalTime[] = new long[operations.length];
 
         for (String op : new String[]{
-            "m",
+//            "m",
             "k",
             "r"
         }) {
