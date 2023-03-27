@@ -522,7 +522,7 @@ public class GraphHNV
 
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
         GraphHNV op = new GraphHNV();
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Douban/edges.csv"));
@@ -566,13 +566,16 @@ public class GraphHNV
 //        graph = UtilGraph.loadBigDataset(
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/nodes.csv"),
 //                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog/edges.csv"));
+        graph = UtilGraph.loadBigDataset(
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Livemocha/nodes.csv"),
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/Livemocha/edges.csv"));
         GraphTSSCordasco tss = new GraphTSSCordasco();
         op.map.put(0, new int[0]);
 //        op.setPularAvaliacaoOffset(true);
 //        op.setTryMinimal();
 //        op.setTryMinimal2();
 //        op.setSortByDegree(true);
-//        op.setR(2);
+//        op.setR(1);
 
         op.setVerbose(true);
         Map<Integer, Set<Integer>> connectedComponents = op.connectedComponents(graph);
@@ -588,7 +591,7 @@ public class GraphHNV
 
         op.setVerbose(true);
 //        op.setMarjority(2);
-        op.setR(2);
+        op.setR(1);
         UtilProccess.printStartTime();
         buildOptimizedHullSet = op.buildOptimizedHullSet(graph);
         UtilProccess.printEndTime();
