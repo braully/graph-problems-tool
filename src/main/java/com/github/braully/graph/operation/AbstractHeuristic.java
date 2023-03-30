@@ -7,6 +7,7 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
+import static java.lang.Math.abs;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,9 +74,14 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             } else if (K != null) {
                 kr[i] = K;
             } else if (marjority != null) {
-                kr[i] = graph.degree(i) / marjority;
+                kr[i] = roundUp(graph.degree(i), marjority);
             }
         }
+    }
+
+    public static int roundUp(int num, int divisor) {
+        int sign = (num > 0 ? 1 : -1) * (divisor > 0 ? 1 : -1);
+        return sign * (abs(num) + abs(divisor) - 1) / abs(divisor);
     }
 
     public void setVerbose(boolean verbose) {

@@ -63,18 +63,19 @@ public class ExecBigDataSets3 {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-            "ca-GrQc", "ca-HepTh",
-            "ca-CondMat",
-            "ca-HepPh",
-            "ca-AstroPh",
-            "Douban",
-            "Delicious",
-            "BlogCatalog3",
-            "BlogCatalog2",
-            "Livemocha",
-            "BlogCatalog",
-            "BuzzNet",
-            "Last.fm", //            "YouTube2"
+//            "ca-GrQc", "ca-HepTh",
+//            "ca-CondMat",
+//            "ca-HepPh",
+//            "ca-AstroPh",
+//            "Douban",
+//            "Delicious",
+//            "BlogCatalog3",
+//            "BlogCatalog2",
+//            "Livemocha",
+//            "BlogCatalog",
+//            "BuzzNet",
+//            "Last.fm", 
+            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
