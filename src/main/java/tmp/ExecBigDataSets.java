@@ -443,7 +443,7 @@ public class ExecBigDataSets {
         optm2.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
         GraphHNV hnv2 = new GraphHNV();
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            //            tss, //            heur1,
+            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
