@@ -49,7 +49,6 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
     protected boolean rankMult = false;
 
     protected int[] pularAvaliacao = null;
-    protected int[] degree = null;
 
     protected Set<Integer> verticesTrabalho;
     protected Set<Integer> podados;

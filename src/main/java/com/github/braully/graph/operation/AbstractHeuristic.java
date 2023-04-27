@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -30,7 +31,11 @@ public abstract class AbstractHeuristic implements IGraphOperation {
 
     public Integer K;
     public Integer R;
-    public Integer marjority;
+    public Integer majority;
+    public Integer P;
+    protected int[] degree = null;
+
+    protected static Random randomUtil = new Random();
     protected int[] kr;
     protected boolean verbose;
     static final String type = "Contamination";
@@ -49,20 +54,30 @@ public abstract class AbstractHeuristic implements IGraphOperation {
 
     public void setK(Integer K) {
         this.K = K;
-        this.marjority = null;
+        this.majority = null;
         this.R = null;
+        this.P = null;
     }
 
     public void setR(Integer R) {
         this.R = R;
         this.K = null;
-        this.marjority = null;
+        this.majority = null;
+        this.P = null;
     }
 
     public void setMarjority(Integer marjority) {
-        this.marjority = marjority;
+        this.majority = marjority;
         this.K = null;
         this.R = null;
+        this.P = null;
+    }
+
+    public void setP(Integer p) {
+        this.majority = null;
+        this.K = null;
+        this.R = null;
+        this.P = p;
     }
 
     public void initKr(UndirectedSparseGraphTO graph) {
@@ -73,10 +88,23 @@ public abstract class AbstractHeuristic implements IGraphOperation {
                 kr[i] = Math.min(R, graph.degree(i));
             } else if (K != null) {
                 kr[i] = K;
-            } else if (marjority != null) {
-                kr[i] = roundUp(graph.degree(i), marjority);
+            } else if (majority != null) {
+                kr[i] = roundUp(graph.degree(i), majority);
+            } else if (P != null) {
+                int degree = graph.degree(i);
+                if (degree > 0) {
+                    int random = random(degree, P);
+                    kr[i] = random;
+                } else {
+                    kr[i] = degree;
+                }
             }
         }
+    }
+
+    public static int random(int num, Integer probability) {
+        //Probability ignored, for future use
+        return randomUtil.nextInt(num);
     }
 
     public static int roundUp(int num, int divisor) {
@@ -377,6 +405,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         Set<Integer> fecho = new HashSet<>();
 
         int vertexCount = graph.getVertexCount();
+
         if (kr == null || kr.length < vertexCount) {
             initKr(graph);
         }
@@ -401,9 +430,6 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             Integer verti = mustBeIncluded.remove();
             Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
             for (Integer vertn : neighbors) {
-                if (vertn.equals(verti)) {
-                    continue;
-                }
                 if ((++aux[vertn]) == kr[vertn]) {
                     mustBeIncluded.add(vertn);
                 }
@@ -411,7 +437,8 @@ public abstract class AbstractHeuristic implements IGraphOperation {
             fecho.add(verti);
             aux[verti] += kr[verti];
         }
-        return fecho.size() == graph.getVertexCount();
+        boolean name = fecho.size() == graph.getVertexCount();
+        return name;
     }
 
     public Map<Integer, Set<Integer>> connectedComponents(UndirectedSparseGraphTO<Integer, Integer> graph) {

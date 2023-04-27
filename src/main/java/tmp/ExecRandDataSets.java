@@ -156,7 +156,7 @@ public class ExecRandDataSets {
 
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             //                        optm,
-            tss, //            heur1,
+            //            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -186,25 +186,18 @@ public class ExecRandDataSets {
 
         Map<String, Boolean> piorou = new HashMap<>();
 
-        for (int k = 2; k <= 10; k++) {
-            if (false) {
-                optm.setK(k);
-                tss.setK(k);
-                optmpoda.setK(k);
-                heur5t2.setK(k);
-                hnv2.setK(k);
-            } else {
-                optm.setR(k);
-                tss.setR(k);
-                optmpoda.setR(k);
-                heur5t2.setR(k);
-                hnv2.setR(k);
-            }
+        for (int k = 1; k <= 1; k++) {
+//            optm.setP(k);
+            tss.setP(k);
+//            optmpoda.setP(k);
+//            heur5t2.setP(k);
+            hnv2.setP(k);
+//            hnv2.setK(k);
             System.out.println("-------------\n\nR: " + k);
 
             for (String s : dataSets) {
 //                if (verbose) {
-                    System.out.println("\n-DATASET: " + s);
+                System.out.println("\n-DATASET: " + s);
 //                }
 //                /home/strike/Workspace/graph-problems-tool/database/rand10/
                 UndirectedSparseGraphTO<Integer, Integer> graphES = null;
@@ -231,23 +224,19 @@ public class ExecRandDataSets {
                             System.out.println("*************");
                             System.out.print(" - EXEC: " + operations[i].getName() + "-k: " + k + " g:" + s + " " + graphES.getVertexCount() + " ");
                         }
-                        int[] get = resultadoArquivado.get(arquivadoStr);
-                        if (get != null) {
-                            result[i] = get[0];
-                            totalTime[i] = get[1];
+
+                        UtilProccess.printStartTime();
+                        doOperation = operations[i].doOperation(graphES);
+                        result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
+                        if (verbose) {
+                            totalTime[i] += UtilProccess.printEndTime();
                         } else {
-                            UtilProccess.printStartTime();
-                            doOperation = operations[i].doOperation(graphES);
-                            result[i] = (Integer) doOperation.get(IGraphOperation.DEFAULT_PARAM_NAME_RESULT);
-                            if (verbose) {
-                                totalTime[i] += UtilProccess.printEndTime();
-                            } else {
-                                totalTime[i] += UtilProccess.endTime();
-                            }
-                            if (verbose) {
-                                System.out.println(" - arquivar: resultadoArquivado.put(\"" + arquivadoStr + "\", new int[]{" + result[i] + ", " + totalTime[i] + "});");
-                            }
+                            totalTime[i] += UtilProccess.endTime();
                         }
+                        if (verbose) {
+                            System.out.println(" - arquivar: resultadoArquivado.put(\"" + arquivadoStr + "\", new int[]{" + result[i] + ", " + totalTime[i] + "});");
+                        }
+
                         if (verbose) {
                             System.out.println(" - Result: " + result[i]);
                         }
@@ -266,7 +255,8 @@ public class ExecRandDataSets {
                         writer.flush();
 
                         if (doOperation != null) {
-                            boolean checkIfHullSet = operations[i].checkIfHullSet(graphES, ((Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET)));
+                            Set<Integer> hs = (Set<Integer>) doOperation.get(DEFAULT_PARAM_NAME_SET);
+                            boolean checkIfHullSet = operations[i].checkIfHullSet(graphES, hs);
                             if (!checkIfHullSet) {
                                 System.out.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
                                 System.err.println("ALERT: ----- RESULTADO ANTERIOR IS NOT HULL SET");
@@ -275,9 +265,7 @@ public class ExecRandDataSets {
                             }
                         }
                         if (i == 0) {
-                            if (get == null) {
-                                delta[i] = 0;
-                            }
+                            delta[i] = 0;
                         } else {
                             delta[i] = result[0] - result[i];
 

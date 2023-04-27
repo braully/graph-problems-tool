@@ -382,7 +382,8 @@ public class ExecBigDataSets {
             "Livemocha",
             "BlogCatalog",
             "BuzzNet",
-            "Last.fm", //            "YouTube2"
+            "Last.fm",
+            "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
 
@@ -442,8 +443,9 @@ public class ExecBigDataSets {
         optm2.setParameter(AbstractHeuristicOptm.pdeltaHsixdificuldadeTotal, true);
         optm2.setParameter(AbstractHeuristicOptm.pbonusParcial, true);
         GraphHNV hnv2 = new GraphHNV();
+        HNV1 hnv1 = new HNV1();
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
-            tss, //            heur1,
+            //            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
@@ -452,7 +454,9 @@ public class ExecBigDataSets {
             //            heur5t2
             //            optm,
             //            optm2, 
-            hnv2};
+            //            hnv2,
+            hnv1
+        };
         long totalTime[] = new long[operations.length];
         Integer[] result = new Integer[operations.length];
         Integer[] delta = new Integer[operations.length];
@@ -471,11 +475,11 @@ public class ExecBigDataSets {
         for (String op : new String[]{
             //            "r"
             //                ,
-            //            "k"
-            "m"
-        //            "r",
+            "m",
+            "k",
+            "r"
         }) {
-            for (int k = 7; k <= 10; k++) {
+            for (int k = 1; k <= 10; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
@@ -486,6 +490,7 @@ public class ExecBigDataSets {
                     tss.setR(k);
                     optm2.setR(k);
                     hnv2.setR(k);
+                    hnv1.setR(k);
                     System.out.println("-------------\n\nR: " + k);
 //                    if (k <= 2) {
 //                        System.out.println("Pulando resultados já processados: " + op + " " + k);
@@ -498,6 +503,8 @@ public class ExecBigDataSets {
                     optm2.setMarjority(k);
                     tss.setMarjority(k);
                     hnv2.setMarjority(k);
+                    hnv1.setMarjority(k);
+
                     System.out.println("-------------\n\nm: " + k);
                 } else {
                     op = "k";
@@ -506,6 +513,8 @@ public class ExecBigDataSets {
                     optm2.setK(k);
                     tss.setK(k);
                     hnv2.setK(k);
+                    hnv1.setK(k);
+
                     System.out.println("-------------\n\nk: " + k);
                 }
                 if (op.equals("m") && k == 1) {

@@ -697,6 +697,9 @@ public class GraphHNVOptm
         return s;
     }
 
+    int saturacao = 0;
+    int bonusDisponivel = 0;
+
     public Set<Integer> tryMinimal2Lite(UndirectedSparseGraphTO<Integer, Integer> graphRead,
             Set<Integer> tmp, int tamanhoAlvo) {
         Set<Integer> s = tmp;
@@ -749,6 +752,7 @@ public class GraphHNVOptm
             if (distance <= 1 && !s.contains(v)) {
                 verticesElegiveis.add(v);
             }
+            bonusDisponivel = degree[v] - kr[v];
         }
         double density = (2 * nedges) / (nacessivel * (nacessivel - 1));
         double bonusdisponivelnorm = bonusdisponivel / (double) nacessivel;
