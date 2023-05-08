@@ -1221,6 +1221,9 @@ public class GraphHNVOptm
                 for (Entry<String, Integer> e : entrySet) {
                     String p = e.getKey();
                     System.out.println(p + ": " + e.getValue());
+                    if (p.equals("tss")) {
+                        System.out.println("---------- Limpando no TSS");
+                    }
                 }
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
 //                String p = allParameters.get(ip);
