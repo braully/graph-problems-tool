@@ -475,11 +475,11 @@ public class ExecBigDataSets {
         for (String op : new String[]{
             //            "r"
             //                ,
-            "m",
+            //            "m",
             "k",
             "r"
         }) {
-            for (int k = 1; k <= 10; k++) {
+            for (int k = 1; k <= 5; k++) {
 //            heur1.K = heur2.K = heur3.K
 //                    = heur4.K = heur5.K = heur5t.K = heur5t2.K = tss.K = tssg.K = k;
 //            tss.setR(k);
@@ -517,10 +517,7 @@ public class ExecBigDataSets {
 
                     System.out.println("-------------\n\nk: " + k);
                 }
-                if (op.equals("m") && k == 1) {
-                    System.out.println("Será ignorado m=1 e k=1");
-                    continue;
-                }
+
                 for (String s : dataSets) {
                     System.out.println("\n-DATASET: " + s);
 

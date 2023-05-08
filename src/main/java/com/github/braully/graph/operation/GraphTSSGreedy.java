@@ -6,14 +6,10 @@ import com.github.braully.graph.UtilGraph;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import util.UtilParse;
@@ -26,8 +22,7 @@ import util.UtilProccess;
  */
 public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation {
 
-    static final String type = "P3-Convexity";
-    static final String description = "TSS-Greedy";
+    static final String description = "Greedy-Cordasco";
 
     private static final Logger log = Logger.getLogger(GraphWS.class);
     public int K = 2;
@@ -81,7 +76,6 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
             Integer v = null;
             int min_d = Integer.MAX_VALUE;
             for (Integer u : U) {
-                double x = calcularAvaliacao(k[u], delta[u]);
                 if (k[u] < min_d) {
                     min_d = k[u];
                     v = u;
@@ -107,15 +101,7 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
             }
             U.remove(v);
         }
-        S = tryMinimal(graph, S);
         return S;
-    }
-
-    double calcularAvaliacao(double k, double delta) {
-//        return k / (delta * (delta + 1));
-//        return k - delta;
-//        return k/delta;
-        return delta / k;
     }
 
     public String getTypeProblem() {

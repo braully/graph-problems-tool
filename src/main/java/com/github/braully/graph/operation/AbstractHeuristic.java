@@ -74,27 +74,34 @@ public abstract class AbstractHeuristic implements IGraphOperation {
     }
 
     public void setP(Integer p) {
+        this.P = p;
         this.majority = null;
         this.K = null;
         this.R = null;
-        this.P = p;
     }
 
     public void initKr(UndirectedSparseGraphTO graph) {
         int vertexCount = (Integer) graph.maxVertex() + 1;
         kr = new int[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
+            int degree = graph.degree(i);
             if (R != null) {
                 kr[i] = Math.min(R, graph.degree(i));
             } else if (K != null) {
                 kr[i] = K;
             } else if (majority != null) {
-                kr[i] = roundUp(graph.degree(i), majority);
+                double percent = (double) majority * 0.1;
+                //                kr[i] = roundUp(degree, majority);
+                double ki = Math.ceil(percent * degree);
+                int kii = (int) Math.ceil(ki);
+                kr[i] = kii;
             } else if (P != null) {
-                int degree = graph.degree(i);
                 if (degree > 0) {
-                    int random = random(degree, P);
-                    kr[i] = random;
+//                    int random = random(degree, P);
+//                    kr[i] = random;
+                    double ki = (P.doubleValue() * 0.1) * (double) degree;
+                    int kii = (int) Math.ceil(ki);
+                    kr[i] = kii;
                 } else {
                     kr[i] = degree;
                 }
@@ -488,4 +495,22 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         return tentarMinamilzar2;
     }
 
+    public Set<Integer> refineResultStep1(UndirectedSparseGraphTO<Integer, Integer> graphRead,
+            Set<Integer> tmp, int tamanhoAlvo) {
+        Set<Integer> s = new LinkedHashSet<>(tmp);
+
+        for (Integer v : tmp) {
+            Collection<Integer> nvs = graphRead.getNeighborsUnprotected(v);
+            int scont = 0;
+            for (Integer nv : nvs) {
+                if (s.contains(nv)) {
+                    scont++;
+                }
+            }
+            if (scont >= kr[v]) {
+                s.remove(v);
+            }
+        }
+        return s;
+    }
 }

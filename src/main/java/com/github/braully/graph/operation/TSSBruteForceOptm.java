@@ -246,10 +246,7 @@ public class TSSBruteForceOptm
                     hnv2.setK(k);
                     System.out.println("-------------\n\nk: " + k);
                 }
-                if (op.equals("m") && k == 1) {
-                    System.out.println("Será ignorado m=1 e k=1");
-                    continue;
-                }
+
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;
                 int contgraph = 0;

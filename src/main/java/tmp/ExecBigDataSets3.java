@@ -63,18 +63,18 @@ public class ExecBigDataSets3 {
 
     public static void main(String... args) throws FileNotFoundException, IOException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         String[] dataSets = new String[]{
-//            "ca-GrQc", "ca-HepTh",
-//            "ca-CondMat",
-//            "ca-HepPh",
-//            "ca-AstroPh",
-//            "Douban",
-//            "Delicious",
-//            "BlogCatalog3",
-//            "BlogCatalog2",
-//            "Livemocha",
-//            "BlogCatalog",
-//            "BuzzNet",
-//            "Last.fm", 
+            //            "ca-GrQc", "ca-HepTh",
+            //            "ca-CondMat",
+            //            "ca-HepPh",
+            //            "ca-AstroPh",
+            //            "Douban",
+            //            "Delicious",
+            //            "BlogCatalog3",
+            //            "BlogCatalog2",
+            //            "Livemocha",
+            //            "BlogCatalog",
+            //            "BuzzNet",
+            //            "Last.fm", 
             "YouTube2"
         };
 //        GraphHullNumberHeuristicV5Tmp heur = new GraphHullNumberHeuristicV5Tmp();
@@ -183,10 +183,6 @@ public class ExecBigDataSets3 {
                     tss.setK(k);
                     hnv2.setK(k);
                     System.out.println("-------------\n\nk: " + k);
-                }
-                if (op.equals("m") && k == 1) {
-                    System.out.println("Será ignorado m=1 e k=1");
-                    continue;
                 }
                 for (String s : dataSets) {
                     System.out.println("\n-DATASET: " + s);

@@ -153,17 +153,19 @@ public class ExecRandDataSets {
         GraphTSSCordasco tss = new GraphTSSCordasco();
         GraphTSSGreedy tssg = new GraphTSSGreedy();
         GraphHNV hnv2 = new GraphHNV();
-
+        HNV1 hnv1 = new HNV1();
         AbstractHeuristic[] operations = new AbstractHeuristic[]{
             //                        optm,
-            //            tss, //            heur1,
+            tss, //            heur1,
             //            heur2, 
             //            heur3, heur4,
             //            heur5,
             //            heur5t,
             //            tssg,
             //            heur5t2,
-            hnv2
+                                    hnv2
+//            hnv1
+
 //            optm
 //            optmpoda
         };
@@ -186,13 +188,20 @@ public class ExecRandDataSets {
 
         Map<String, Boolean> piorou = new HashMap<>();
 
-        for (int k = 1; k <= 1; k++) {
+        for (int k = 1; k <= 10; k++) {
 //            optm.setP(k);
-            tss.setP(k);
 //            optmpoda.setP(k);
 //            heur5t2.setP(k);
-            hnv2.setP(k);
 //            hnv2.setK(k);
+
+//            tss.setP(k);
+//            hnv2.setP(k);
+//            hnv1.setP(k);
+
+            tss.setMarjority(k);
+            hnv2.setMarjority(k);
+            hnv1.setMarjority(k);
+
             System.out.println("-------------\n\nR: " + k);
 
             for (String s : dataSets) {
