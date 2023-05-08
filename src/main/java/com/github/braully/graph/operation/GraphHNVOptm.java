@@ -1092,17 +1092,18 @@ public class GraphHNVOptm
         {
             System.out.println("Testando ciclo: " + t);
 
-            for (int r = 1; r <= 8; r++) {
+            for (int r = 2; r <= 7; r++) {
                 BufferedReader files = new BufferedReader(new FileReader(strFile));
                 String line = null;
                 int cont = 0;
                 MapCountOpt contMelhor = new MapCountOpt(allParameters.size() * 100000);
-
+                String sop = null;
                 while (null != (line = files.readLine())) {
                     graph = UtilGraph.loadGraphES(line);
 //                    op.setK(r);
                     op.setP(r);
                     tss.setP(r);
+                    sop = "percent";
 //                    tss.setR(r);
                     Set<Integer> tssCordasco = tss.tssCordasco(graph);
                     Integer melhor = tssCordasco.size();
@@ -1177,16 +1178,16 @@ public class GraphHNVOptm
                         }
                         z--;
 //                for (Integer i : melhores) {
-                        for (int[] ip : melhores) {
-                            int i = op.array2idx(ip);
-                            contMelhor.inc(i);
-                        }
-                        cont++;
                     }
+                    for (int[] ip : melhores) {
+                        int i = op.array2idx(ip);
+                        contMelhor.inc(i);
+                    }
+                    cont++;
                 }
                 files.close();
                 System.out.println("\n---------------");
-                System.out.println("Resumo r:" + r + " toal de grafos: " + cont);
+                System.out.println("Resumo + " + sop + ":" + r + " toal de grafos: " + cont);
                 op.resetParameters();
                 System.out.println("Otimizações iniciais: " + op.getName());
 
