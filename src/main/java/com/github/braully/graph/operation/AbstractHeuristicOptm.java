@@ -65,9 +65,8 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
 
     String firstParameter = null;
 
-   public Set<String> parametersPular = Set.of(pdeltaHsi, pbonusTotal,
-            pdificuldadeTotal, pdificuldadeParcial, pdeltaParcial,
-            pbonusParcial);
+    public Set<String> parametersPular = Set.of(pdeltaHsi, pbonusTotal,
+            pdificuldadeTotal);
 
     public void setParameter(String p, boolean b) {
         if (this.parameters.isEmpty()) {
