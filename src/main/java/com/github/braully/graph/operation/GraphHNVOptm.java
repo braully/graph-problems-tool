@@ -1223,6 +1223,7 @@ public class GraphHNVOptm
                     System.out.println(p + ": " + e.getValue());
                     if (p.equals("tss")) {
                         System.out.println("---------- Limpando no TSS");
+                        break;
                     }
                 }
 //            for (int ip = 0; ip < allParameters.size(); ip++) {
