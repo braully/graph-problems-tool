@@ -1105,9 +1105,12 @@ public class GraphHNVOptm
                 while (null != (line = files.readLine())) {
                     graph = UtilGraph.loadGraphES(line);
 //                    op.setK(r);
-                    op.setP(r);
-                    tss.setP(r);
-                    sop = "percent";
+//                    op.setP(r);
+//                    tss.setP(r);
+//                    sop = "percent";
+                    op.setK(r);
+                    tss.setK(r);
+                    sop = "k-fixed";
 //                    tss.setR(r);
                     Set<Integer> tssCordasco = tss.tssCordasco(graph);
                     Integer melhor = tssCordasco.size();
