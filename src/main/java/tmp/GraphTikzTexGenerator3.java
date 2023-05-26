@@ -31,14 +31,24 @@ import java.util.logging.Logger;
  *
  * @author strike
  */
-public class GraphTikzTexGenerator {
+public class GraphTikzTexGenerator3 {
 
     static String url = "jdbc:h2:file:/home/strike/Documentos/doutorado/artigo-p3-hull-heuristica/db-resultado-heuristica/db;ACCESS_MODE_DATA=r";
 
     static String sqlquery = "SELECT distinct k, min(tss) as tss "
-            + " FROM resultado  WHERE k <= 7 and algoritmo in ('ALGO') and grafo='GRAFO' and p in ('OP') "
+            + " FROM resultado  WHERE k>0 and k <= 7 and algoritmo in ('ALGO') and grafo='GRAFO' and p in ('OP') "
             + "  group by grupo, grafo, p, k, algoritmo "
             + " order by k";
+
+    static String sqlTimequery2 = "SELECT algoritmo, k, SUM(tempo/1000) as tempo, count(*) \n"
+            + "FROM (SELECT distinct grupo, grafo, p, k, algoritmo, min(tempo) as tempo \n"
+            + " FROM RESULTADO \n"
+            + " where grupo = 'Big' and p in ('OP') and k>0  and k <= 7 \n"
+            + " and grafo='GRAFO' "
+            + " group by grupo, grafo, p, k, algoritmo\n"
+            + " order by grafo, p, k)\n"
+            + "WHERE algoritmo in ('ALGO')\n"
+            + "GROUP by k, algoritmo;";
 
     static String sqlTimequery = "SELECT algoritmo, k, SUM(tempo/1000) as tempo, count(*) \n"
             + "FROM (SELECT distinct grupo, grafo, p, k, algoritmo, min(tempo) as tempo \n"
@@ -95,7 +105,7 @@ public class GraphTikzTexGenerator {
         context.put("grafos", dataSets);
         context.put("operacoes", operacoes);
 
-        GetTTimeList gettimelist = new GraphTikzTexGenerator.GetTTimeList();
+        GetTTimeList gettimelist = new GraphTikzTexGenerator3.GetTTimeList();
 
         context.put("gettimelist", gettimelist);
 //        context.put("legend", Map.of("m", "percentage of neighbors"));
@@ -123,8 +133,11 @@ public class GraphTikzTexGenerator {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("grafos", dataSets);
         context.put("operacoes", operacoes);
-        GetList getlist = new GraphTikzTexGenerator.GetList();
+        GetList getlist = new GraphTikzTexGenerator3.GetList();
 
+        GetTTimeList2 gettimelist = new GraphTikzTexGenerator3.GetTTimeList2();
+
+        context.put("gettimelist", gettimelist);
         context.put("getlist", getlist);
 //        context.put("legend", Map.of("m", "percentage of neighbors"));
         context.put("legend", Map.of("m", "porcentagem de vizinhos"));
@@ -193,7 +206,50 @@ public class GraphTikzTexGenerator {
                 }
 
             } catch (Exception ex) {
-                Logger.getLogger(GraphTikzTexGenerator.class.getName())
+                Logger.getLogger(GraphTikzTexGenerator3.class.getName())
+                        .log(Level.SEVERE, null, ex);
+            }
+//            sb.append("'");
+//            sbs.append("(0,3)");
+//            return new SimpleScalar(sb.toString());
+            return sb.toString();
+        }
+    }
+
+    public static class GetTTimeList2 implements TemplateMethodModelEx {
+
+        @Override
+        public Object exec(List args) {
+            StringBuilder sb = new StringBuilder();
+//            StringBuilder sbs = new StringBuilder();
+
+//            sb.append("'");
+            try {
+                List<SimpleScalar> argv = args;
+                String op = argv.get(1).getAsString();
+                String sql = sqlTimequery2
+                        .replaceAll("GRAFO", argv.get(0).getAsString())
+                        .replaceAll("OP", op)
+                        .replaceAll("ALGO", argv.get(2).getAsString());
+                ResultSet executeQuery
+                        = stmt.executeQuery(sql);
+
+                while (executeQuery.next()) {
+                    int k = executeQuery.getInt("k");
+                    int tss = executeQuery.getInt("tempo");
+                    sb.append("(");
+                    if (op.equals("m")) {
+                        sb.append("0." + k);
+                    } else {
+                        sb.append(k);
+                    }
+                    sb.append(",");
+                    sb.append(tss);
+                    sb.append(") ");
+                }
+
+            } catch (Exception ex) {
+                Logger.getLogger(GraphTikzTexGenerator3.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
 //            sb.append("'");
@@ -236,7 +292,7 @@ public class GraphTikzTexGenerator {
                 }
 
             } catch (Exception ex) {
-                Logger.getLogger(GraphTikzTexGenerator.class.getName())
+                Logger.getLogger(GraphTikzTexGenerator3.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
 //            sb.append("'");

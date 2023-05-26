@@ -31,23 +31,22 @@ import java.util.logging.Logger;
  *
  * @author strike
  */
-public class GraphTikzTexGenerator {
+public class GraphTikzTexGenerator2 {
 
     static String url = "jdbc:h2:file:/home/strike/Documentos/doutorado/artigo-p3-hull-heuristica/db-resultado-heuristica/db;ACCESS_MODE_DATA=r";
 
     static String sqlquery = "SELECT distinct k, min(tss) as tss "
-            + " FROM resultado  WHERE k <= 7 and algoritmo in ('ALGO') and grafo='GRAFO' and p in ('OP') "
+            + " FROM resultado  WHERE k>0 and k <= 7 and algoritmo in ('ALGO') and grafo='GRAFO' and p in ('OP') "
             + "  group by grupo, grafo, p, k, algoritmo "
             + " order by k";
 
     static String sqlTimequery = "SELECT algoritmo, k, SUM(tempo/1000) as tempo, count(*) \n"
             + "FROM (SELECT distinct grupo, grafo, p, k, algoritmo, min(tempo) as tempo \n"
             + " FROM RESULTADO \n"
-            + " where grupo = 'Big' and p in ('OP') and k <= 7 \n"
-            + " and grafo in ('ca-GrQc', 'ca-HepTh', 'ca-CondMat', 'ca-HepPh', 'ca-AstroPh',"
-            + " 'Douban', 'Delicious', 'BlogCatalog3',  'BlogCatalog2', 'Livemocha',"
-            + " 'BlogCatalog', 'BuzzNet', 'Last.fm', 'YouTube2'"
-            + ") "
+            + " where grupo = 'Big' and p in ('OP') and k>0 and k <= 7 \n"
+            + " and grafo in ('ca-GrQc', 'ca-HepTh', 'ca-CondMat', 'ca-HepPh', 'ca-AstroPh', 'Douban', 'Delicious', 'BlogCatalog3', "
+            //            + " 'BlogCatalog2', 'Livemocha', 'BlogCatalog', 'BuzzNet', 'Last.fm', 'YouTube2') "
+            + " 'BlogCatalog2', 'Livemocha', 'BlogCatalog', 'BuzzNet', 'Last.fm') "
             + " group by grupo, grafo, p, k, algoritmo\n"
             + " order by grafo, p, k)\n"
             + "WHERE algoritmo in ('ALGO')\n"
@@ -68,10 +67,11 @@ public class GraphTikzTexGenerator {
             "BlogCatalog",
             "BuzzNet",
             "Last.fm",
-            "YouTube2"
+//            "YouTube2"
         };
         String[] operacoes = new String[]{
-            "m", //            "k", //            "r"
+            //            "m", 
+            "k", //            "r"
         };
         init();
         try {
@@ -89,19 +89,19 @@ public class GraphTikzTexGenerator {
 
     public static void generateGraphBar(String[] dataSets, String[] operacoes) throws IOException, TemplateException {
         //Load template from source folder
-        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/qualificacao-doutorado-2023/template/grafico-total-exec-time.tex.vm");
+        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-total-exec-time-sbpo.tex.vm");
         // Build the data-model
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("grafos", dataSets);
         context.put("operacoes", operacoes);
 
-        GetTTimeList gettimelist = new GraphTikzTexGenerator.GetTTimeList();
+        GetTTimeList gettimelist = new GraphTikzTexGenerator2.GetTTimeList();
 
         context.put("gettimelist", gettimelist);
-//        context.put("legend", Map.of("m", "percentage of neighbors"));
-        context.put("legend", Map.of("m", "porcentagem de vizinhos"));
+
+        context.put("legend", Map.of("m", "percentage of neighbors"));
         // Console output
-        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/qualificacao-doutorado-2023/img/tss/grafico-total-exec-time.tex"));
+        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/grafico-total-exec-time-sbpo.tex"));
 
         template.process(context, file);
         file.flush();
@@ -118,18 +118,17 @@ public class GraphTikzTexGenerator {
 
     public static void generateGraphAxis(String[] dataSets, String[] operacoes) throws IOException, TemplateException {
         //Load template from source folder
-        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/qualificacao-doutorado-2023/template/grafico-big-exec-linhas.tex.vm");
+        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-big-exec-linhas-sbpo.tex.vm");
         // Build the data-model
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("grafos", dataSets);
         context.put("operacoes", operacoes);
-        GetList getlist = new GraphTikzTexGenerator.GetList();
+        GetList getlist = new GraphTikzTexGenerator2.GetList();
 
         context.put("getlist", getlist);
-//        context.put("legend", Map.of("m", "percentage of neighbors"));
-        context.put("legend", Map.of("m", "porcentagem de vizinhos"));
+        context.put("legend", Map.of("k", "k-vizinhos"));
         // Console output
-        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/qualificacao-doutorado-2023/img/tss/graficos.tex"));
+        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/graficos-sbpo.tex"));
 
         template.process(context, file);
         file.flush();
@@ -193,7 +192,7 @@ public class GraphTikzTexGenerator {
                 }
 
             } catch (Exception ex) {
-                Logger.getLogger(GraphTikzTexGenerator.class.getName())
+                Logger.getLogger(GraphTikzTexGenerator2.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
 //            sb.append("'");
@@ -236,7 +235,7 @@ public class GraphTikzTexGenerator {
                 }
 
             } catch (Exception ex) {
-                Logger.getLogger(GraphTikzTexGenerator.class.getName())
+                Logger.getLogger(GraphTikzTexGenerator2.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
 //            sb.append("'");
