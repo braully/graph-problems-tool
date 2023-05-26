@@ -6,10 +6,7 @@
 package com.github.braully.graph;
 
 import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV2;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV3;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV5;
+import com.github.braully.graph.operation.GraphDensity;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
 import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
@@ -55,12 +52,13 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphCaratheodoryNumberBinary(),
         //        new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumberOptm(),
-        new GraphHullNumberHeuristicV1(),
-        new GraphHullNumberHeuristicV2(),
-        new GraphHullNumberHeuristicV3(),
-        new GraphHullNumberHeuristicV5(),
+//        new GraphHullNumberHeuristicV1(),
+//        new GraphHullNumberHeuristicV2(),
+//        new GraphHullNumberHeuristicV3(),
+//        new GraphHullNumberHeuristicV5(),
         new GraphHullNumberHeuristicV5Tmp(),
         new GraphHullNumberHeuristicV5Tmp2(),
+        new GraphDensity(),
         new GraphIterationNumberOptm(),
         new GraphTSSCordasco(),
         new ConjectureOperation()

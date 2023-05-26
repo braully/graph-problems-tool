@@ -27,14 +27,14 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
 
     public static final String pdeltaHsixdificuldadeTotal = "deltaHXdifTotal";
 
-    public static final String pdeltaHsi = "deltaHsi";
-    public static final String pdeltaParcial = "deltaParcial";
-    public static final String pbonusTotal = "bonusTotal";
-    public static final String pbonusParcial = "bonusParcial";
-    public static final String pdificuldadeTotal = "dificuldadeTotal";
+    public static final String pdeltaHsi = "delta";
+    public static final String pdeltaParcial = "partial";//"deltaParcial";
+    public static final String pbonusTotal = "distDelta";
+    public static final String pbonusParcial = "degreeDelta";
+    public static final String pdificuldadeTotal = "difDelta";
     public static final String pdificuldadeParcial = "dificuldadeParcial";
-    public static final String pbonusTotalNormalizado = "bonusTotalNormalizado";
-    public static final String pbonusParcialNormalizado = "bonusParcialNormalizado";
+    public static final String pbonusTotalNormalizado = "difficulty";//"bonusTotalNormalizado";
+    public static final String pbonusParcialNormalizado = "dist";//"bonusParcialNormalizado";
     public static final String pprofundidadeS = "profundidadeS";
     public static final String pgrau = "grau";
     public static final String paux = "aux";
@@ -443,6 +443,9 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
     protected int maiorGrauContaminacao = 0;
     protected int maiorDeltaHs = 0;
     protected int maiorContaminadoParcialmente = 0;
+    protected int maiorDificuldade = 0;
+    protected int maiorBonus = 0;
+    protected int maiorVizinhanca = 0;
     protected double maiorBonusParcialNormalizado = 0.0;
     protected double maiorDificuldadeTotal = 0;
     protected double maiorBonusTotal = 0;

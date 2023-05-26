@@ -13,6 +13,7 @@ public class GraphDensity implements IGraphOperation {
     /*
     
      */
+    static public final String PARAM_DENSITY = "density";
     static final String type = "General";
     static final String description = "Density";
 
@@ -26,8 +27,17 @@ public class GraphDensity implements IGraphOperation {
 
     @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
-        double d = 0.0;
+        double d = density(graph);
 
+        /* Processar a buscar pelo hullset e hullnumber */
+        Map<String, Object> response = new HashMap<>();
+        response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, d);
+        response.put(PARAM_DENSITY, d);
+        return response;
+    }
+
+    public double density(UndirectedSparseGraphTO<Integer, Integer> graph) {
+        double d = 0.0;
         try {
             double m = graph.getEdgeCount();
             double n = graph.getVertexCount();
@@ -35,11 +45,7 @@ public class GraphDensity implements IGraphOperation {
         } catch (Exception e) {
 
         }
-
-        /* Processar a buscar pelo hullset e hullnumber */
-        Map<String, Object> response = new HashMap<>();
-        response.put(IGraphOperation.DEFAULT_PARAM_NAME_RESULT, d);
-        return response;
+        return d;
     }
 
 }
