@@ -377,4 +377,13 @@ public class UndirectedSparseGraphTO<V extends Number, E extends Number> extends
     public String toResumedString() {
         return name + " n=" + getVertexCount() + " m=" + getEdgeCount();
     }
+
+    public Integer addVertex() {
+        Integer newVert = 0;
+        if (this.getVertexCount() > 0) {
+            newVert = (Integer) maxVertex() + 1;
+        }
+        addVertex(newVert);
+        return newVert;
+    }
 }

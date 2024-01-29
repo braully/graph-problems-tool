@@ -51,7 +51,7 @@ public class GraphGeneratorPath extends AbstractGraphGenerator {
             Integer target = vertexs[i] + 1;
             graph.addEdge(countEdge++, source, target);
         }
-        graph.setName("P" + (nvertices + 1));
+        graph.setName("P" + (nvertices));
         return graph;
     }
 }

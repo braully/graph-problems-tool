@@ -67,11 +67,11 @@ public class GraphTikzTexGenerator2 {
             "BlogCatalog",
             "BuzzNet",
             "Last.fm",
-//            "YouTube2"
+            "YouTube2"
         };
         String[] operacoes = new String[]{
-            //            "m", 
-            "k", //            "r"
+                        "m", 
+//            "k", //            "r"
         };
         init();
         try {
@@ -89,7 +89,7 @@ public class GraphTikzTexGenerator2 {
 
     public static void generateGraphBar(String[] dataSets, String[] operacoes) throws IOException, TemplateException {
         //Load template from source folder
-        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-total-exec-time-sbpo.tex.vm");
+        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-total-exec-time.tex.vm");
         // Build the data-model
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("grafos", dataSets);
@@ -101,7 +101,7 @@ public class GraphTikzTexGenerator2 {
 
         context.put("legend", Map.of("m", "percentage of neighbors"));
         // Console output
-        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/grafico-total-exec-time-sbpo.tex"));
+        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/grafico-total-exec-time.tex"));
 
         template.process(context, file);
         file.flush();
@@ -118,7 +118,7 @@ public class GraphTikzTexGenerator2 {
 
     public static void generateGraphAxis(String[] dataSets, String[] operacoes) throws IOException, TemplateException {
         //Load template from source folder
-        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-big-exec-linhas-sbpo.tex.vm");
+        Template template = cfg.getTemplate("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/grafico-big-exec-linhas.tex.vm");
         // Build the data-model
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("grafos", dataSets);
@@ -128,7 +128,7 @@ public class GraphTikzTexGenerator2 {
         context.put("getlist", getlist);
         context.put("legend", Map.of("k", "k-vizinhos"));
         // Console output
-        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/graficos-sbpo.tex"));
+        Writer file = new FileWriter(new File("/home/strike/Documentos/doutorado/artigo-greedy-contamination-problem/img/graficos-asonam.tex"));
 
         template.process(context, file);
         file.flush();

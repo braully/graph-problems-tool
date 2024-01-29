@@ -44,18 +44,22 @@ public class GraphStatistics implements IGraphOperation {
             response.put("n", graph.getVertexCount());
             response.put("m", graph.getEdgeCount());
 
-            int Lambda = 0, lambda = Integer.MAX_VALUE;
-            for (Integer i : (Collection<Integer>) graph.getVertices()) {
-                lambda = Math.min(lambda, graph.getNeighborCount(i));
-                Lambda = Math.max(Lambda, graph.getNeighborCount(i));
-            }
-            response.put("δ", lambda);
-            response.put("Δ", Lambda);
-            response.put("ω", numConnectedComponents(graph));
+            basicstats(graph, response);
         } catch (Exception ex) {
             log.error(null, ex);
         }
         return response;
+    }
+
+    public void basicstats(UndirectedSparseGraphTO<Integer, Integer> graph, Map<String, Object> response) {
+        int Lambda = 0, lambda = Integer.MAX_VALUE;
+        for (Integer i : (Collection<Integer>) graph.getVertices()) {
+            lambda = Math.min(lambda, graph.getNeighborCount(i));
+            Lambda = Math.max(Lambda, graph.getNeighborCount(i));
+        }
+        response.put("δ", lambda);
+        response.put("Δ", Lambda);
+        response.put("ω", numConnectedComponents(graph));
     }
 
     /* 

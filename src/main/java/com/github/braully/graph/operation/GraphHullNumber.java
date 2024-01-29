@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 public class GraphHullNumber implements IGraphOperation {
 
-    protected boolean verbose = true;
+    protected boolean verbose = false;
 
     static final String type = "P3-Convexity";
     static final String description = "Hull Number (Java)";

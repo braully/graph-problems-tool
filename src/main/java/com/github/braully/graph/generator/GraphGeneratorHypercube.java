@@ -1,16 +1,14 @@
 package com.github.braully.graph.generator;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class GraphGeneratorHypercube extends AbstractGraphGenerator {
 
-    static final String N_VERTICES = "Nº Vertices";
-    static final String STRING_EDGES = "List";
-    static final String[] parameters = {N_VERTICES, STRING_EDGES};
-    static final String description = "Circulant";
+    static final String N_VERTICES = "N";
+    static final String STRING_EDGES = "N";
+    static final String[] parameters = {N_VERTICES};
+    static final String description = "Hypercube";
     static final Integer DEFAULT_NVERTICES = 5;
 
     @Override

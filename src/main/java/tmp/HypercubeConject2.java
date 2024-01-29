@@ -24,35 +24,31 @@
 package tmp;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import com.github.braully.graph.generator.GraphGeneratorCirculant;
-import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
+import com.github.braully.graph.generator.GraphGeneratorHypercube;
 import com.github.braully.graph.operation.GraphCaratheodoryNumberOptm;
 import com.github.braully.graph.operation.GraphStatistics;
-import static com.github.braully.graph.operation.OperationConvexityGraphResult.PARAM_NAME_CARATHEODORY_NUMBER;
-import static com.github.braully.graph.operation.OperationConvexityGraphResult.PARAM_NAME_CARATHEODORY_SET;
-import static com.github.braully.graph.operation.OperationConvexityGraphResult.PARAM_NAME_CONVEX_HULL;
-import java.util.Collection;
-import static java.util.Collections.list;
+import com.github.braully.graph.operation.OperationConvexityGraphResult;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author strike
  */
-public class CirculantConject {
+public class HypercubeConject2 {
 
     public static void main(String... args) {
-        GraphGeneratorCirculant gerador = new GraphGeneratorCirculant();
+        GraphGeneratorHypercube gerador = new GraphGeneratorHypercube();
 //        GraphHullNumberOptm operacao = new GraphHullNumberOptm();
 //        TSSBruteForceOptm operacao = new TSSBruteForceOptm();
 //        operacao.setK(2);
         GraphStatistics statistics = new GraphStatistics();
-//        GraphCaratheodoryNumberBinary operacao = new GraphCaratheodoryNumberBinary();
         GraphCaratheodoryNumberOptm operacao = new GraphCaratheodoryNumberOptm();
-        String list = "1,5";
+
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        for (int n = 20; n < 100; n++) {
-            graph = gerador.generate(n, list);
+        for (int n = 2; n < 100; n++) {
+            graph = gerador.generate(n);
             Map<String, Object> stats = statistics.doOperation(graph);
             System.out.println(graph.getName());
             System.out.println(" - statistics: " + stats);
@@ -60,12 +56,22 @@ public class CirculantConject {
 //            Set<Integer> hullSet = operacao.findMinHullSetGraph(graph);
 //            System.out.println(graph.getName() + ": " + hullSet.size());
 //            System.out.println(hullSet);
-            Map<String, Object> doOperation = operacao.doOperation(graph);
-            System.out.println(graph.getName() + ": " + doOperation.get(PARAM_NAME_CARATHEODORY_NUMBER));
-            System.out.println(doOperation.get(PARAM_NAME_CARATHEODORY_SET));
-            Collection ch = (Collection) doOperation.get(PARAM_NAME_CONVEX_HULL);
-            if (ch != null) {
-                System.out.println("|H(S)|: " + ch.size());
+            List<Integer> list = new ArrayList<>();
+            int nvertices = (int) Math.pow(2, n);
+            Integer[] vertexs = new Integer[n];
+            for (int i = 0; i < n; i++) {
+                list.add((int) Math.pow(2, i));
+            }
+
+            OperationConvexityGraphResult hsp3aux = operacao.hsp3aux(graph, list.toArray(Integer[]::new));
+//            Map<String, Object> doOperation = operacao.doOperation(graph);
+//            Collection<Integer> set = (Collection<Integer>) doOperation.get(PARAM_NAME_CARATHEODORY_SET);
+//            Integer nc = (Integer) doOperation.get(PARAM_NAME_CARATHEODORY_NUMBER);
+            System.out.println(graph.getName() + ": " + hsp3aux.caratheodoryNumber);
+            System.out.println("Caratheodory set: " + hsp3aux.caratheodorySet);
+            for (Integer v : hsp3aux.caratheodorySet) {
+                String toBinaryString = Integer.toBinaryString(v);
+                System.out.println(v + " " + toBinaryString);
             }
         }
     }
