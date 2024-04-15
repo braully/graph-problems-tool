@@ -5,6 +5,7 @@
  */
 package com.github.braully.graph;
 
+import edu.uci.ics.jung.graph.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -17,9 +18,12 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 /**
@@ -34,6 +38,7 @@ public class UtilGraph {
 
     private static String inputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/converter";
     private static String outputFilePath = com.github.braully.graph.DatabaseFacade.DATABASE_DIRECTORY + "tmp/grafos/convertidos";
+    private static boolean verbose = false;
 
     public static void main(String... args) throws Exception {
         processDirectory(null, null);
@@ -225,32 +230,145 @@ public class UtilGraph {
         writer.write("\n");
     }
 
-    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDataset(InputStream streamNodes, InputStream edgesStream) throws IOException {
+    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDatasetRaw(InputStream edgesStream) throws IOException {
         UndirectedSparseGraphTO<Integer, Integer> ret = null;
-        if (streamNodes != null && edgesStream != null) {
+        if (edgesStream != null) {
+            Map<Integer, Integer> vCount = new HashMap<>();
+            TreeSet<Integer> mnodes = new TreeSet<>();
+            List<Pair<Integer>> sedges = new ArrayList<>();
+
+            int count = 0;
+            String readLine = null;
             try {
                 ret = new UndirectedSparseGraphTO<Integer, Integer>();
-                BufferedReader rnodes = new BufferedReader(new InputStreamReader(streamNodes));
-                String readLine = null;
-                while ((readLine = rnodes.readLine()) != null
-                        && !(readLine = readLine.trim()).startsWith("#")) {
-                    Integer v = Integer.parseInt(readLine);
-                    ret.addVertex(v - 1);
-                }
+
                 BufferedReader redges = new BufferedReader(new InputStreamReader(edgesStream));
                 readLine = null;
                 while ((readLine = redges.readLine()) != null
-                        && !(readLine = readLine.trim()).isEmpty()
-                        && !readLine.startsWith("#")) {
-                    String[] split = readLine.split(",");
+                        && !(readLine = readLine.trim()).isEmpty()) {
+                    if (readLine.startsWith("#")) {
+                        continue;
+                    }
+                    String[] split = readLine.split("\t");
                     if (split.length >= 2) {
-                        Integer v = Integer.parseInt(split[0].trim()) - 1;
-                        Integer t = Integer.parseInt(split[1].trim()) - 1;
+                        Integer v = Integer.parseInt(split[0].trim());
+                        Integer t = Integer.parseInt(split[1].trim());
+                        ret.addVertex(v);
+                        ret.addVertex(t);
+                        if (v != null && t != null && !v.equals(t)) {
+                            ret.addEdge(v, t);
+                        }
+                    } else {
+                        System.err.println("Line not parsed: " + readLine);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(readLine);
+            }
+
+        }
+        return ret;
+    }
+
+    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDataset(InputStream edgesStream) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        if (edgesStream != null) {
+            Map<Integer, Integer> vCount = new HashMap<>();
+            TreeSet<Integer> mnodes = new TreeSet<>();
+            List<Pair<Integer>> sedges = new ArrayList<>();
+
+            int count = 0;
+            String readLine = null;
+            try {
+                ret = new UndirectedSparseGraphTO<Integer, Integer>();
+
+                BufferedReader redges = new BufferedReader(new InputStreamReader(edgesStream));
+                readLine = null;
+                while ((readLine = redges.readLine()) != null
+                        && !(readLine = readLine.trim()).isEmpty()) {
+                    if (readLine.startsWith("#")) {
+                        continue;
+                    }
+                    String[] split = readLine.split("\t");
+                    if (split.length >= 2) {
+                        Integer v = Integer.parseInt(split[0].trim());
+                        Integer t = Integer.parseInt(split[1].trim());
+                        mnodes.add(t);
+                        mnodes.add(v);
+                        sedges.add(new Pair<Integer>(v, t));
+                    } else {
+                        System.err.println("Line not parsed: " + readLine);
+                    }
+                }
+                for (Integer v : mnodes) {
+                    vCount.put(v, count);
+                    ret.addVertex(count);
+                    count++;
+                }
+
+                for (Pair<Integer> p : sedges) {
+                    Integer v = vCount.get(p.getFirst());
+                    Integer t = vCount.get(p.getSecond());
+                    if (v != null && t != null && !v.equals(t)) {
                         ret.addEdge(v, t);
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(readLine);
+            }
 
+        }
+        return ret;
+    }
+
+    public static UndirectedSparseGraphTO<Integer, Integer> loadBigDataset(InputStream streamNodes, InputStream edgesStream) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        if (streamNodes != null && edgesStream != null) {
+            Map<Integer, Integer> vCount = new HashMap<>();
+            int count = 0;
+            String readLine = null;
+            try {
+                ret = new UndirectedSparseGraphTO<Integer, Integer>();
+                BufferedReader rnodes = new BufferedReader(new InputStreamReader(streamNodes));
+                while ((readLine = rnodes.readLine()) != null
+                        && !(readLine = readLine.trim()).startsWith("#")) {
+                    Integer v = Integer.parseInt(readLine);
+//                    ret.addVertex(v - 1);
+                    vCount.put(v, count);
+                    ret.addVertex(count);
+                    count++;
+                }
+                BufferedReader redges = new BufferedReader(new InputStreamReader(edgesStream));
+                readLine = null;
+                while ((readLine = redges.readLine()) != null
+                        && !(readLine = readLine.trim()).isEmpty()) {
+                    if (readLine.startsWith("#")) {
+                        continue;
+                    }
+                    String[] split = readLine.split(",");
+                    if (split.length >= 2) {
+//                        Integer v = Integer.parseInt(split[0].trim()) - 1;
+//                        Integer t = Integer.parseInt(split[1].trim()) - 1;
+                        Integer v = vCount.get(Integer.parseInt(split[0].trim()));
+                        Integer t = vCount.get(Integer.parseInt(split[1].trim()));
+                        if (v != null && t != null && !t.equals(v)) {
+                            ret.addEdge(v, t);
+                        } else {
+                            if (verbose) {
+                                System.err.println("Fail on edge v e t null: " + readLine);
+                            }
+                        }
+                    } else {
+                        if (verbose) {
+                            System.err.println("Fail on edge: " + readLine);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(readLine);
             }
         }
         return ret;
@@ -448,6 +566,7 @@ public class UtilGraph {
             ret = loadGraphG6(readLine);
         }
         return ret;
+
     }
 
     static class ByteReader6 {
@@ -586,6 +705,31 @@ public class UtilGraph {
             }
         }
         return g;
+    }
+
+    public static UndirectedSparseGraphTO<Integer, Integer> loadGraphES(String readLine) throws IOException {
+        UndirectedSparseGraphTO<Integer, Integer> ret = null;
+        ret = new UndirectedSparseGraphTO<>();
+        int countEdge = 0;
+        String[] edges = null;
+        if (readLine != null && !readLine.isEmpty() && (edges = readLine.trim().split(",")) != null) {
+            try {
+                for (String stredge : edges) {
+                    String[] vs = stredge.split("-");
+                    if (vs != null && vs.length >= 2) {
+                        Integer source = Integer.parseInt(vs[0].trim());
+                        Integer target = Integer.parseInt(vs[1].trim());
+                        ret.addEdge(countEdge++, source, target);
+                    } else if (!stredge.isEmpty()) {
+                        ret.addVertex(Integer.parseInt(stredge));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ret;
     }
 
     public static UndirectedSparseGraphTO<Integer, Integer> loadGraphES(InputStream uploadedInputStream) throws IOException {

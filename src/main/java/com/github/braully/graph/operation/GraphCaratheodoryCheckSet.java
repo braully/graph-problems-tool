@@ -58,21 +58,39 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
         Set<Integer> hsp3g = new HashSet<>();
         int[] aux = new int[graph.getVertexCount()];
         int[] auxc = new int[graph.getVertexCount()];
+        int[] scount = new int[graph.getVertexCount()];
+        int maxscount = 0;
+
         for (int i = 0; i < aux.length; i++) {
             aux[i] = 0;
             auxc[i] = 0;
+            scount[i] = 0;
         }
+
+        int cont = 0;
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         for (Integer v : currentSet) {
             mustBeIncluded.add(v);
             aux[v] = INCLUDED;
             auxc[v] = 1;
             currentSetSize++;
+            cont++;
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(v);
+            for (Integer nb : neighbors) {
+                scount[nb]++;
+            }
         }
-        while (!mustBeIncluded.isEmpty()) {
+        boolean skip = false;
+        for (Integer v : currentSet) {
+            if (scount[v] >= 2) {
+                skip = true;
+                break;
+            }
+        }
+        while (!mustBeIncluded.isEmpty() && !skip) {
             Integer verti = mustBeIncluded.remove();
             hsp3g.add(verti);
-            Collection<Integer> neighbors = graph.getNeighbors(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
 
             for (int vertn : neighbors) {
                 if (vertn == verti) {
@@ -95,8 +113,95 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
                 break;
             }
         }
+
+        if (checkDerivated && hsp3g.size() < 2 * currentSet.length - 1) {
+            checkDerivated = false;
+        }
         Set<Integer> partial = null;
-        if (checkDerivated) {
+        if (checkDerivated && !skip) {
+            partial = calcDerivatedPartial(graph,
+                    hsp3g, currentSet);
+        }
+        Set<Integer> setCurrent = new HashSet<>();
+        for (int i : currentSet) {
+            setCurrent.add(i);
+        }
+        processedHullSet = new OperationConvexityGraphResult();
+        processedHullSet.caratheodoryNumber = currentSetSize;
+        processedHullSet.auxProcessor = aux;
+        processedHullSet.convexHull = hsp3g;
+        processedHullSet.caratheodorySet = setCurrent;
+        processedHullSet.partial = partial;
+        return processedHullSet;
+    }
+
+    public OperationConvexityGraphResult hsp3aux(UndirectedSparseGraphTO<Integer, Integer> graph, Integer[] currentSet) {
+        int currentSetSize = 0;
+        OperationConvexityGraphResult processedHullSet = null;
+        Set<Integer> hsp3g = new HashSet<>();
+        int[] aux = new int[graph.getVertexCount()];
+        int[] auxc = new int[graph.getVertexCount()];
+        int[] scount = new int[graph.getVertexCount()];
+        int maxscount = 0;
+
+        for (int i = 0; i < aux.length; i++) {
+            aux[i] = 0;
+            auxc[i] = 0;
+            scount[i] = 0;
+        }
+
+        int cont = 0;
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        for (Integer v : currentSet) {
+            mustBeIncluded.add(v);
+            aux[v] = INCLUDED;
+            auxc[v] = 1;
+            currentSetSize++;
+            cont++;
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(v);
+            for (Integer nb : neighbors) {
+                scount[nb]++;
+            }
+        }
+        boolean skip = false;
+        for (Integer v : currentSet) {
+            if (scount[v] >= 2) {
+                skip = true;
+                break;
+            }
+        }
+        while (!mustBeIncluded.isEmpty() && !skip) {
+            Integer verti = mustBeIncluded.remove();
+            hsp3g.add(verti);
+            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+
+            for (int vertn : neighbors) {
+                if (vertn == verti) {
+                    continue;
+                }
+                if (vertn != verti && aux[vertn] < INCLUDED) {
+                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                    if (aux[vertn] == INCLUDED) {
+                        mustBeIncluded.add(vertn);
+                    }
+                    auxc[vertn] = auxc[vertn] + auxc[verti];
+                }
+            }
+            aux[verti] = PROCESSED;
+        }
+        boolean checkDerivated = false;
+        for (int i = 0; i < graph.getVertexCount(); i++) {
+            if (auxc[i] >= currentSet.length && aux[i] == PROCESSED) {
+                checkDerivated = true;
+                break;
+            }
+        }
+
+        if (checkDerivated && hsp3g.size() < 2 * currentSet.length - 1) {
+            checkDerivated = false;
+        }
+        Set<Integer> partial = null;
+        if (checkDerivated && !skip) {
             partial = calcDerivatedPartial(graph,
                     hsp3g, currentSet);
         }
@@ -123,6 +228,38 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
      */
     public Set<Integer> calcDerivatedPartial(UndirectedSparseGraphTO<Integer, Integer> graph,
             Set<Integer> hsp3g, int[] currentSet) {
+        Set<Integer> partial = new HashSet<>();
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+        partial.addAll(hsp3g);
+
+        for (Integer p : currentSet) {
+            int[] aux = new int[graph.getVertexCount()];
+            for (Integer v : currentSet) {
+                if (!v.equals(p)) {
+                    mustBeIncluded.add(v);
+                    aux[v] = INCLUDED;
+                }
+            }
+            while (!mustBeIncluded.isEmpty() && !partial.isEmpty()) {
+                Integer verti = mustBeIncluded.remove();
+                partial.remove(verti);
+                Collection<Integer> neighbors = graph.getNeighbors(verti);
+                for (int vertn : neighbors) {
+                    if (vertn != verti) {
+                        int previousValue = aux[vertn];
+                        aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                        if (previousValue < INCLUDED && aux[vertn] >= INCLUDED) {
+                            mustBeIncluded.add(vertn);
+                        }
+                    }
+                }
+            }
+        }
+        return partial;
+    }
+
+    public Set<Integer> calcDerivatedPartial(UndirectedSparseGraphTO<Integer, Integer> graph,
+            Set<Integer> hsp3g, Integer[] currentSet) {
         Set<Integer> partial = new HashSet<>();
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         partial.addAll(hsp3g);

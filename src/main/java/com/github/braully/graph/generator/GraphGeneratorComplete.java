@@ -6,33 +6,37 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphGeneratorComplete extends AbstractGraphGenerator {
-    
+
     static final String N_VERTICES = "N";
     static final String[] parameters = {N_VERTICES};
     static final String description = "Complete";
     static final Integer DEFAULT_NVERTICES = 5;
-    
+
     @Override
     public String[] getParameters() {
         return parameters;
     }
-    
+
     @Override
     public String getDescription() {
         return description;
     }
-    
+
     @Override
     public UndirectedSparseGraphTO<Integer, Integer> generateGraph(Map parameters) {
         Integer nvertices = getIntegerParameter(parameters, N_VERTICES);
-        
+
         if (nvertices == null) {
             nvertices = DEFAULT_NVERTICES;
         }
-        
+
+        return generate(nvertices);
+    }
+
+    public UndirectedSparseGraphTO<Integer, Integer> generate(Integer nvertices) {
         UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
         graph.setName("K" + nvertices);
-        
+
         List<Integer> vertexElegibles = new ArrayList<>(nvertices);
         Integer[] vertexs = new Integer[nvertices];
         for (int i = 0; i < nvertices; i++) {

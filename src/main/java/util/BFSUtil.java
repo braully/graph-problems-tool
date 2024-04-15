@@ -50,6 +50,8 @@ public class BFSUtil {
         return bfsUtil;
     }
 
+    public int discored = 0;
+
     private BFSUtil(int size) {
         bfs = new Integer[size];
         vertexCount = size;
@@ -64,10 +66,35 @@ public class BFSUtil {
         return bfs[u];
     }
 
+    public Integer getDistanceSafe(UndirectedSparseGraphTO graphTemplate, Integer u) {
+        if (bfs[u] == null) {
+            return -1;
+        }
+        return bfs[u];
+    }
+
+    public void labelDistances(UndirectedSparseGraphTO graphTemplate, Collection<Integer> vs) {
+        bfsRanking(graphTemplate, vs);
+    }
+
+    public void bfsRanking(UndirectedSparseGraphTO<Integer, Integer> subgraph, Collection<Integer> vs) {
+        for (int i = 0; i < bfs.length; i++) {
+            bfs[i] = null;
+        }
+        queue.clear();
+        for (Integer v : vs) {
+            queue.add(v);
+            bfs[v] = 0;
+            revisitVertex(v, bfs, subgraph);
+        }
+    }
+
     public void bfsRanking(UndirectedSparseGraphTO<Integer, Integer> subgraph, Integer v, Integer... fakeNeighbor) {
         for (int i = 0; i < bfs.length; i++) {
             bfs[i] = null;
         }
+        discored = 1;
+
         clearRanking();
         queue.clear();
         queue.add(v);
@@ -97,6 +124,7 @@ public class BFSUtil {
                     getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
                 if (bfs[nv] == null) {
+                    discored++;
                     bfs[nv] = depth;
                     queue.add(nv);
                 }
@@ -113,6 +141,7 @@ public class BFSUtil {
                     getNeighborsUnprotected(poll);
             for (Integer nv : ns) {
                 if (bfs[nv] > depth) {
+                    discored++;
                     depthcount[bfs[nv]]--;
                     bfs[nv] = depth;
                     queue.add(nv);
@@ -127,7 +156,54 @@ public class BFSUtil {
     }
 
     void visitVertex(Integer v, Integer[] bfs, UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
+        while (!queue.isEmpty()) {
+            Integer poll = queue.poll();
+            int depth = bfs[poll] + 1;
+            Collection<Integer> ns = (Collection<Integer>) subgraph1.
+                    getNeighborsUnprotected(poll);
+            for (Integer nv : ns) {
+                if (bfs[nv] == null) {
+                    bfs[nv] = depth;
+                    queue.add(nv);
+                }
+            }
+        }
+    }
 
+    public void revisitVertex(UndirectedSparseGraphTO<Integer, Integer> subgraph1,
+            Integer v) {
+        while (!queue.isEmpty()) {
+            Integer poll = queue.poll();
+            int depth = bfs[poll] + 1;
+            Collection<Integer> ns = (Collection<Integer>) subgraph1.
+                    getNeighborsUnprotected(poll);
+            for (Integer nv : ns) {
+                if (bfs[nv] == null) {
+                    discored++;
+                    bfs[nv] = depth;
+                    queue.add(nv);
+                } else if (bfs[nv] > depth) {
+                    bfs[nv] = depth;
+                    queue.add(nv);
+                }
+            }
+        }
+    }
+
+    public void revisitVertex(Integer v, Integer[] bfs,
+            UndirectedSparseGraphTO<Integer, Integer> subgraph1) {
+        while (!queue.isEmpty()) {
+            Integer poll = queue.poll();
+            int depth = bfs[poll] + 1;
+            Collection<Integer> ns = (Collection<Integer>) subgraph1.
+                    getNeighborsUnprotected(poll);
+            for (Integer nv : ns) {
+                if (bfs[nv] == null || bfs[nv] > depth) {
+                    bfs[nv] = depth;
+                    queue.add(nv);
+                }
+            }
+        }
     }
 
     public void incDepthcount(int[] depthcount) {
@@ -147,6 +223,15 @@ public class BFSUtil {
         }
     }
 
+    public void incBfs(UndirectedSparseGraphTO graph, Integer newroowt) {
+        if (bfs[newroowt] == null) {
+            discored++;
+        }
+        bfs[newroowt] = 0;
+        queue.add(newroowt);
+        revisitVertex(graph, newroowt);
+    }
+
     public void labelDistancesCompactMatrix(UndirectedSparseGraphTO graph) {
         for (Integer vertsrc : (List<Integer>) graph.getVertices()) {
             labelDistances(graph, vertsrc);
@@ -154,7 +239,7 @@ public class BFSUtil {
                 if (vertsrc != null) {
 
                     Integer va=  bfs[j];
-                    if (va != null) {
+                    if (va  != null) {
                         set(vertsrc, j, va);
                     }
                 }
@@ -244,5 +329,11 @@ public class BFSUtil {
         //System.out.printf("set(%d,%d)=%d\n", i, j, value);
         int pos = calcPositionCompactMatrix(i, j);
         compactMatrix[pos] = value;
+    }
+
+    public void clearBfs() {
+        for (int i = 0; i < bfs.length; i++) {
+            bfs[i] = null;
+        }
     }
 }

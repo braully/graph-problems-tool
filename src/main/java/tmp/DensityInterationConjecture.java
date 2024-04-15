@@ -23,7 +23,6 @@ public class DensityInterationConjecture {
         GraphGeneratorRandomGilbert generator = new GraphGeneratorRandomGilbert();
         GraphIterationNumberOptm operacao = new GraphIterationNumberOptm();
         UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        Set<Integer> minHullSet = null;
 
         System.out.print("Dens:\t");
         for (double density = 0.1; density <= 0.9; density += 0.1) {
@@ -38,8 +37,8 @@ public class DensityInterationConjecture {
 
             for (double density = 0.1; density <= 0.9; density += 0.1) {
                 graph = generator.generate(nv, density);
-                minHullSet = operacao.findMinHullSetGraph(graph);
-                System.out.printf("%2d\t", minHullSet.size());
+                operacao.doOperation(graph);
+                System.out.printf("%2d\t", operacao.lastResult);
 
             }
 

@@ -23,6 +23,7 @@ public class GraphHullNumberOptm extends GraphHullNumberHeuristicV1 implements I
         if (graph == null || graph.getVertices().isEmpty()) {
             return ceilling;
         }
+
         int minSizeSet = 2;
         int currentSize = ceilling.size() - 1;
         int countOneNeigh = 0;
@@ -35,6 +36,9 @@ public class GraphHullNumberOptm extends GraphHullNumberHeuristicV1 implements I
             }
         }
         minSizeSet = Math.max(minSizeSet, countOneNeigh);
+        if (verbose) {
+            System.out.println(" - Teto heuristico: " + ceilling.size());
+        }
 //        System.out.println("Find hull number: min val " + minSizeSet);
         while (currentSize >= minSizeSet) {
 //            System.out.println("Find hull number: current founded " + (currentSize + 1));
@@ -49,6 +53,15 @@ public class GraphHullNumberOptm extends GraphHullNumberHeuristicV1 implements I
                 break;
             }
             currentSize--;
+        }
+        if (verbose) {
+            int delta = hullSet.size() - ceilling.size();
+            if (delta == 0) {
+                System.out.println(" - Heuristica match");
+            } else {
+                System.out.println(" - Heuristica fail by: " + delta);
+
+            }
         }
         return hullSet;
     }

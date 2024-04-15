@@ -1,0 +1,9 @@
+null n=88784 m=2093195
+
+Maior distancia de 25: 6
+Maior distancia de 31: 3
+otimização individualizada
+Ciclo: 1
+ melhor otimizado
+R	 g0	 r4	HHnV2+deltaHsi:pulaOff	290
+

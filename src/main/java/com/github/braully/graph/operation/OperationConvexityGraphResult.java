@@ -23,13 +23,13 @@ public class OperationConvexityGraphResult {
     public static final String PARAM_NAME_PARTIAL_DERIVATED = "∂H(S)=H(S)\\⋃p∈SH(S\\{p})";
     public static final String PARAM_NAME_INCLUDED_SEQUENCE = "Included sequence";
 
-    Set<Integer> caratheodorySet;
+    public Set<Integer> caratheodorySet;
     public Set<Integer> convexHull;
     int[] auxProcessor;
-    Set<Integer> partial;
+    public Set<Integer> partial;
     List<Integer> includedSequence;
     long totalTimeMillis;
-    Integer caratheodoryNumber;
+    public Integer caratheodoryNumber;
     Set<Integer> vizs;
     Set<Integer> verticesPotenciais;
     int iteracoes;

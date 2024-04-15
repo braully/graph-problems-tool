@@ -5,11 +5,15 @@
  */
 package com.github.braully.graph;
 
-import com.github.braully.graph.operation.GraphCaratheodoryNumberBinary;
-import com.github.braully.graph.operation.GraphHullNumberHeuristicV1;
+import com.github.braully.graph.operation.GraphCaratheodoryNumberOptm;
+import com.github.braully.graph.operation.GraphCycleChordlessDetec;
+import com.github.braully.graph.operation.GraphDensity;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp;
+import com.github.braully.graph.operation.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
+import com.github.braully.graph.operation.GraphTmpDetect;
 import com.github.braully.graph.operation.IGraphOperation;
 import com.github.braully.graph.operation.OperationConvexityGraphResult;
 import java.io.BufferedReader;
@@ -47,15 +51,23 @@ public class BatchExecuteOperation implements IBatchExecute {
     static boolean verbose = true;
 
     static final IGraphOperation[] operations = new IGraphOperation[]{
-        new GraphCaratheodoryNumberBinary(),
+        new GraphCaratheodoryNumberOptm(),
+        //        new GraphCaratheodoryNumberBinary(),
         //        new GraphCaratheodoryHeuristicHybrid(),
         new GraphHullNumberOptm(),
-        new GraphHullNumberHeuristicV1(),
+        //        new GraphHullNumberHeuristicV1(),
+        //        new GraphHullNumberHeuristicV2(),
+        //        new GraphHullNumberHeuristicV3(),
+        //        new GraphHullNumberHeuristicV5(),
+        new GraphHullNumberHeuristicV5Tmp(),
+        new GraphHullNumberHeuristicV5Tmp2(),
+        new GraphDensity(),
         new GraphIterationNumberOptm(),
         new GraphTSSCordasco(),
-        new ConjectureOperation()
+        new ConjectureOperation(),
+        new GraphTmpDetect(),
     //        new GraphCountEdges(),
-//        new GraphCycleChordlessDetec(),
+        new GraphCycleChordlessDetec()
 //        new com.github.braully.graph.operation.CycleHullCheck()
     };
     private String formatResult;
@@ -113,6 +125,11 @@ public class BatchExecuteOperation implements IBatchExecute {
             System.out.println(e.getMessage());
             formatter.printHelp("BatchExecuteOperation", options);
             System.exit(1);
+            return;
+        }
+
+        if (args == null || args.length == 0) {
+            formatter.printHelp("BatchExecuteOperation", options);
             return;
         }
 
@@ -380,7 +397,7 @@ public class BatchExecuteOperation implements IBatchExecute {
                 UndirectedSparseGraphTO ret = UtilGraph.loadGraphG6(readLine);
                 if (ret != null) {
                     if (graphcount > continueOffset) {
-                        ret.setName(graphFileName + "-" + graphcount);
+                        ret.setName(graphFileName + "-" + graphcount + ": " + readLine);
                         String resultProcess = processGraph(operation, ret, dirname, graphcount);
                         writer.write(formatResultSimples);
 //                        writer.write(resultProcess);
@@ -393,6 +410,7 @@ public class BatchExecuteOperation implements IBatchExecute {
                     graphcount++;
                 }
             } catch (Exception e) {
+                graphcount++;
                 e.printStackTrace();
             }
         }
@@ -453,7 +471,7 @@ public class BatchExecuteOperation implements IBatchExecute {
         inforResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResult = formatResult(groupName, id, loadGraphAdjMatrix, operation, result);
         formatResultSimples = formatResultSimple(groupName, "" + graphcount, loadGraphAdjMatrix, operation, result);
-        System.out.println(formatResult);
+//        System.out.println(formatResult);
         return formatResult;
     }
 

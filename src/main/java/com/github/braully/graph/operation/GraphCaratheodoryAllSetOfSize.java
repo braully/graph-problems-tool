@@ -1,10 +1,14 @@
 package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 
@@ -38,6 +42,7 @@ public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary
 
         int countNCarat = 0;
         int menorhsize = 0;
+        Set<Integer> menor = new HashSet<Integer>();
 
         if (size >= 2) {
             Iterator<int[]> combinationsIterator = CombinatoricsUtils.combinationsIterator(graph.getVertexCount(), size);
@@ -48,16 +53,21 @@ public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary
                     int chsize = hsp3g.convexHull.size();
                     if (menorhsize == 0 || chsize < menorhsize) {
                         menorhsize = chsize;
+                        menor.clear();
+                        for (int i : currentSet) {
+                            menor.add(i);
+                        }
                     }
                     String key = "Caratheodory Set-" + (countNCarat++) + " |HS|=" + chsize;
-                    result.put(key, hsp3g.caratheodorySet);
-                    log.info(key + ": " + hsp3g.caratheodorySet);
+//                    result.put(key, hsp3g.caratheodorySet);
+//                    log.info(key + ": " + hsp3g.caratheodorySet);
                 }
             }
             result.put("Nº Caratheodory Set of Size(" + size + ")", countNCarat);
             result.put("Menor |H(S)", menorhsize);
-            log.info("Menor |H(S): " + menorhsize);
-            log.info("Nº Caratheodory Set of Size(" + size + "): " + countNCarat);
+            result.put("menor", menor);
+//            log.info("Menor |H(S): " + menorhsize);
+//            log.info("Nº Caratheodory Set of Size(" + size + "): " + countNCarat);
         }
         return result;
     }
