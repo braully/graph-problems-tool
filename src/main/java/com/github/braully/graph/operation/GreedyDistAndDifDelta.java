@@ -34,6 +34,7 @@ public class GreedyDistAndDifDelta
     public GreedyDistAndDifDelta() {
         this.refine = true;
         this.refine2 = true;
+        this.verbose = true;
     }
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {

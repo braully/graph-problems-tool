@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public abstract class AbstractHeuristic implements IGraphOperation {
 
-    public static final String type = "Contamination";
+    public static final String type = "Target set selection";
     public static final String PARAM_NAME_HULL_NUMBER = "number";
     public static final String PARAM_NAME_HULL_SET = "set";
     protected static Random randomUtil = new Random();
@@ -261,7 +261,7 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         int vertexCount = graph.getVertexCount();
         int maxVertex = graph.maxVertex();
 //        if (kr == null || kr.length < maxVertex + 1) {
-            initKr(graph);
+        initKr(graph);
 //        }
         int[] aux = new int[maxVertex + 1];
         for (Integer i : vertices) {
