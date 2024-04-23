@@ -1,5 +1,6 @@
 package com.github.braully.graph.operation;
 
+import heuristic.AbstractHeuristic;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import static com.github.braully.graph.operation.GraphHullNumber.PARAM_NAME_HULL_NUMBER;

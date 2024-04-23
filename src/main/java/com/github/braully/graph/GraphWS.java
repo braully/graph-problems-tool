@@ -258,7 +258,7 @@ public class GraphWS {
     )
     public Map<String, Object> operation(@RequestBody String jsonGraph) {
         Map<String, Object> result = null;
-
+        
         try {
             ObjectMapper mapper = new ObjectMapper();
             UndirectedSparseGraphTO graph = mapper.readValue(jsonGraph, UndirectedSparseGraphTO.class

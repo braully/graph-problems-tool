@@ -2,9 +2,12 @@ package com.github.braully.graph.operation;
 
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -17,6 +20,8 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
     public static final int NEIGHBOOR_COUNT_INCLUDED = 1;
     public static final int INCLUDED = 2;
     public static final int PROCESSED = 3;
+
+    public static boolean verbose = false;
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graphRead) {
         long totalTimeMillis = -1;
@@ -226,11 +231,15 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
      * @param currentSet
      * @return
      */
+    public int maxp = 0;
+
     public Set<Integer> calcDerivatedPartial(UndirectedSparseGraphTO<Integer, Integer> graph,
             Set<Integer> hsp3g, int[] currentSet) {
         Set<Integer> partial = new HashSet<>();
         Queue<Integer> mustBeIncluded = new ArrayDeque<>();
         partial.addAll(hsp3g);
+
+        maxp = 0;
 
         for (Integer p : currentSet) {
             int[] aux = new int[graph.getVertexCount()];
@@ -240,8 +249,11 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
                     aux[v] = INCLUDED;
                 }
             }
+
+            List<Integer> list = new ArrayList<>();
             while (!mustBeIncluded.isEmpty() && !partial.isEmpty()) {
                 Integer verti = mustBeIncluded.remove();
+                list.add(verti);
                 partial.remove(verti);
                 Collection<Integer> neighbors = graph.getNeighbors(verti);
                 for (int vertn : neighbors) {
@@ -253,6 +265,15 @@ public class GraphCaratheodoryCheckSet implements IGraphOperation {
                         }
                     }
                 }
+            }
+            if (verbose) {
+                System.out.print("H(S-" + p + ")=");
+//                Collections.sort(list);
+                System.out.println(list);
+
+            }
+            if (list.size() > maxp) {
+                maxp = list.size();
             }
         }
         return partial;

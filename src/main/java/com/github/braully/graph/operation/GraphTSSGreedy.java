@@ -29,6 +29,11 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
     public Integer marjority;
 
     @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
 //        Set<Integer> setN = new HashSet<>();
 //        setN.addAll(graph.getSet());
@@ -112,27 +117,26 @@ public class GraphTSSGreedy extends AbstractHeuristic implements IGraphOperation
         return description;
     }
 
-    public static void main(String... args) throws FileNotFoundException, IOException {
-        GraphTSSGreedy optss = new GraphTSSGreedy();
-
-        System.out.println("Teste greater: ");
-
-        UndirectedSparseGraphTO<Integer, Integer> graph = null;
-        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
-        System.out.println(graph.toResumedString());
-        optss.setR(5);
-        optss.setTryMinimal();
-        UtilProccess.printStartTime();
-        Set<Integer> buildOptimizedHullSet = optss.tssGreedy(graph);
-
-        UtilProccess.printStartTime();
-
-        System.out.println(
-                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
-
-        if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
-            throw new IllegalStateException("NOT HULL SET");
-        }
-    }
-
+//    public static void main(String... args) throws FileNotFoundException, IOException {
+//        GraphTSSGreedy optss = new GraphTSSGreedy();
+//
+//        System.out.println("Teste greater: ");
+//
+//        UndirectedSparseGraphTO<Integer, Integer> graph = null;
+//        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
+//        System.out.println(graph.toResumedString());
+//        optss.setR(5);
+//        optss.setTryMinimal();
+//        UtilProccess.printStartTime();
+//        Set<Integer> buildOptimizedHullSet = optss.tssGreedy(graph);
+//
+//        UtilProccess.printStartTime();
+//
+//        System.out.println(
+//                "S[" + buildOptimizedHullSet.size() + "]: " + buildOptimizedHullSet);
+//
+//        if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
+//            throw new IllegalStateException("NOT HULL SET");
+//        }
+//    }
 }

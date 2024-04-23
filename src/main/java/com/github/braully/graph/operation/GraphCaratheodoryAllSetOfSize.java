@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 
@@ -23,9 +24,8 @@ public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary
     static final String description = "Caratheodory All Sets of Size";
 
     public Map<String, Object> doOperation(UndirectedSparseGraphTO<Integer, Integer> graph) {
-        Map<String, Object> result = new HashMap<>();
         if (graph == null || graph.getVertexCount() <= 0) {
-            return result;
+            return new HashMap<>();
         }
 
         Integer size = null;
@@ -36,12 +36,20 @@ public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary
         } catch (Exception e) {
 
         }
+        return checksizeof(size, graph);
+    }
+
+    public Map<String, Object> checksizeof(Integer size, UndirectedSparseGraphTO<Integer, Integer> graph) throws IllegalArgumentException {
+        Map<String, Object> result = new HashMap<>();
+
         if (size == null) {
             throw new IllegalArgumentException("Input invalid (not integer): " + graph.getInputData());
         }
+        result.put("sets", new ArrayList<>());
 
         int countNCarat = 0;
         int menorhsize = 0;
+        int maiorMaxp = 0;
         Set<Integer> menor = new HashSet<Integer>();
 
         if (size >= 2) {
@@ -58,14 +66,30 @@ public class GraphCaratheodoryAllSetOfSize extends GraphCaratheodoryNumberBinary
                             menor.add(i);
                         }
                     }
+                    if (maiorMaxp == 0) {
+                        maiorMaxp = this.maxp;
+                    }
+                    if (maiorMaxp < this.maxp) {
+                        maiorMaxp = this.maxp;
+                    }
+                    TreeSet<Integer> treeSet = new TreeSet<>(hsp3g.caratheodorySet);
                     String key = "Caratheodory Set-" + (countNCarat++) + " |HS|=" + chsize;
+                    System.out.println(key + ": " + treeSet);
+                    System.out.println("Maior P: " + this.maxp);
+                    System.out.println("Partial: " + hsp3g.partial);
+                    ((List) result.get("sets")).add(treeSet);
 //                    result.put(key, hsp3g.caratheodorySet);
+
 //                    log.info(key + ": " + hsp3g.caratheodorySet);
+                    if (verbose) {
+                    }
                 }
             }
             result.put("Nº Caratheodory Set of Size(" + size + ")", countNCarat);
             result.put("Menor |H(S)", menorhsize);
             result.put("menor", menor);
+            result.put("maiorp", maiorMaxp);
+
 //            log.info("Menor |H(S): " + menorhsize);
 //            log.info("Nº Caratheodory Set of Size(" + size + "): " + countNCarat);
         }

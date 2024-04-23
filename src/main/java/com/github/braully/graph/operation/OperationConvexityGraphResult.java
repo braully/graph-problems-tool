@@ -27,7 +27,7 @@ public class OperationConvexityGraphResult {
     public Set<Integer> convexHull;
     int[] auxProcessor;
     public Set<Integer> partial;
-    List<Integer> includedSequence;
+    public List<Integer> includedSequence;
     long totalTimeMillis;
     public Integer caratheodoryNumber;
     Set<Integer> vizs;
