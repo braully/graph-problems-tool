@@ -8,8 +8,6 @@ package com.github.braully.graph;
 import com.github.braully.graph.operation.GraphCaratheodoryNumberOptm;
 import com.github.braully.graph.operation.GraphCycleChordlessDetec;
 import com.github.braully.graph.operation.GraphDensity;
-import heuristic.GraphHullNumberHeuristicV5Tmp;
-import heuristic.GraphHullNumberHeuristicV5Tmp2;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
 import com.github.braully.graph.operation.GraphTSSCordasco;
@@ -38,7 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.cli.*;
-import tmp.ConjectureOperation;
 
 /**
  *
@@ -59,14 +56,14 @@ public class BatchExecuteOperation implements IBatchExecute {
         //        new GraphHullNumberHeuristicV2(),
         //        new GraphHullNumberHeuristicV3(),
         //        new GraphHullNumberHeuristicV5(),
-        new GraphHullNumberHeuristicV5Tmp(),
-        new GraphHullNumberHeuristicV5Tmp2(),
+        //        new GraphHullNumberHeuristicV5Tmp(),
+        //        new GraphHullNumberHeuristicV5Tmp2(),
         new GraphDensity(),
         new GraphIterationNumberOptm(),
         new GraphTSSCordasco(),
-        new ConjectureOperation(),
+        //        new ConjectureOperation(),
         new GraphTmpDetect(),
-    //        new GraphCountEdges(),
+        //        new GraphCountEdges(),
         new GraphCycleChordlessDetec()
 //        new com.github.braully.graph.operation.CycleHullCheck()
     };

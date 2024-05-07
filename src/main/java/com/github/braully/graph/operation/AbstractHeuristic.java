@@ -3,9 +3,14 @@ package com.github.braully.graph.operation;
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import static java.lang.Math.abs;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -29,6 +34,14 @@ public abstract class AbstractHeuristic implements IGraphOperation {
     //
     protected int[] kr;
     protected boolean verbose;
+
+    public static final String MINIMAL = "minimal";
+    public Map<String, Boolean> parameters = new LinkedHashMap<>();
+    protected int[] scount = null;
+
+    public boolean tentarMinamilzar = false;
+    public boolean tentarMinamilzar2 = false;
+    protected boolean grafoconexo = true;
 
     protected int[] degree = null;
     protected Set<Integer>[] N = null;
@@ -293,4 +306,195 @@ public abstract class AbstractHeuristic implements IGraphOperation {
         return fecho.size() == vertexCount;
     }
 
+    public Set<Integer> tryMinimal(UndirectedSparseGraphTO<Integer, Integer> graphRead,
+            Set<Integer> tmp) {
+        Set<Integer> s = tmp;
+        if (verbose) {
+            System.out.println("tentando reduzir: " + s.size());
+//            System.out.println("s: " + s);
+        }
+        int cont = 0;
+        for (Integer v : tmp) {
+
+//        LinkedList<Integer> tmp2 = new LinkedList<>(tmp);
+//        Iterator<Integer> descendingIterator = tmp2.descendingIterator();
+//        while (descendingIterator.hasNext()) {
+//            Integer v = descendingIterator.next();
+            cont++;
+            if (graphRead.degree(v) < kr[v]) {
+                continue;
+            }
+            Set<Integer> t = new LinkedHashSet<>(s);
+            t.remove(v);
+            if (checkIfHullSet(graphRead, t)) {
+                s = t;
+//                if (verbose) {
+//                System.out.println("Reduzido removido: " + v + " na posição " + cont + "/" + (tmp.size() - 1));
+//                }
+                if (cont > (tmp.size() / 2) && grafoconexo) {
+//                    System.out.println("Poda de v:  " + v + " realizada depois de 50% em grafo conexo " + cont + "/" + (tmp.size() - 1));
+//                    System.out.println(" - Detalhes de v: "
+//                            + v + " degree: " + graphRead.degree(v) + " scount: "
+//                            + scount[v] + " kr:" + kr[v]);
+                }
+            }
+        }
+        if (verbose) {
+            System.out.println("reduzido para: " + s.size());
+//            System.out.println("s: " + s);
+        }
+        return s;
+    }
+
+    public Set<Integer> tryMinimal2(UndirectedSparseGraphTO<Integer, Integer> graphRead,
+            Set<Integer> tmp) {
+        Set<Integer> s = tmp;
+        List<Integer> ltmp = new ArrayList<>(tmp);
+        if (verbose) {
+            System.out.println("tentando reduzir-2: " + s.size());
+//            System.out.println("s: " + s);
+        }
+        Collection<Integer> vertices = graphRead.getVertices();
+        int cont = 0;
+        for_p:
+        for (int h = 0; h < ltmp.size(); h++) {
+            Integer x = ltmp.get(h);
+            if (graphRead.degree(x) < kr[x] || !s.contains(x)) {
+                continue;
+            }
+            for (int j = h + 1; j < ltmp.size(); j++) {
+                Integer y = ltmp.get(j);
+                if (graphRead.degree(y) < kr[y] || y.equals(x)
+                        || !s.contains(y)) {
+                    continue;
+                }
+                Set<Integer> t = new LinkedHashSet<>(s);
+                t.remove(x);
+                t.remove(y);
+
+                int contadd = 0;
+
+                int[] aux = new int[(Integer) graphRead.maxVertex() + 1];
+                for (int i = 0; i < aux.length; i++) {
+                    aux[i] = 0;
+                }
+
+                Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+                for (Integer iv : t) {
+                    Integer v = iv;
+                    mustBeIncluded.add(v);
+                    aux[v] = kr[v];
+                }
+                while (!mustBeIncluded.isEmpty()) {
+                    Integer verti = mustBeIncluded.remove();
+                    contadd++;
+                    Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
+                    for (Integer vertn : neighbors) {
+                        if (vertn.equals(verti)) {
+                            continue;
+                        }
+                        if (!vertn.equals(verti) && aux[vertn] <= kr[vertn] - 1) {
+                            aux[vertn] = aux[vertn] + 1;
+                            if (aux[vertn] == kr[vertn]) {
+                                mustBeIncluded.add(vertn);
+                            }
+                        }
+                    }
+                    aux[verti] += kr[verti];
+                }
+
+                for (Integer z : vertices) {
+                    if (aux[z] >= kr[z] || z.equals(x) || z.equals(y)) {
+                        continue;
+                    }
+                    int contz = contadd;
+                    int[] auxb = (int[]) aux.clone();
+                    mustBeIncluded.add(z);
+                    auxb[z] = kr[z];
+                    while (!mustBeIncluded.isEmpty()) {
+                        Integer verti = mustBeIncluded.remove();
+                        contz++;
+                        Collection<Integer> neighbors = graphRead.getNeighborsUnprotected(verti);
+                        for (Integer vertn : neighbors) {
+                            if (vertn.equals(verti)) {
+                                continue;
+                            }
+                            if (!vertn.equals(verti) && auxb[vertn] <= kr[vertn] - 1) {
+                                auxb[vertn] = auxb[vertn] + 1;
+                                if (auxb[vertn] == kr[vertn]) {
+                                    mustBeIncluded.add(vertn);
+                                }
+                            }
+                        }
+                        auxb[verti] += kr[verti];
+                    }
+
+                    if (contz == vertices.size()) {
+                        if (verbose) {
+                            System.out.println("Reduzido removido: " + x + " " + y + " adicionado " + z);
+                            if (scount != null) {
+                                Collection<Integer> nsX = graphRead.getNeighborsUnprotected(y);
+                                Collection<Integer> nsY = graphRead.getNeighborsUnprotected(x);
+                                Collection<Integer> nsZ = graphRead.getNeighborsUnprotected(z);
+                                System.out.print("Count s: " + x + ": "
+                                        + scount[x] + " " + y + ": " + scount[y]
+                                        + " adicionado " + z + ": " + scount[z]);
+                                if (Collections.disjoint(nsX, nsY)) {
+                                    System.out.print(" ... é disjunto");
+                                } else {
+                                    System.out.print(" ... tem vizinhos comuns");
+                                }
+                                if (Collections.disjoint(nsZ, nsY) && Collections.disjoint(nsZ, nsX)) {
+                                    System.out.println(" ... z é independente");
+                                } else {
+                                    System.out.println(" ... z intercept x ou y");
+                                }
+                            }
+                            System.out.println("Na posição " + cont + "/" + (tmp.size() - 1));
+                        }
+                        if (cont > (tmp.size() / 2) && grafoconexo) {
+                            System.out.println("Poda dupla em grafo conexo removido:  " + x + "," + y + " realizada depois de 50% " + cont + "/" + (tmp.size() - 1));
+                            System.out.println(" - Detalhes de v: "
+                                    + x + " degree: " + graphRead.degree(x) + " scount: "
+                                    + scount[x] + " kr:" + kr[x]);
+                            System.out.println(" - Detalhes de v: "
+                                    + y + " degree: " + graphRead.degree(y) + " scount: "
+                                    + scount[y] + " kr:" + kr[y]);
+                        }
+                        t.add(z);
+                        s = t;
+                        ltmp = new ArrayList<>(s);
+//                        h--;
+                        h = 0;
+//                        h = h / 2;
+                        continue for_p;
+                    }
+                }
+
+            }
+            cont++;
+
+        }
+        return s;
+    }
+
+    public void setTryMinimal() {
+        tentarMinamilzar = true;
+    }
+
+    public void setTryMinimal2() {
+        tentarMinamilzar2 = true;
+    }
+
+    public void setTryMinimal(boolean v) {
+        tentarMinamilzar = v;
+    }
+
+    protected boolean tryMiminal() {
+        return tentarMinamilzar;
+    }
+
+    protected boolean tryMiminal2() {
+        return tentarMinamilzar2;
+    }
 }
