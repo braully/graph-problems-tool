@@ -336,4 +336,8 @@ public class BFSUtil {
             bfs[i] = null;
         }
     }
+
+    public boolean isEmpty(UndirectedSparseGraphTO graph, Integer newroowt) {
+        return bfs[newroowt] == null;
+    }
 }

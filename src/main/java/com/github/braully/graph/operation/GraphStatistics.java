@@ -179,4 +179,13 @@ public class GraphStatistics implements IGraphOperation {
         }
         return ret;
     }
+
+    public int bigDelta(UndirectedSparseGraphTO clone) {
+        int Lambda = 0, lambda = Integer.MAX_VALUE;
+        for (Integer i : (Collection<Integer>) clone.getVertices()) {
+            lambda = Math.min(lambda, clone.getNeighborCount(i));
+            Lambda = Math.max(Lambda, clone.getNeighborCount(i));
+        }
+        return Lambda;
+    }
 }

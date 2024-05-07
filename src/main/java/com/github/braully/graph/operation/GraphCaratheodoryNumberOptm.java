@@ -42,6 +42,9 @@ public class GraphCaratheodoryNumberOptm extends GraphCaratheodoryCheckSet {
         int rigth = maxSizeSet;
         result = new HashMap<>();
 
+        if (verbose) {
+            System.out.print(" heuristic call");
+        }
         GraphCaratheodoryHeuristicHybrid graphCaratheodoryHeuristicHybrid = new GraphCaratheodoryHeuristicHybrid();
         Set<Integer> caratheodorySet = graphCaratheodoryHeuristicHybrid.buildMaxCaratheodorySet(graph);
         if (caratheodorySet != null) {
@@ -51,6 +54,9 @@ public class GraphCaratheodoryNumberOptm extends GraphCaratheodoryCheckSet {
         }
         processedCaratheodroySet = findCaratheodroySetBruteForce(graph, left);
         if (processedCaratheodroySet == null || processedCaratheodroySet.caratheodorySet == null) {
+            if (verbose) {
+                System.out.println(" bruteforce fail on size: " + left);
+            }
             return result;
         } else {
             result.clear();

@@ -103,32 +103,43 @@ public class GraphHullSetP3 implements IGraphOperation {
             aux[i] = 0;
             auxc[i] = 0;
         }
-        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
-        for (Integer v : currentSet) {
-            mustBeIncluded.add(v);
-            aux[v] = INCLUDED;
-            auxc[v] = 1;
-        }
-        while (!mustBeIncluded.isEmpty()) {
-            Integer verti = mustBeIncluded.remove();
-            hsp3g.add(verti);
-            includedSequence.add(verti);
-            Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
 
-            for (int vertn : neighbors) {
-                if (vertn == verti) {
-                    continue;
-                }
-                if (vertn != verti && aux[vertn] < INCLUDED) {
-                    aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
-                    if (aux[vertn] == INCLUDED) {
-                        mustBeIncluded.add(vertn);
-                    }
-                    auxc[vertn] = auxc[vertn] + auxc[verti];
-                }
+        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+
+        for (int i = 0; i < currentSet.length; i++) {
+            Integer v = currentSet[i];
+            if (aux[v] < INCLUDED) {
+                mustBeIncluded.add(v);
+                aux[v] = INCLUDED;
+                auxc[v] = 1;
             }
-            aux[verti] = PROCESSED;
+            while (!mustBeIncluded.isEmpty()) {
+                Integer verti = mustBeIncluded.remove();
+                hsp3g.add(verti);
+                includedSequence.add(verti);
+                Collection<Integer> neighbors = graph.getNeighborsUnprotected(verti);
+
+                for (int vertn : neighbors) {
+                    if (vertn == verti) {
+                        continue;
+                    }
+                    if (vertn != verti && aux[vertn] < INCLUDED) {
+                        aux[vertn] = aux[vertn] + NEIGHBOOR_COUNT_INCLUDED;
+                        if (aux[vertn] == INCLUDED) {
+                            mustBeIncluded.add(vertn);
+                        }
+                        auxc[vertn] = auxc[vertn] + auxc[verti];
+                    }
+                }
+                aux[verti] = PROCESSED;
+            }
         }
+//        Queue<Integer> mustBeIncluded = new ArrayDeque<>();
+//        for (Integer v : currentSet) {
+//            mustBeIncluded.add(v);
+//            aux[v] = INCLUDED;
+//            auxc[v] = 1;
+//        }
 
         Set<Integer> setCurrent = new HashSet<>();
         for (int i : currentSet) {

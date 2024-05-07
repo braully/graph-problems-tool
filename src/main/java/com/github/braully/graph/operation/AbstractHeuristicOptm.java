@@ -5,8 +5,9 @@
  */
 package com.github.braully.graph.operation;
 
+;
+
 import com.github.braully.graph.UndirectedSparseGraphTO;
-import static com.github.braully.graph.operation.GraphHNVOptm.getDescription;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,8 @@ import util.MapCountOpt;
  *
  * @author strike
  */
+
+
 public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
 
     public static final String pdeltaHsixdificuldadeTotal = "deltaHXdifTotal";
@@ -119,6 +122,7 @@ public abstract class AbstractHeuristicOptm extends AbstractHeuristic {
         }
         return sb.toString();
     }
+
 
     public void setRankMult(boolean rankMult) {
         this.rankMult = rankMult;

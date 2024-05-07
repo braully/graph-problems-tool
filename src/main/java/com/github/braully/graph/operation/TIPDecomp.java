@@ -1,6 +1,5 @@
 package com.github.braully.graph.operation;
 
-
 import com.github.braully.graph.UndirectedSparseGraphTO;
 import com.github.braully.graph.UtilGraph;
 import java.io.FileInputStream;
@@ -111,5 +110,10 @@ public class TIPDecomp extends AbstractHeuristic implements IGraphOperation {
         if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
             throw new IllegalStateException("NOT HULL SET");
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 }

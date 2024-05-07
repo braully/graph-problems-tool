@@ -6,7 +6,6 @@ import com.github.braully.graph.UtilGraph;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -121,7 +120,7 @@ public class GraphTIPDecomp extends AbstractHeuristic implements IGraphOperation
 //        graph = UtilGraph.loadBigDataset(new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/ca-GrQc/ca-GrQc.txt"));
         graph = UtilGraph.loadBigDataset(
                 new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/nodes.csv"),
-                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv")); 
+                new FileInputStream("/home/strike/Workspace/tss/TSSGenetico/Instancias/BlogCatalog3/edges.csv"));
         System.out.println(graph.toResumedString());
         optss.setR(3);
         UtilProccess.printStartTime();
@@ -135,5 +134,10 @@ public class GraphTIPDecomp extends AbstractHeuristic implements IGraphOperation
         if (!optss.checkIfHullSet(graph, buildOptimizedHullSet)) {
             throw new IllegalStateException("NOT HULL SET");
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 }
