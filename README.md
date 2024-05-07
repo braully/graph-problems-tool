@@ -25,7 +25,7 @@
    Netbeans 8 recommended.
 
 ## Demo
-   http://graph-problems-tool.herokuapp.com/
+   [http://graph-problems-tool.herokuapp.com/](https://gpt-np-ad3ae7c30fc7.herokuapp.com/)
 
 ## References and Libraries
 
