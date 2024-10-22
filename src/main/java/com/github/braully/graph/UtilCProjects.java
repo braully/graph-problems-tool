@@ -36,20 +36,24 @@ public class UtilCProjects {
     public static void makeAllProjects() {
         File dir = new File(DEFAULT_C_SUPPROJECTS);
         File[] filesList = dir.listFiles();
-        for (File file : filesList) {
-            try {
-                if (file.isDirectory()) {
-                    System.out.println(file.getAbsolutePath());
-                    int ret = execMakeProject(file);
-                    if (ret == 0) {
-                        System.out.print("Compile: " + file.getAbsolutePath() + "... Ok");
-                    } else {
-                        System.err.print("Compile: " + file.getAbsolutePath() + "... Error");
+        try {
+            for (File file : filesList) {
+                try {
+                    if (file.isDirectory()) {
+                        System.out.println(file.getAbsolutePath());
+                        int ret = execMakeProject(file);
+                        if (ret == 0) {
+                            System.out.print("Compile: " + file.getAbsolutePath() + "... Ok");
+                        } else {
+                            System.err.print("Compile: " + file.getAbsolutePath() + "... Error");
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
