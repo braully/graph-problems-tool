@@ -1,4 +1,2 @@
 #!/bin/sh
-java -Xmx500m -jar target/graph-problems-tool-1.0.0.jar
-echo "http://localhost:5000"
-
+./mvnw "-Dexec.args=-Xmx2g -classpath %classpath com.github.braully.graph.App" -Dexec.executable=java -Dexec.classpathScope=runtime -DskipTests=true -Dexec.vmArgs=-Xmx2g -Dexec.appArgs= org.codehaus.mojo:exec-maven-plugin:1.5.0:exec
