@@ -31,6 +31,7 @@ public class UtilCProjects {
                 System.out.println("Make all c-projects...Done");
                 break;
         }
+        listOperations();
     }
 
     public static void makeAllProjects() {
@@ -134,7 +135,9 @@ public class UtilCProjects {
                             }
                             if (binaryExec != null && !Strings.isNullOrEmpty(type) && !Strings.isNullOrEmpty(operation) && !Strings.isNullOrEmpty(format)) {
                                 operation = OBS + operation;
-                                operations.add(new CBInaryOperation(binaryExec.getAbsolutePath(), type, operation, format));
+                                CBInaryOperation op = new CBInaryOperation(binaryExec.getAbsolutePath(), type, operation, format);
+                                operations.add(op);
+                                System.out.println("Operção criada: " + op);
                             }
                         }
                     }

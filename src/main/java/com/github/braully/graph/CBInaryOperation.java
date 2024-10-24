@@ -169,4 +169,10 @@ public class CBInaryOperation implements IGraphOperation, Interruptible {
         }
         return tmpExec;
     }
+
+    @Override
+    public String toString() {
+        return "CBInaryOperation{" + "type=" + type + ", name=" + name + ", exec=" + exec + ", format=" + format + ", process=" + process + '}';
+    }
+
 }
