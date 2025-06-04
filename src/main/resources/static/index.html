@@ -471,7 +471,8 @@
 
                             var vertex = graph.normalizedVertices.map(function (d) {
                                 return {"idname": graph.vertices[d],
-                                    "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
+//                                    "name": graph.vertices[d] + (graph.vertices[d] !== d ? " (" + d + "º)" : ""),
+                                    "name": graph.vertices[d] + (graph.labels != null ? " (" + graph.labels[d] + ")" : ""),
                                     "group": 1,
                                     "x": (graph.positionX !== null ? graph.positionX[d] : Math.floor(Math.random() * width) + 1) * 70,
                                     "y": (graph.positionY !== null ? graph.positionY[d] : Math.floor(Math.random() * height) + 1) * 70

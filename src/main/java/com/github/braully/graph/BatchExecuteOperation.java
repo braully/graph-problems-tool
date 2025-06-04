@@ -10,6 +10,7 @@ import com.github.braully.graph.operation.GraphCycleChordlessDetec;
 import com.github.braully.graph.operation.GraphDensity;
 import com.github.braully.graph.operation.GraphHullNumberOptm;
 import com.github.braully.graph.operation.GraphIterationNumberOptm;
+import com.github.braully.graph.operation.GraphPathDetec;
 import com.github.braully.graph.operation.GraphTSSCordasco;
 import com.github.braully.graph.operation.GraphTmpDetect;
 import com.github.braully.graph.operation.IGraphOperation;
@@ -63,9 +64,8 @@ public class BatchExecuteOperation implements IBatchExecute {
         new GraphTSSCordasco(),
         //        new ConjectureOperation(),
         new GraphTmpDetect(),
-        //        new GraphCountEdges(),
-        new GraphCycleChordlessDetec()
-//        new com.github.braully.graph.operation.CycleHullCheck()
+        new GraphCycleChordlessDetec(),
+        new GraphPathDetec()
     };
     private String formatResult;
     private String formatResultSimples;
