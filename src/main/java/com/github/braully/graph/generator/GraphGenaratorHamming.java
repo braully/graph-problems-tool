@@ -48,11 +48,28 @@ public class GraphGenaratorHamming extends GraphGeneratorCartesianProduct {
         UndirectedSparseGraphTO<Integer, Integer> kq = kgenerator.generate(q.get(0));
         UndirectedSparseGraphTO graph = kq.clone();
 
+        List<String> labels = new ArrayList<>();
+        List<String> labelsaux = new ArrayList<>();
+
+        for (int i = 0; i < q.get(0); i++) {
+            labels.add("" + i);
+        }
+
         for (int i = 1; i < q.size(); i++) {
             kq = kgenerator.generate(q.get(i));
             // cartesian product
             graph = this.cartesianProduct(graph, kq);
+            for (String lbl : labels) {
+                for (int j = 0; j < q.get(i); j++) {
+                    labelsaux.add(lbl + "," + j);
+                }
+            }
+            List aux = labels;
+            labels = labelsaux;
+            labelsaux = aux;
+            aux.clear();
         }
+        graph.setLabels(labels);
         graph.setName("H" + q);
         return graph;
     }
