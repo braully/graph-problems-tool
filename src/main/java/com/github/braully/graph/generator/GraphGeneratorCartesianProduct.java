@@ -91,6 +91,25 @@ public class GraphGeneratorCartesianProduct extends AbstractGraphGenerator {
             graph.addVertex(vertexs[i]);
         }
 
+        List<String> labels = new ArrayList<>();
+        List<String> labelsaux = new ArrayList<>();
+
+        for (int i = 0; i < nvertices0; i++) {
+            labels.add("" + i);
+        }
+
+        for (String lbl : labels) {
+            for (int j = 0; j < nvertices1; j++) {
+                labelsaux.add(lbl + "," + j);
+            }
+        }
+        List aux = labels;
+        labels = labelsaux;
+        labelsaux = aux;
+        aux.clear();
+
+        graph.setLabels(labels);
+
         List<Integer> edges0 = new ArrayList<>();
         edges0.addAll((Collection<Integer>) graph0.getEdges());
         List<Integer> edges1 = new ArrayList<>();

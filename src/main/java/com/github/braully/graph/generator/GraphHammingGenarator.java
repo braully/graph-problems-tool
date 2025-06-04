@@ -54,12 +54,92 @@ public class GraphHammingGenarator extends GraphGeneratorCartesianProduct {
         UndirectedSparseGraphTO<Integer, Integer> kq = kgenerator.generate(q);
         UndirectedSparseGraphTO graph = kq.clone();
 
-        for (int i = 1; i < d; i++) {
-            graph = this.cartesianProduct(graph, kq);
+        List<String> labels = new ArrayList<>();
+        List<String> labelsaux = new ArrayList<>();
+
+        for (int i = 0; i < q; i++) {
+            labels.add("" + i);
         }
+
+        for (int i = 1; i < d; i++) {
+//            graphs[i] =  kq.clone();
+            graph = this.cartesianProduct(graph, kq);
+            for (String lbl : labels) {
+                for (int j = 0; j < q; j++) {
+                    labelsaux.add(lbl + "," + j);
+        }
+            }
+            List aux = labels;
+            labels = labelsaux;
+            labelsaux = aux;
+            aux.clear();
+
+        }
+        graph.setLabels(labels);
+
+//        UndirectedSparseGraphTO graph = this.cartesianProduct(graphs);
         graph.setName("H(" + d + "," + q + ")");
+//        System.out.println("Labels: " + labels);
+//        for (Integer v : (List<Integer>) graph.getVertices()) {
+//            System.out.println(v + ": " + labels.get(v.intValue()));
+//        }
         return graph;
     }
+    //    UndirectedSparseGraphTO<Integer, Integer> cartesianProduct(UndirectedSparseGraphTO<Integer, Integer>...graphs) {
+    //        int nvertices0 = graph0.getVertexCount();
+    //        int nvertices1 = graph1.getVertexCount();
+    //
+    //        // We order the vertices of the cartesian product by each element aij = (vi, uj) as its vertexes, a pair of vi in G and uj in H
+    //        // To know (vi, uj) from aij, vi = aij/nvertices1, uj = aij%nvertices1
+    //        // To know aij from (vi, uj), aij = vi*nvertices1 + uj
+    //        int nvertices = nvertices0 * nvertices1;
+    //
+    //        UndirectedSparseGraphTO<Integer, Integer> graph = new UndirectedSparseGraphTO<>();
+    //        graph.setName("G x H");
+    //
+    //        List<Integer> vertexElegibles = new ArrayList<>(nvertices);
+    //        Integer[] vertexs = new Integer[nvertices];
+    //        for (int i = 0; i < nvertices; i++) {
+    //            vertexElegibles.add(i);
+    //            vertexs[i] = i;
+    //            graph.addVertex(vertexs[i]);
+    //        }
+    //
+    //        List<Integer> edges0 = new ArrayList<>();
+    //        edges0.addAll((Collection<Integer>) graph0.getEdges());
+    //        List<Integer> edges1 = new ArrayList<>();
+    //        edges1.addAll((Collection<Integer>) graph1.getEdges());
+    //
+    //        int edge_count = 0;
+    //
+    //        // For each edge (vi, vj) in G, make (aim, ajm) for m from 0 to nvertices1
+    //        for (Integer e : edges0) {
+    //            Pair p = (Pair) graph0.getEndpoints(e);
+    //            int i = (int) p.getFirst();
+    //            int j = (int) p.getSecond();
+    //
+    //            for (int m = 0; m < nvertices1; m++) {
+    //                int line = i * nvertices1 + m;
+    //                int column = j * nvertices1 + m;
+    //                graph.addEdge(edge_count++, line, column);
+    //            }
+    //        }
+    //
+    //        // For each edge (ui, uj) in H, make (ami, amj) for m from 0 to nvertices0
+    //        for (Integer e : edges1) {
+    //            Pair p = (Pair) graph1.getEndpoints(e);
+    //            int i = (int) p.getFirst();
+    //            int j = (int) p.getSecond();
+    //
+    //            for (int m = 0; m < nvertices0; m++) {
+    //                int line = m * nvertices1 + i;
+    //                int column = m * nvertices1 + j;
+    //                graph.addEdge(edge_count++, line, column);
+    //            }
+    //        }
+    //
+    //        return graph;
+    //    }
 
     public static void main(String... args) {
         GraphHammingGenarator hm = new GraphHammingGenarator();
